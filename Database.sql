@@ -26,7 +26,7 @@ CREATE TABLE Utente(
 
 CREATE TABLE UtentePremium(
     Emailutente VARCHAR(30) PRIMARY KEY,
-    InizioAbbonamento date,
+    InizioAbbonamento Date,
     FineAbbonamento Date,
     Costo DOUBLE(10,6),
     NumSondaggi INT,
@@ -41,9 +41,7 @@ CREATE TABLE Sondaggio(
     DataChiusura Date,
     DataCreazione Date,
     ArgomentoDominio VARCHAR(30),
-    EmailPremium VARCHAR(30),
-    FOREIGN KEY (ArgomentoDominio) REFERENCES Dominio(Argomento),
-    FOREIGN KEY (EmailPremium) REFERENCES UtentePremium(EmailUtente)
+    EmailPremium VARCHAR(30)
 ) ENGINE = "INNODB";
 
 CREATE TABLE DomandaAperta(
@@ -51,26 +49,14 @@ CREATE TABLE DomandaAperta(
     Testo VARCHAR(30),
     Punteggio INT,
     Foto VARCHAR(50),
-    MaxCaratteri INT,
-    CodiceSondaggio INT,
-    CodiceAzienda VARCHAR(30),
-    EmailPremium VARCHAR(30),
-	FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice),
-    FOREIGN KEY (CodiceAzienda) REFERENCES Azienda(CodiceFiscale),
-    FOREIGN KEY (EmailPremium) REFERENCES UtentePremium(EmailUtente)
+    MaxCaratteri INT
 ) ENGINE = "INNODB";
 
 CREATE TABLE DomandaChiusa(
     Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Testo VARCHAR(30),
     Punteggio INT,
-    Foto VARCHAR(50),
-    CodiceSondaggio INT,
-    CodiceAzienda VARCHAR(30) NOT NULL,
-    EmailPremium VARCHAR(30),
-	FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice),
-    FOREIGN KEY (CodiceAzienda) REFERENCES Azienda(CodiceFiscale),
-    FOREIGN KEY (EmailPremium) REFERENCES UtentePremium(EmailUtente)
+    Foto VARCHAR(50)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Opzione(
@@ -84,21 +70,15 @@ CREATE TABLE Opzione(
 CREATE TABLE RispostaChiusa(
     Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Testo VARCHAR(30),
-    NumeroOpzione INT,
     IdDomanda INT,
-    EmailUtente VARCHAR(30),
-	FOREIGN KEY (NumeroOpzione) REFERENCES Opzione(Numero),
-    FOREIGN KEY (IdDomanda) REFERENCES DomandaChiusa(Id),
-    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
+    EmailUtente VARCHAR(30)
 ) ENGINE = "INNODB";
 
 CREATE TABLE RispostaAperta(
     Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Testo VARCHAR(30),
     IdDomanda INT,
-    EmailUtente VARCHAR(30),
-    FOREIGN KEY (IdDomanda) REFERENCES DomandaAperta(Id),
-    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
+    EmailUtente VARCHAR(30)
 ) ENGINE = "INNODB";
 
 CREATE TABLE InserimentoAziendale(
@@ -118,11 +98,28 @@ CREATE TABLE CreazioneAziendale(
     FOREIGN KEY (CodiceAzienda) REFERENCES Azienda(CodiceFiscale)
 ) ENGINE = "INNODB";
 
+CREATE TABLE InserimentoPremium(
+    IdDomanda INT,
+    EmailUtentePremium VARCHAR(30),
+    PRIMARY KEY (IdDomanda, EmailUtentePremium),
+    FOREIGN KEY (IdDomanda) REFERENCES DomandaAperta(Id),
+    FOREIGN KEY (IdDomanda) REFERENCES DomandaChiusa(Id),
+	FOREIGN KEY (EmailUtentePremium) REFERENCES UtentePremium(EmailUtente)
+) ENGINE = "INNODB";
+
+CREATE TABLE CreazionePremium(
+    EmailUtentePremium VARCHAR(30),
+    CodiceSondaggio INT,
+    PRIMARY KEY (CodiceSondaggio, EmailUtentePremium),
+    FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice),
+    FOREIGN KEY (EmailUtentePremium) REFERENCES UtentePremium(EmailUtente)
+) ENGINE = "INNODB";
+
 CREATE TABLE Invito(
     Codice INT PRIMARY KEY,
     CodiceSondaggio INT,
     Esito ENUM ('ACCETTATO', 'RIFIUTATO'),
-    FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice)
+    EmailUtente VARCHAR(30)
 ) ENGINE = "INNODB";
 
 CREATE TABLE UtenteAmministratore(
@@ -135,15 +132,14 @@ CREATE TABLE Premio(
     Descrizione TEXT,
     Foto VARCHAR(30),
     PuntiMin INT,
-    EmailAdmin VARCHAR(30),
-    FOREIGN KEY (EmailAdmin) REFERENCES UtenteAmministratore(EmailUtente)
+    EmailAdmin VARCHAR(30)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Vincita(
     EmailUtente VARCHAR(30),
     NomePremio VARCHAR(30),
     DataVincita Date,
-    PRIMARY KEY(EmailUtente, NomePremio, DataVincita),
+    PRIMARY KEY(EmailUtente, NomePremio),
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email),
     FOREIGN KEY (NomePremio) REFERENCES Premio(Nome)
 ) ENGINE = "INNODB";
@@ -157,10 +153,65 @@ CREATE TABLE Ricezione(
 ) ENGINE = "INNODB";
 
 CREATE TABLE RispostaInvito(
-    CodiceInvito INT,
+    CodiceInvito INT PRIMARY KEY,
     EmailUtente VARCHAR(30),
     Esito ENUM ('ACCETTATO', 'RIFIUTATO'),
-    PRIMARY KEY(EmailUtente, CodiceInvito),
-    FOREIGN KEY (CodiceInvito) REFERENCES Invito(Codice),
+    FOREIGN KEY (CodiceInvito) REFERENCES Invito(Codice)
+) ENGINE = "INNODB";
+
+CREATE TABLE Associazione(
+    CodiceSondaggio INT,
+    EmailUtente VARCHAR(30),
+    PRIMARY KEY(EmailUtente, CodiceSondaggio),
+    FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice),
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
+
+CREATE TABLE Composizione(
+    CodiceSondaggio INT,
+    IdDomanda INT,
+    PRIMARY KEY(IdDomanda, CodiceSondaggio),
+    FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice),
+    FOREIGN KEY (IdDomanda) REFERENCES DomandaChiusa(Id),
+	FOREIGN KEY (IdDomanda) REFERENCES DomandaAperta(Id)
+) ENGINE = "INNODB";
+
+CREATE TABLE Selezione(
+    IdRisposta INT,
+    NumeroOpzione INT,
+    PRIMARY KEY(IdRisposta, NumeroOpzione),
+    FOREIGN KEY (IdRisposta) REFERENCES RispostaChiusa(Id),
+    FOREIGN KEY (NumeroOpzione) REFERENCES Opzione(Numero)
+) ENGINE = "INNODB";
+
+CREATE TABLE Interessamento(
+    Argomento VARCHAR(30),
+    EmailUtente VARCHAR(30),
+    PRIMARY KEY(Argomento, EmailUtente),
+    FOREIGN KEY (Argomento) REFERENCES Dominio(Argomento),
+    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
+) ENGINE = "INNODB";
+
+#Insercisci risposta sondaggio
+DELIMITER $
+CREATE PROCEDURE InserisciRispostaAperta (IN Testo VARCHAR(30), IdDomanda INT, EmailUtente VARCHAR(30))
+BEGIN
+	INSERT INTO RispostaAperta VALUES (Testo,IdDomanda,EmailUtente);
+END
+$ DELIMITER ;
+
+#Visualizza lista sondaggi
+DELIMITER $
+CREATE PROCEDURE VisualizzaSondaggi (IN EmailUtente VARCHAR(30),OUT CodiceSondaggi)
+BEGIN
+DECLARE email INT;
+DECLARE codice INT;
+DECLARE numeromutui INT;
+SET email = (SELECT COUNT(*) FROM CLIENTE WHERE (CLIENTE.Email=EmailCliente));
+SET codice = (SELECT COUNT(*) FROM IMMOBILE WHERE (IMMOBILE.Codice=CodiceImmobile));
+SET numeromutui = (SELECT COUNT(*) FROM MUTUO WHERE (MUTUO.EmailCliente=EmailCliente));
+IF (email > 0) AND (codice > 0) AND (numeromutui < 1) THEN
+	INSERT INTO MUTUO VALUES (CodiceMutuo,EmailCliente,CodiceImmobile,NOW(),ImportoTotale,"APERTO");
+END IF;
+END
+$ DELIMITER ;
