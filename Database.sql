@@ -1,7 +1,7 @@
-DROP DATABASE IF EXISTS EForm;
-CREATE DATABASE EForm;
+DROP DATABASE IF EXISTS PollDB;
+CREATE DATABASE PollDB;
 
-USE EForm;
+USE PollDB;
 
 CREATE TABLE Dominio(
     Argomento VARCHAR(30) PRIMARY KEY,
@@ -200,18 +200,3 @@ BEGIN
 END
 $ DELIMITER ;
 
-#Visualizza lista sondaggi
-DELIMITER $
-CREATE PROCEDURE VisualizzaSondaggi (IN EmailUtente VARCHAR(30),OUT CodiceSondaggi)
-BEGIN
-DECLARE email INT;
-DECLARE codice INT;
-DECLARE numeromutui INT;
-SET email = (SELECT COUNT(*) FROM CLIENTE WHERE (CLIENTE.Email=EmailCliente));
-SET codice = (SELECT COUNT(*) FROM IMMOBILE WHERE (IMMOBILE.Codice=CodiceImmobile));
-SET numeromutui = (SELECT COUNT(*) FROM MUTUO WHERE (MUTUO.EmailCliente=EmailCliente));
-IF (email > 0) AND (codice > 0) AND (numeromutui < 1) THEN
-	INSERT INTO MUTUO VALUES (CodiceMutuo,EmailCliente,CodiceImmobile,NOW(),ImportoTotale,"APERTO");
-END IF;
-END
-$ DELIMITER ;
