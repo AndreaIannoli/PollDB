@@ -16,10 +16,11 @@ CREATE TABLE Azienda(
 ) ENGINE = "INNODB";
 
 CREATE TABLE Utente(
-    Email VARCHAR(30) PRIMARY KEY,
+    Email VARCHAR(30) NOT NULL PRIMARY KEY,
+    Pass CHAR(64) NOT NULL,
     Nome VARCHAR(30),
     Cognome VARCHAR(30),
-    Anno INT,
+    DataDiNascita DATE,
     LuogoNascita VARCHAR(30),
     TotaleBonus INT
 ) ENGINE = "INNODB";
@@ -44,19 +45,39 @@ CREATE TABLE Sondaggio(
     EmailPremium VARCHAR(30)
 ) ENGINE = "INNODB";
 
+CREATE TABLE Domanda(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    Testo VARCHAR(200) NOT NULL
+    
+) ENGINE = "INNODB";
+
+CREATE TABLE Punteggio(
+	IdDomanda INT NOT NULL PRIMARY KEY,
+    Punteggio INT NOT NULL,
+    
+    FOREIGN KEY(IdDomanda) REFERENCES Domanda(Id)
+) ENGINE = "INNODB";
+
+CREATE TABLE Foto(
+	IdDomanda INT NOT NULL PRIMARY KEY,
+    UrlFoto VARCHAR(100) NOT NULL,
+    
+    FOREIGN KEY(IdDomanda) REFERENCES Domanda(Id)
+) ENGINE = "INNODB";
+
 CREATE TABLE DomandaAperta(
-    Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    Testo VARCHAR(30),
-    Punteggio INT,
-    Foto VARCHAR(50),
-    MaxCaratteri INT
+    Id INT NOT NULL PRIMARY KEY,
+    Testo VARCHAR(200) NOT NULL,
+    MaxCaratteri INT,
+    
+    FOREIGN KEY(Id) REFERENCES Domanda(Id)
 ) ENGINE = "INNODB";
 
 CREATE TABLE DomandaChiusa(
-    Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    Testo VARCHAR(30),
-    Punteggio INT,
-    Foto VARCHAR(50)
+    Id INT NOT NULL PRIMARY KEY,
+    Testo VARCHAR(200) NOT NULL,
+    
+    FOREIGN KEY(Id) REFERENCES Domanda(Id)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Opzione(
@@ -78,7 +99,10 @@ CREATE TABLE RispostaAperta(
     Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Testo VARCHAR(30),
     IdDomanda INT,
-    EmailUtente VARCHAR(30)
+    EmailUtente VARCHAR(30),
+    
+    FOREIGN KEY (IdDomanda) REFERENCES DomandaAperta(Id),
+    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
 CREATE TABLE InserimentoAziendale(
@@ -198,5 +222,30 @@ CREATE PROCEDURE InserisciRispostaAperta (IN Testo VARCHAR(30), IdDomanda INT, E
 BEGIN
 	INSERT INTO RispostaAperta VALUES (Testo,IdDomanda,EmailUtente);
 END
-$ DELIMITER ;
+$
+DELIMITER ;
 
+#Inserimento nuovo utente
+DELIMITER $
+CREATE PROCEDURE RegistrazioneUtenteSemplice (IN Email VARCHAR(30), Pass CHAR(64), Nome VARCHAR(30), Cognome VARCHAR(30), DataDiNascita DATE, LuogoDiNascita VARCHAR(30), TotaleBonus INT)
+BEGIN
+	INSERT INTO Utente VALUES (Email , sha2(Pass, 256), Nome, Cognome, DataDiNascita, LuogoDiNascita, TotaleBonus);
+END
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE CheckEmail (IN Email_Inserita VARCHAR(30))
+BEGIN
+	SELECT count(*) AS Counter FROM Utente WHERE(Email = Email_Inserita);
+END
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE CheckCredentials (IN Email_Inserita VARCHAR(30), Pass_Inserita VARCHAR(100))
+BEGIN
+	SELECT count(*) AS Authorized FROM Utente WHERE(Email = Email_Inserita  AND Pass_Inserita = (SELECT Pass FROM Utente WHERE(Email = Email_Inserita)));
+END 
+$
+DELIMITER ;
