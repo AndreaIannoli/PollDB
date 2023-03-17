@@ -22,55 +22,6 @@ body{
     justify-content: center;
 }
 
-/* ===== Buttons Css ===== */
-.primary-btn {
-    background: blue;
-    color: white;
-    box-shadow: black;
-}
-.active.primary-btn, .primary-btn:hover, .primary-btn:focus {
-    background: black;
-    color: white;
-    box-shadow: white;
-}
-.deactive.primary-btn {
-    background: gray;
-    color: black;
-    pointer-events: none;
-}
-
-.primary-btn-outline {
-    border-color: #864068;
-    color: #864068;
-}
-.active.primary-btn-outline, .primary-btn-outline:hover, .primary-btn-outline:focus {
-    background: white;
-    color: #864068;
-}
-.deactive.primary-btn-outline {
-    color: black;
-    border-color: gray;
-    pointer-events: none;
-}
-
-.navbar-one .navbar .navbar-btn ul li a.primary-btn-outline {
-    border-color: white;
-    color: white;
-}
-.navbar-one .navbar .navbar-btn ul li a.primary-btn-outline:hover {
-    background-color: white;
-    color: blue;
-}
-.navbar-one .navbar .navbar-btn ul li a.primary-btn {
-    background-color: white;
-    color: blue;
-    border-color: white;
-}
-.navbar-one .navbar .navbar-btn ul li a.primary-btn:hover {
-    background-color: transparent;
-    color: white;
-}
-
 #logo{
     width: 70% !important;
     margin-top: 20px;
