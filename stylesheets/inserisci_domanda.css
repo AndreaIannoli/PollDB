@@ -14,3 +14,11 @@
 #main{
     margin-bottom: 10%;
 }
+
+#bloccoOpzioni{
+    display: none;
+}
+
+.opzione{
+    margin-top: 5px;
+}
