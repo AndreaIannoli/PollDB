@@ -16,7 +16,7 @@
     $host = "localhost:3306";
     $dbName = "PollDB";
     $username = "root";
-    $pass = "Gabrieletech01";
+    $pass = "";
     try {
         $pdo = new PDO('mysql:host='.$host.';dbname='.$dbName, $username, $pass);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
