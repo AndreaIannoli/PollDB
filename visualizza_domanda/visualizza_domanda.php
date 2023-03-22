@@ -12,6 +12,32 @@
   </head>
   <body>
 
+  <?php
+    $host = "localhost:3306";
+    $dbName = "PollDB";
+    $username = "root";
+    $pass = "Gabrieletech01";
+    try {
+        $pdo = new PDO('mysql:host='.$host.';dbname='.$dbName, $username, $pass);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (PDOException $e) {
+        echo("[ERRORE] Connessione al DB non riuscita. Errore: " . $e->getMessage());
+        throw $e;
+    }
+
+    $IdDomanda = 17; #bisogna inserire l'id passato nell'url
+    $tipologia = "APERTA";
+
+    $sql="SELECT * FROM RispostaAperta WHERE IdDomanda='$IdDomanda'";
+    $res=$pdo->query($sql);
+    if ($res->rowCount() > 0) {
+      $tipologia = "APERTA";
+    } else {
+      $tipologia = "CHIUSA";
+    }
+
+  ?>
+
     <!--====== NAVBAR ONE PART START ======-->
     <section class="navbar-area navbar-one">
       <div class="container">
@@ -95,30 +121,59 @@
         <div class="row">
           <div class="col-5 col-sm-5 col-md-3 col-lg-2">
             <div class="tag">
-              <p class="t3">Id: 3456132</p>
+              <p class="t3">
+                <?php
+                  echo $IdDomanda;
+                ?>
+              </p>
             </div>
           </div>
           <div class="col-5 col-sm-5 col-md-3 col-lg-2">
             <div class="tag">
-              <p class="t3">Punteggio: 100 <i class="bi bi-coin"></i></p>
+              <p class="t3">
+              <?php
+                $sql="SELECT Punteggio FROM Domanda WHERE Id='$IdDomanda'";
+                $res=$pdo->query($sql);
+                $row = $res->fetch();
+                $punteggio = $row['Punteggio'];
+                echo $punteggio;
+                ?>
+              <i class="bi bi-coin"></i></p>
             </div>
           </div>
         </div>
 
         <div class="box question">
           <h4 class="t2">Domanda:</h4  >
-          <p class="t2">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+          <p class="t2">
+            <?php
+              $sql="SELECT Testo FROM Domanda WHERE Id='$IdDomanda'";
+              $res=$pdo->query($sql);
+              $row = $res->fetch();
+              $testo = $row['Testo'];
+              echo $testo;
+            ?>
+          </p>
         </div>
 
-        <div class="box answer">
-          <h4 class="t2">Risposta:</h4  >
-          <p class="t2">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
-        </div>
+        <?php
+          if($tipologia == 'APERTA'){
+            $sql="SELECT Testo FROM RispostaAperta WHERE IdDomanda='$IdDomanda'";
+          }else{
+            $sql="SELECT Testo FROM RispostaChiusa WHERE IdDomanda='$IdDomanda'";
+          }
+          $res=$pdo->query($sql);
+          foreach($res as $row) {
+            echo '<div class="box answer">';
+            echo '<h4 class="t2">Risposta:</h4>';
+            echo '<p class="t2">' . $row["Testo"] . '</p>';
+            echo '</div>';
+          }
+        ?>
 
-        <div class="box answer">
-          <h4 class="t2">Risposta:</h4  >
-          <p class="t2">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
-        </div>
+        
+
+        
 
         <div class="floating" style="color:white"><button type="button" class="btn bfloat" data-bs-toggle="modal" data-bs-target="#inseriscirisposta"><i class="bi bi-plus ifloat"></i></button></div>
 
