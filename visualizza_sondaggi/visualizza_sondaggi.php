@@ -12,6 +12,23 @@
   </head>
   <body>
 
+  <?php
+    $host = "localhost:3306";
+    $dbName = "PollDB";
+    $username = "root";
+    $pass = "PollDB";
+    try {
+        $pdo = new PDO('mysql:host='.$host.';dbname='.$dbName, $username, $pass);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (PDOException $e) {
+        echo("[ERRORE] Connessione al DB non riuscita. Errore: " . $e->getMessage());
+        throw $e;
+    }
+
+    $emailUtente = "Email";
+
+  ?>
+
     <!--====== NAVBAR ONE PART START ======-->
     <section class="navbar-area navbar-one">
         <div class="container">
@@ -92,25 +109,22 @@
         <h1 class="t3">I tuoi sondaggi</h1>
         <p class="t3" style="margin-bottom: 8%;">Visualizza la lista dei sondaggi a cui hai partecipato, assieme alla lista di domande e le loro relative risposte. Non perderti mai nessuna informazione e resta aggiornato sui risultati dei sondaggi!</p>
 
-        <div class="box answer">
-            <h4 class="t2">Sondaggio 1:</h4  >
-            <p class="t2">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
-            <p class="info">Creazione: 12/07/2022</p>
-            <p class="info">Scadenza: 15/08/2022</p>
-            <p class="info">Max utenti: 150</p>
-            <a href="../visualizza_domanda/visualizza_domanda.html"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>
-          </div>
 
-          <div class="box answer">
-            <h4 class="t2">Sondaggio 2:</h4  >
-            <p class="t2">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
-            <p class="info">Creazione: 12/07/2022</p>
-            <p class="info">Scadenza: 15/08/2022</p>
-            <p class="info">Max utenti: 150</p>
-            <button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button>
-          </div>
+        <?php
+          $sql="SELECT MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailPremium='$emailUtente'";
+          $res=$pdo->query($sql);
+          foreach($res as $row) {
+            echo '<div class="box answer">';
+            echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
+            # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
+            echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
+            echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
+            echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
+            echo '<a href="../visualizza_domanda/visualizza_domanda.html"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+            echo '</div>';
+          }
+        ?>
          
-
     </div>
       
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
