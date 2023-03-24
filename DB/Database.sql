@@ -180,8 +180,7 @@ CREATE TABLE Composizione(
     IdDomanda INT,
     PRIMARY KEY(IdDomanda, CodiceSondaggio),
     FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice),
-    FOREIGN KEY (IdDomanda) REFERENCES DomandaChiusa(Id),
-	FOREIGN KEY (IdDomanda) REFERENCES DomandaAperta(Id)
+    FOREIGN KEY (IdDomanda) REFERENCES Domanda(Id)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Selezione(

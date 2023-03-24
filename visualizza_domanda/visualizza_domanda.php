@@ -25,9 +25,11 @@
         throw $e;
     }
 
+
     $emailUtente = "prova@prova.com";
-    $IdDomanda = 19; #bisogna inserire l'id passato nell'url
+    $IdDomanda = $_GET['IdDomanda']; #bisogna inserire l'id passato nell'url
     $tipologia = "CHIUSA";
+
 
     $sql="SELECT * FROM RispostaAperta WHERE IdDomanda='$IdDomanda'";
     $res=$pdo->query($sql);

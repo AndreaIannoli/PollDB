@@ -25,7 +25,9 @@
         throw $e;
     }
 
-    $emailUtente = "Email";
+    $CodiceSondaggio = $_GET['CodiceSondaggio']; 
+    $TitoloSondaggio = $_GET['titoloSondaggio']; 
+
 
   ?>
 
@@ -106,23 +108,27 @@
     <!--====== NAVBAR ONE PART ENDS ======-->
     
     <div class="container box2">
-        <h1 class="t3">I tuoi sondaggi</h1>
-        <p class="t3" style="margin-bottom: 8%;">Visualizza la lista dei sondaggi a cui hai partecipato, assieme alla lista di domande e le loro relative risposte. Non perderti mai nessuna informazione e resta aggiornato sui risultati dei sondaggi!</p>
+        <h1 class="t3">
+            <?php
+                echo $TitoloSondaggio;
+            ?>
+        </h1>
+        <p class="t3" style="margin-bottom: 8%;">Visualizza la lista delle domande di questo sondaggio. Non perderti mai nessuna informazione e resta aggiornato sui risultati dei sondaggi!</p>
 
 
         <?php
-          $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailPremium='$emailUtente'";
+          $sql="SELECT IdDomanda FROM Composizione WHERE CodiceSondaggio='$CodiceSondaggio'";
           $res=$pdo->query($sql);
           foreach($res as $row) {
-            $CodiceSondaggio = $row["Codice"];
-            $titoloSondaggio = $row["Titolo"];
+            $iddomanda = $row["IdDomanda"];
+            $sql="SELECT Id, Testo, Punteggio FROM Domanda WHERE Id='$iddomanda'";
+            $res=$pdo->query($sql);
+            $row2 = $res->fetch();
             echo '<div class="box answer">';
-            echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
-            # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
-            echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
-            echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
-            echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
-            echo '<a href="../visualizza_domande/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+            echo '<h4 class="t2">Domanda: ' . $row2["Id"] . '</h4>';
+            echo '<p class="t2">' . $row2["Testo"] . '</p>';
+            echo '<p class="info"> Punteggio: ' . $row2["Punteggio"] .  '</p>';
+            echo '<a href="../visualizza_domanda/visualizza_domanda.php?IdDomanda=' . $iddomanda . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
             echo '</div>';
           }
         ?>
