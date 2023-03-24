@@ -235,3 +235,10 @@ BEGIN
 END
 $ DELIMITER ;
 
+#Insercisci risposta chiusa domanda 
+DELIMITER $
+CREATE PROCEDURE InserisciRispostaChiusa (IN Testo VARCHAR(200), IdDomanda INT, EmailUtente VARCHAR(50))
+BEGIN
+	INSERT INTO RispostaChiusa (Testo, IdDomanda, EmailUtente)  VALUES (Testo, IdDomanda, EmailUtente);
+END
+$ DELIMITER ;
