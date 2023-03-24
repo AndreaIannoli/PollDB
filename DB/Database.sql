@@ -227,3 +227,11 @@ BEGIN
 END
 $ DELIMITER ;
 
+#i caratteri massimi di risposta dovrebbero essere a discrezione di chi fa la domanda
+DELIMITER $
+CREATE PROCEDURE InserisciRispostaAperta (IN Testo VARCHAR(200), IdDomanda INT, EmailUtente VARCHAR(50))
+BEGIN
+	INSERT INTO RispostaAperta (Testo, IdDomanda, EmailUtente)  VALUES (Testo, IdDomanda, EmailUtente);
+END
+$ DELIMITER ;
+
