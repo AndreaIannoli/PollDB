@@ -26,8 +26,8 @@
     }
 
     $emailUtente = "prova@prova.com";
-    $IdDomanda = 13; #bisogna inserire l'id passato nell'url
-    $tipologia = "APERTA";
+    $IdDomanda = 19; #bisogna inserire l'id passato nell'url
+    $tipologia = "CHIUSA";
 
     $sql="SELECT * FROM RispostaAperta WHERE IdDomanda='$IdDomanda'";
     $res=$pdo->query($sql);
@@ -187,7 +187,20 @@
           <form action="inserisci_risposta.php" method="post">
             <div class="mb-3">
                 <label for="recipient-name" class="col-form-label">Testo della risposta:</label>
-                <textarea class="form-control" rows="3" name="testoRisposta"></textarea>
+                <?php
+                  if($tipologia == "APERTA"){
+                    echo '<textarea class="form-control" rows="3" name="testoRisposta"></textarea>';
+                  }else{
+                    $sql="SELECT Testo FROM Opzione WHERE IdDomanda='$IdDomanda'";
+                    $res=$pdo->query($sql);
+                    foreach($res as $row) {
+                      echo '<div class="form-check">';
+                      echo '<input class="form-check-input" type="checkbox" name="selections[]" value="' . $row["Testo"] . '">';
+                      echo $row["Testo"];
+                      echo '</div>';                      
+                    }
+                  }
+                ?>
             </div>
           </div>
           <div class="modal-footer">

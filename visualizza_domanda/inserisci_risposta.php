@@ -14,10 +14,11 @@
 
    #Questi paramentri sono statici ma dovremmo prenderli dalla pagina visualizza_domanda 
     $emailUtente = "Email";
-    $IdDomanda = 13; #bisogna inserire l'id passato nell'url
-    $tipologia = "APERTA";
+    $IdDomanda = 19; #bisogna inserire l'id passato nell'url
+    $tipologia = "CHIUSA";
 
     $testoRisposta = $_POST['testoRisposta'];
+    $selections = $_POST['selections'];
 
 
     if ($tipologia == 'APERTA') {
@@ -33,8 +34,10 @@
       } else {
   
         try{
-          $sql="CALL InserisciDomandaChiusa('$testoRisposta', '$IdDomanda', '$emailUtente')";
-          $res=$pdo->exec($sql);
+            foreach($selections as $selection) {
+                $sql="CALL InserisciRispostaChiusa('$selection', '$IdDomanda', '$emailUtente')";
+                $res=$pdo->exec($sql);                
+            }
         } catch (PDOException $e) {
           echo("Abbiamo un problema: " . $e->getMessage());
           throw $e;
