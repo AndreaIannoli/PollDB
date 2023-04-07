@@ -371,7 +371,7 @@ $
 DELIMITER ;
 
 DELIMITER $
-CREATE PROCEDURE DenyInvito (IN CodiceSondaggio ,)
+CREATE PROCEDURE DenyInvito (IN CodiceSondaggio)
 BEGIN
 	SELECT * FROM Notifica;
 END 
