@@ -1,0 +1,58 @@
+.logo{
+    width: 10%;
+}
+
+.box2{
+    padding: 5% 10% 10% 10%;
+}
+
+.answer{
+    background-color: black;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.info{
+    display: inline-block;
+    color: #9740EF;
+    margin-right: 20px;
+}
+
+body{
+    background-color: white !important;
+}
+
+.t2{
+    color: white;
+}
+
+.t1{
+    color: white;
+    margin: 0px !important;
+    font-size: 11px;
+}
+.t3{
+    color: black;
+}
+
+.box{
+    padding: 30px;
+}
+
+.button1{
+    background-color: #9740EF !important;
+    color: white;
+}
+
+.buttonclose{
+    background-color: #1E1E2C !important;
+    color: white;
+}
+
+
+@media only screen and (max-width: 600px) {
+    .logo{
+        width: 40% !important;
+    }
+  }

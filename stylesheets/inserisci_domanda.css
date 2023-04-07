@@ -1,0 +1,24 @@
+.logo{
+    width: 10%;
+}
+
+#uploadimage{
+    width: 100%;
+    height: 250px;
+    background-image: url(../img/add_placeholder.png);
+    background-position: center;
+    background-size: cover;
+    border-color: white;
+}
+
+#main{
+    margin-bottom: 10%;
+}
+
+#bloccoOpzioni{
+    display: none;
+}
+
+.opzione{
+    margin-top: 5px;
+}

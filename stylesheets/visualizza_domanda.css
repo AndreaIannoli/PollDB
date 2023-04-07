@@ -1,0 +1,102 @@
+
+body{
+    background-color: black !important;
+}
+
+.logo{
+    width: 10%;
+}
+
+#uploadimage{
+    width: 100%;
+    height: 400px;
+    background-image: url(../img/img1.jpg);
+    background-position: center;
+    background-size: cover;
+    border-color: white;
+}
+
+#main{
+    margin-bottom: 10%;
+}
+
+.tag{
+    background-color: white;
+    text-align: center;
+    vertical-align: middle;
+    border-radius: 20px;
+    padding: 8px;
+}
+
+
+.question{
+    padding-top: 60px !important;
+    padding-left: 0px !important;
+}
+
+.answer{
+    background-color: #9740EF;
+    border-radius: 20px;
+    margin-bottom: 30px;
+}
+
+.bfloat{
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    background-color: #9740EF !important;
+}
+
+.ifloat{
+    color: white;
+}
+
+.floating{
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+}
+
+.t2{
+    color: white;
+}
+
+.t1{
+    color: white;
+    margin: 0px !important;
+    font-size: 11px;
+}
+
+.t3{
+    color: black;
+    margin: 0px !important;
+    font-size: 11px;
+}
+
+.box{
+    padding: 30px;
+}
+
+.button1{
+    background-color: #9740EF !important;
+    color: white;
+}
+
+.buttonclose{
+    background-color: #1E1E2C !important;
+    color: white;
+}
+
+
+@media only screen and (max-width: 600px) {
+    .logo{
+        width: 40% !important;
+    }
+  }
+
+
+
+
+
+
+
