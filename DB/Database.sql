@@ -139,15 +139,8 @@ CREATE TABLE CreazionePremium(
     FOREIGN KEY (EmailUtentePremium) REFERENCES UtentePremium(EmailUtente)
 ) ENGINE = "INNODB";
 
-CREATE TABLE Invito(
-    Codice INT PRIMARY KEY,
-    CodiceSondaggio INT,
-    Esito ENUM ('ACCETTATO', 'RIFIUTATO'),
-    EmailUtente VARCHAR(30)
-) ENGINE = "INNODB";
-
 CREATE TABLE UtenteAmministratore(
-    Emailutente VARCHAR(30) PRIMARY KEY,
+    EmailUtente VARCHAR(30) PRIMARY KEY,
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
@@ -168,19 +161,42 @@ CREATE TABLE Vincita(
     FOREIGN KEY (NomePremio) REFERENCES Premio(Nome)
 ) ENGINE = "INNODB";
 
-CREATE TABLE Ricezione(
-    CodiceInvito INT,
+CREATE TABLE Notifica(
+    Codice INT PRIMARY KEY,
     EmailUtente VARCHAR(30),
-    PRIMARY KEY(EmailUtente, CodiceInvito),
-    FOREIGN KEY (CodiceInvito) REFERENCES Invito(Codice),
+    Data DATE,
+    Archiviata BOOLEAN,
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
+) ENGINE = "INNODB";
+
+CREATE TABLE NotificaPartecipazione(
+	CodiceNotifica INT PRIMARY KEY,
+    EmailUtentePartecipante VARCHAR(30),
+    CodiceSondaggio INT,
+    FOREIGN KEY (CodiceNotifica) REFERENCES Notifica(Codice),
+    FOREIGN KEY (EmailUtentePartecipante) REFERENCES Utente(Email),
+    FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice)
+) ENGINE = "INNODB";
+
+Create TABLE NotificaPremio(
+	CodiceNotifica INT PRIMARY KEY,
+    NomePremio VARCHAR(30),
+    FOREIGN KEY (CodiceNotifica) REFERENCES Notifica(Codice),
+    FOREIGN KEY (NomePremio) REFERENCES Premio(Nome)
+) ENGINE = "INNODB";
+
+CREATE TABLE Invito(
+    CodiceNotifica INT PRIMARY KEY,
+    CodiceSondaggio INT,
+    FOREIGN KEY (CodiceNotifica) REFERENCES Notifica(Codice),
+    FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice)
 ) ENGINE = "INNODB";
 
 CREATE TABLE RispostaInvito(
     CodiceInvito INT PRIMARY KEY,
     EmailUtente VARCHAR(30),
     Esito ENUM ('ACCETTATO', 'RIFIUTATO'),
-    FOREIGN KEY (CodiceInvito) REFERENCES Invito(Codice)
+    FOREIGN KEY (CodiceInvito) REFERENCES Invito(CodiceNotifica)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Associazione(
@@ -245,7 +261,87 @@ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE CheckCredentials (IN Email_Inserita VARCHAR(30), Pass_Inserita VARCHAR(100))
 BEGIN
-	SELECT count(*) AS Authorized FROM Utente WHERE(Email = Email_Inserita  AND Pass_Inserita = (SELECT Pass FROM Utente WHERE(Email = Email_Inserita)));
+	SELECT count(*) AS Authorized FROM Utente WHERE(sha2(Pass_Inserita, 256) = (SELECT Pass FROM Utente WHERE(Email = Email_Inserita)));
+END 
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE SearchDominio (IN Argomento_Inserito VARCHAR(30))
+BEGIN
+	SELECT Argomento FROM Dominio WHERE Argomento LIKE CONCAT('%', Argomento_Inserito,'%');
+END 
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE AddInteressamento (IN Argomento_Inserito VARCHAR(30), Email_Inserita VARCHAR(30))
+BEGIN
+	INSERT INTO Interessamento VALUES (Argomento_Inserito, Email_Inserita);
+END 
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE RemoveInteressamento (IN Argomento_Inserito VARCHAR(30), Email_Inserita VARCHAR(30))
+BEGIN
+	DELETE FROM Interessamento WHERE(EmailUtente=Email_Inserita AND Argomento=Argomento_Inserito);
+END 
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE GetUserInteressamento (IN Email_Inserita VARCHAR(30))
+BEGIN
+	SELECT Argomento FROM Interessamento WHERE(EmailUtente=Email_Inserita);
+END 
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE GetDominio ()
+BEGIN
+	SELECT * FROM Dominio;
+END 
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE GetUserNotifica (IN Email_Inserita VARCHAR(30))
+BEGIN
+	SELECT * FROM Notifica WHERE(EmailUtente = Email_Inserita AND Archiviata = false);
+END 
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE GetInvito (IN Codice_Inserito VARCHAR(30))
+BEGIN
+	SELECT * FROM Invito WHERE(CodiceNotifica=Codice_Inserito);
+END
+$
+DELIMITER;
+
+DELIMITER $
+CREATE PROCEDURE AddInvito (IN Email_Inserita VARCHAR(30))
+BEGIN
+	SELECT * FROM Notifica;
+END 
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE AcceptInvito (IN Email_Inserita VARCHAR(30))
+BEGIN
+	SELECT * FROM Notifica;
+END 
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE DenyInvito (IN CodiceSondaggio ,)
+BEGIN
+	SELECT * FROM Notifica;
 END 
 $
 DELIMITER ;

@@ -626,6 +626,8 @@ body{
 }
 .navbar-one .navbar .navbar-btn ul {
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .navbar-one .navbar .navbar-btn ul li {
     display: inline-block;
@@ -642,11 +644,11 @@ body{
 }
 .navbar-one .navbar .navbar-btn ul li a.primary-btn-outline:hover {
     background-color: white;
-    color: blue;
+    color: #864068;
 }
 .navbar-one .navbar .navbar-btn ul li a.primary-btn {
     background-color: white;
-    color: blue;
+    color: #864068;
     border-color: white;
 }
 .navbar-one .navbar .navbar-btn ul li a.primary-btn:hover {

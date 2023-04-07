@@ -5,7 +5,7 @@ body{
 }
 
 #login-container{
-    max-width: 400px;
+    max-width: 800px;
     margin-top: 1vw;
     background: white;
     border-radius: 20px;
@@ -19,6 +19,7 @@ body{
 }
 
 /* ===== Buttons Css ===== */
+
 .primary-btn {
     background: blue;
     color: white;
@@ -52,6 +53,7 @@ body{
 /*===========================
   NAVBAR css
 ===========================*/
+
 .navbar-toggler:focus {
     box-shadow: none;
 }
@@ -61,6 +63,7 @@ body{
 }
 
 /*===== NAVBAR ONE =====*/
+
 .navbar-one {
     background: black;
 }
@@ -94,6 +97,7 @@ body{
     transform: rotate(45deg);
     top: 7px;
 }
+
 .navbar-one .navbar .navbar-toggler.active .toggler-icon:nth-of-type(2) {
     opacity: 0;
 }
@@ -253,6 +257,7 @@ body{
         border-radius: 5px !important;
     }
 }
+
 .navbar-one .navbar .navbar-nav .nav-item .sub-menu li a {
     display: flex;
     justify-content: space-between;
@@ -415,4 +420,41 @@ body{
     background-color: black;
     color: white;
     border-color: white;
+}
+
+.btn-square-md {
+    width: 100px !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    height: 100px !important;
+    text-align: center;
+}
+
+#notificationButton{
+    background-color: transparent;
+    border-color: transparent;
+    position: relative;
+}
+
+#navbar-name{
+    color: white;
+    margin: 0 0 0 0;
+}
+
+.profile-container {
+    position: relative;
+    min-width: 60px;
+    min-height: 60px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #288A3E;
+}
+
+.profile-picture {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    clip-path: circle(45%);
 }
