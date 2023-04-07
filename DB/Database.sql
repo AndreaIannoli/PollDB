@@ -232,14 +232,46 @@ CREATE TABLE Interessamento(
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
-#Insercisci risposta sondaggio
+#DROP PROCEDURE InserisciDomandaChiusa
+#Insercisci domanda aperta sondaggio
 DELIMITER $
-CREATE PROCEDURE InserisciRispostaAperta (IN Testo VARCHAR(30), IdDomanda INT, EmailUtente VARCHAR(30))
+CREATE PROCEDURE InserisciDomandaAperta (IN Testo VARCHAR(200), Punteggio INT, Foto VARCHAR(50), MaxCaratteri INT)
 BEGIN
-	INSERT INTO RispostaAperta VALUES (Testo,IdDomanda,EmailUtente);
+	INSERT INTO Domanda (Testo, Punteggio, Foto)  VALUES (Testo, Punteggio, Foto);
+	SET @last_id = LAST_INSERT_ID(); 
+	INSERT INTO DomandaAperta (Id, MaxCaratteri) VALUES (@last_id, MaxCaratteri); 
 END
-$
-DELIMITER ;
+$ DELIMITER ;
+
+#Insercisci domanda chiusa sondaggio
+DELIMITER $
+CREATE PROCEDURE InserisciDomandaChiusa (IN Testo VARCHAR(200), Punteggio INT, Foto VARCHAR(50), Opzione1 VARCHAR(50), Opzione2 VARCHAR(50), Opzione3 VARCHAR(50), Opzione4 VARCHAR(50))
+BEGIN
+	INSERT INTO Domanda (Testo, Punteggio, Foto)  VALUES (Testo, Punteggio, Foto);
+	SET @last_id = LAST_INSERT_ID(); 
+	INSERT INTO DomandaChiusa (Id) VALUES (@last_id); 
+    INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione1, @last_id); 
+	INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione2, @last_id); 
+    INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione3, @last_id); 
+    INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione4, @last_id); 
+END
+$ DELIMITER ;
+
+#i caratteri massimi di risposta dovrebbero essere a discrezione di chi fa la domanda
+DELIMITER $
+CREATE PROCEDURE InserisciRispostaAperta (IN Testo VARCHAR(200), IdDomanda INT, EmailUtente VARCHAR(50))
+BEGIN
+	INSERT INTO RispostaAperta (Testo, IdDomanda, EmailUtente)  VALUES (Testo, IdDomanda, EmailUtente);
+END
+$ DELIMITER ;
+
+#Insercisci risposta chiusa domanda 
+DELIMITER $
+CREATE PROCEDURE InserisciRispostaChiusa (IN Testo VARCHAR(200), IdDomanda INT, EmailUtente VARCHAR(50))
+BEGIN
+	INSERT INTO RispostaChiusa (Testo, IdDomanda, EmailUtente)  VALUES (Testo, IdDomanda, EmailUtente);
+END
+$ DELIMITER ;
 
 #Inserimento nuovo utente
 DELIMITER $
