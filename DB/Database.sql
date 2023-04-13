@@ -161,16 +161,18 @@ CREATE TABLE Vincita(
     FOREIGN KEY (NomePremio) REFERENCES Premio(Nome)
 ) ENGINE = "INNODB";
 
+
 CREATE TABLE Notifica(
-    Codice INT PRIMARY KEY,
+    Codice VARCHAR(36) PRIMARY KEY,
     EmailUtente VARCHAR(30),
     Data DATE,
     Archiviata BOOLEAN,
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
+
 CREATE TABLE NotificaPartecipazione(
-	CodiceNotifica INT PRIMARY KEY,
+	CodiceNotifica VARCHAR(36) PRIMARY KEY,
     EmailUtentePartecipante VARCHAR(30),
     CodiceSondaggio INT,
     FOREIGN KEY (CodiceNotifica) REFERENCES Notifica(Codice),
@@ -179,21 +181,22 @@ CREATE TABLE NotificaPartecipazione(
 ) ENGINE = "INNODB";
 
 Create TABLE NotificaPremio(
-	CodiceNotifica INT PRIMARY KEY,
+	CodiceNotifica VARCHAR(36) PRIMARY KEY,
     NomePremio VARCHAR(30),
     FOREIGN KEY (CodiceNotifica) REFERENCES Notifica(Codice),
     FOREIGN KEY (NomePremio) REFERENCES Premio(Nome)
 ) ENGINE = "INNODB";
 
+
 CREATE TABLE Invito(
-    CodiceNotifica INT PRIMARY KEY,
+    CodiceNotifica varchar(36) PRIMARY KEY,
     CodiceSondaggio INT,
     FOREIGN KEY (CodiceNotifica) REFERENCES Notifica(Codice),
     FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice)
 ) ENGINE = "INNODB";
 
 CREATE TABLE RispostaInvito(
-    CodiceInvito INT PRIMARY KEY,
+    CodiceInvito VARCHAR(36) PRIMARY KEY,
     EmailUtente VARCHAR(30),
     Esito ENUM ('ACCETTATO', 'RIFIUTATO'),
     FOREIGN KEY (CodiceInvito) REFERENCES Invito(CodiceNotifica)
@@ -361,6 +364,198 @@ BEGIN
 END 
 $
 DELIMITER ;
+
+
+
+
+
+
+DELIMITER $
+CREATE PROCEDURE searchUtentePremium(IN email varchar(30))
+BEGIN
+
+	SELECT EmailUtente FROM UtenntePremium WHERE EmailUtente = email;
+
+    
+END
+$ DELIMITER ;
+
+
+  DELIMITER $
+CREATE PROCEDURE searchAzienda(IN email varchar(30))
+BEGIN
+
+	SELECT IndirizzoEmail FROM Azienda WHERE IndirizzoEmail = email;
+
+    
+END
+$ DELIMITER ;
+
+
+
+
+
+DELIMITER $
+CREATE PROCEDURE returnUtenti()
+BEGIN
+
+	SELECT Email FROM Utente;
+    
+END
+$ DELIMITER ;
+
+
+DELIMITER $
+CREATE PROCEDURE returnCodiceNotifica(IN emailutente varchar(30))
+BEGIN
+
+	SELECT Codice FROM Notifica WHERE EmailUtente = emailutente AND Archiviata = 0;
+    
+END
+$ DELIMITER ;
+
+
+
+DELIMITER $
+CREATE PROCEDURE returnCodiceSondaggioInvito(IN codice varchar(36))
+BEGIN
+
+	SELECT CodiceSondaggio FROM Invito WHERE CodiceNotifica = codice;
+    
+END
+$ DELIMITER ;
+
+
+
+
+
+
+DELIMITER $
+CREATE PROCEDURE returnNomeSondaggio(IN codiceS varchar(36))
+BEGIN
+
+	SELECT Titolo FROM Sondaggio WHERE Codice = codiceS;
+    
+END
+$ DELIMITER ;
+
+
+
+DELIMITER $
+CREATE PROCEDURE returnInvitati()
+BEGIN
+
+	SELECT COUNT(*) FROM Utente;
+    
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE creaNotifica(IN email varchar(30))
+BEGIN
+
+
+	INSERT INTO Notifica(EmailUtente, Data, Archiviata) VALUES(email, current_date(), false);
+
+	
+
+
+END
+$ DELIMITER ;
+
+
+DELIMITER $
+CREATE PROCEDURE prendiCodiceNotifica()
+BEGIN
+
+	SELECT CodiceNotifica FROM Notifica  ;
+
+	INSERT INTO Notifica(EmailUtente, Data, Archiviata) VALUES(email, current_date(), false);
+
+
+END
+$ DELIMITER;
+
+DELIMITER $
+CREATE PROCEDURE creaInvito(IN codSondaggio INT, email varchar(30))
+BEGIN
+
+	DECLARE codiceDaInserire varchar(36);
+	set codiceDaInserire = uuid();
+
+	INSERT INTO Notifica(Codice, EmailUtente, Data, Archiviata) VALUES(codiceDaInserire, email, current_date(), false);
+    
+    
+
+	INSERT INTO Invito(CodiceNotifica, CodiceSondaggio) VALUES(codiceDaInserire, codSondaggio);
+
+
+END
+$ DELIMITER;
+
+
+DELIMITER $
+CREATE PROCEDURE returnDomini()
+BEGIN
+
+	SELECT Argomento FROM Dominio;
+    
+
+
+END
+$ DELIMITER ;
+
+
+
+
+DELIMITER $
+CREATE PROCEDURE AggiungiAppartenenza (IN codiceSondaggio int, argomentoDominio varchar(30))
+
+BEGIN 
+
+	INSERT INTO Appartenenza (CodiceSondaggio, ArgomentoDominio) 
+		VALUES (codiceSondaggio, argomentoDominio);
+        
+      
+END
+$
+DELIMITER;
+
+DELIMITER $
+CREATE PROCEDURE SearchCodiceSondaggio (IN titoloSondaggio varchar(30))
+BEGIN
+
+
+	SELECT Codice FROM Sondaggio WHERE (Sondaggio.Titolo = titoloSondaggio);
+    
+
+END 
+$
+DELIMITER ;
+
+
+
+
+
+DELIMITER $
+CREATE PROCEDURE InserisciSondaggio (IN titolo varchar(30),  utentiMax INT, dataChiusura DATE, statoSondaggio varchar(30), emailCreatore varchar(30))
+
+BEGIN 
+
+	INSERT INTO Sondaggio (Titolo, MaxUtenti, DataCreazione, DataChiusura, Stato, EmailPremium) 
+		VALUES (titolo, utentiMax, current_date(), dataChiusura, statoSondaggio, emailCreatore);
+
+	
+END
+$
+DELIMITER ;
+
+
+
+
+
+
+
 
 DELIMITER $
 CREATE PROCEDURE AcceptInvito (IN Email_Inserita VARCHAR(30))
