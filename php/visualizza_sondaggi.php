@@ -13,10 +13,11 @@
   <body>
 
   <?php
-    require 'connectionManager.php';
-    $pdo = connectToDB();
+      require 'connectionManager.php';
 
-    $emailUtente = "email.azienda@email.com";
+      $pdo = connectToDB();
+
+      $emailUtente = "nome.esempio@email.com";
 
 
   try {
@@ -66,13 +67,6 @@
 
   //echo("azienda: ".$azienda);
   //echo("utenteP: ".$utenteP);
-
-
-    require 'connectionManager.php';
-
-    $pdo = connectToDB();
-
-    $emailUtente = "nome.esempio@email.com";
 
   ?>
 
