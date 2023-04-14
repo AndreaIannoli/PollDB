@@ -13,18 +13,8 @@
   <body>
 
   <?php
-<<<<<<< HEAD
-    $host = "localhost:3306";
-    $dbName = "PollDB";
-    $username = "root";
-    $pass = "root";
-    try {
-        $pdo = new PDO('mysql:host='.$host.';dbname='.$dbName, $username, $pass);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
-        echo("[ERRORE] Connessione al DB non riuscita. Errore: " . $e->getMessage());
-        throw $e;
-    }
+    require 'connectionManager.php';
+    $pdo = connectToDB();
 
     $emailUtente = "email.azienda@email.com";
 
@@ -78,13 +68,11 @@
   //echo("utenteP: ".$utenteP);
 
 
-=======
     require 'connectionManager.php';
 
     $pdo = connectToDB();
 
     $emailUtente = "nome.esempio@email.com";
->>>>>>> 599a66b (fix update)
 
   ?>
 
