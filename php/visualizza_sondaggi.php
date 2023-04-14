@@ -16,7 +16,7 @@
     $host = "localhost:3306";
     $dbName = "PollDB";
     $username = "root";
-    $pass = "PollDB";
+    $pass = "root";
     try {
         $pdo = new PDO('mysql:host='.$host.';dbname='.$dbName, $username, $pass);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -25,7 +25,58 @@
         throw $e;
     }
 
-    $emailUtente = "Email";
+    $emailUtente = "email.azienda@email.com";
+
+
+  try {
+      $sql = 'CALL searchAzienda(?)';
+
+      $res = $pdo->prepare($sql);
+
+      $res->bindValue(1, $emailUtente, PDO::PARAM_STR);
+
+      $res->execute();
+
+
+  } catch (PDOException $e){
+      echo 'exception: '.$e;
+  }
+
+
+  $row = $res->fetch();
+
+  $azienda = $row[0];
+
+  $res->closeCursor();
+
+
+
+
+  try {
+      $sql = 'CALL searchUtentePremium(?)';
+      $res = $pdo->prepare($sql);
+
+      $res->bindValue(1, $emailUtente, PDO::PARAM_STR);
+
+      $res->execute();
+
+
+  } catch (PDOException $e){
+      echo 'exception: '.$e;
+  }
+
+
+  $row = $res->fetch();
+
+  $utenteP = $row[0];
+
+  $res->closeCursor();
+
+
+  //echo("azienda: ".$azienda);
+  //echo("utenteP: ".$utenteP);
+
+
 
   ?>
 
@@ -116,14 +167,28 @@
           foreach($res as $row) {
             $CodiceSondaggio = $row["Codice"];
             $titoloSondaggio = $row["Titolo"];
-            echo '<div class="box answer">';
-            echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
-            # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
-            echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
-            echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
-            echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
-            echo '<a href="../visualizza_domande/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
-            echo '</div>';
+              $MaxUtenti = $row["MaxUtenti"];
+
+
+              echo '<div class="box answer">';
+                echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
+                # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
+                echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
+                echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
+                echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
+                echo '<a href="../visualizza_domande/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+
+                if(is_null($azienda)){
+
+                    echo '<a href="invitoUtentePremium.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '&MaxUtenti=' . urlencode($MaxUtenti) . '"><button  type="button" class="btn btn-light">invita</button></a>';
+
+                }else {
+
+                    echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
+
+                }
+
+              echo '</div>';
           }
         ?>
          
