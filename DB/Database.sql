@@ -45,6 +45,16 @@ CREATE TABLE Sondaggio(
     EmailPremium VARCHAR(30)
 ) ENGINE = "INNODB";
 
+CREATE TABLE Appartenenza(
+	CodiceSondaggio INT NOT NULL AUTO_INCREMENT,
+	ArgomentoDominio VARCHAR(30),
+   
+	PRIMARY KEY (CodiceSondaggio, ArgomentoDominio),
+	FOREIGN KEY (CodiceSondaggio) references Sondaggio(Codice),
+	FOREIGN KEY (ArgomentoDominio) references Dominio(Argomento)
+   
+) ENGINE = "INNODB";
+
 CREATE TABLE Domanda(
 	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Testo VARCHAR(200) NOT NULL
@@ -549,13 +559,6 @@ BEGIN
 END
 $
 DELIMITER ;
-
-
-
-
-
-
-
 
 DELIMITER $
 CREATE PROCEDURE AcceptInvito (IN Email_Inserita VARCHAR(30))
