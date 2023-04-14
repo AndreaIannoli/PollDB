@@ -13,6 +13,7 @@
   <body>
 
   <?php
+<<<<<<< HEAD
     $host = "localhost:3306";
     $dbName = "PollDB";
     $username = "root";
@@ -77,6 +78,13 @@
   //echo("utenteP: ".$utenteP);
 
 
+=======
+    require 'connectionManager.php';
+
+    $pdo = connectToDB();
+
+    $emailUtente = "nome.esempio@email.com";
+>>>>>>> 599a66b (fix update)
 
   ?>
 

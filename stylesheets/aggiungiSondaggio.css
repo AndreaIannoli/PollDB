@@ -1,8 +1,7 @@
 body{
-    background-image: url("./img/bg.jpg");
+    background-image: url("../img/bg.jpg");
     background-size: cover;
     background-attachment: fixed;
-
 }
 
 
