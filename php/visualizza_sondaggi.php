@@ -14,60 +14,10 @@
 
   <?php
       require 'connectionManager.php';
-
       $pdo = connectToDB();
-
-      $emailUtente = "nome.esempio@email.com";
-
-
-  try {
-      $sql = 'CALL searchAzienda(?)';
-
-      $res = $pdo->prepare($sql);
-
-      $res->bindValue(1, $emailUtente, PDO::PARAM_STR);
-
-      $res->execute();
-
-
-  } catch (PDOException $e){
-      echo 'exception: '.$e;
-  }
-
-
-  $row = $res->fetch();
-
-  $azienda = $row[0];
-
-  $res->closeCursor();
-
-
-
-
-  try {
-      $sql = 'CALL searchUtentePremium(?)';
-      $res = $pdo->prepare($sql);
-
-      $res->bindValue(1, $emailUtente, PDO::PARAM_STR);
-
-      $res->execute();
-
-
-  } catch (PDOException $e){
-      echo 'exception: '.$e;
-  }
-
-
-  $row = $res->fetch();
-
-  $utenteP = $row[0];
-
-  $res->closeCursor();
-
-
-  //echo("azienda: ".$azienda);
-  //echo("utenteP: ".$utenteP);
-
+      session_start();
+      $emailUtente = $_SESSION['emailLogged'];
+      $type = $_SESSION['type'];
   ?>
 
     <!--====== NAVBAR ONE PART START ======-->
@@ -125,12 +75,12 @@
                         <div class="navbar-btn d-none d-sm-inline-block">
                             <ul>
                                 <li>
-                                    <a class="btn primary-btn-outline" href="../login/login.html"
+                                    <a class="btn primary-btn-outline" href="../php/login.php"
                                     >Login</a
                                     >
                                 </li>
                                 <li>
-                                    <a class="btn primary-btn" href="../login/register.html"
+                                    <a class="btn primary-btn" href="../php/registration.php"
                                     >Registrati</a
                                     >
                                 </li>
@@ -150,6 +100,7 @@
         <h1 class="t3">I tuoi sondaggi</h1>
         <p class="t3" style="margin-bottom: 8%;">Visualizza la lista dei sondaggi a cui hai partecipato, assieme alla lista di domande e le loro relative risposte. Non perderti mai nessuna informazione e resta aggiornato sui risultati dei sondaggi!</p>
 
+        <!-- questa parte dovrebbe contenere i sondaggi che hai creato se sei premium, quelli a cui hai partecipato se sei utente-->
 
         <?php
           $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailPremium='$emailUtente'";
@@ -157,27 +108,20 @@
           foreach($res as $row) {
             $CodiceSondaggio = $row["Codice"];
             $titoloSondaggio = $row["Titolo"];
-              $MaxUtenti = $row["MaxUtenti"];
+            $MaxUtenti = $row["MaxUtenti"];
+            echo '<div class="box answer">';
+            echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
+            # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
+            echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
+            echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
+            echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
+            echo '<a href="../visualizza_domande/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
 
-
-              echo '<div class="box answer">';
-                echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
-                # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
-                echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
-                echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
-                echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
-                echo '<a href="../visualizza_domande/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
-
-                if(is_null($azienda)){
-
-                    echo '<a href="invitoUtentePremium.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '&MaxUtenti=' . urlencode($MaxUtenti) . '"><button  type="button" class="btn btn-light">invita</button></a>';
-
-                }else {
-
-                    echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
-
-                }
-
+            if($type == "Utente"){
+                echo '<a href="invitoUtentePremium.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '&MaxUtenti=' . urlencode($MaxUtenti) . '"><button  type="button" class="btn btn-light">invita</button></a>';
+            }else {
+                echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
+            }
               echo '</div>';
           }
         ?>

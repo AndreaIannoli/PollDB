@@ -12,7 +12,8 @@ CREATE TABLE Azienda(
     CodiceFiscale VARCHAR(30) PRIMARY KEY,
     Nome VARCHAR(30),
     Sede VARCHAR(30),
-    IndirizzoEmail VARCHAR(30)
+    IndirizzoEmail VARCHAR(30),
+    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Utente(
@@ -35,7 +36,7 @@ CREATE TABLE UtentePremium(
 ) ENGINE = "INNODB";
 
 CREATE TABLE Sondaggio(
-    Codice INT NOT NULL auto_increment KEY,
+    Codice INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     MaxUtenti INT NOT NULL,
     Stato ENUM ('APERTO', 'CHIUSO'),
 	Titolo VARCHAR(30) NOT NULL,

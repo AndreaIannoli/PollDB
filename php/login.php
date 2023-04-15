@@ -33,8 +33,8 @@
                     session_start();
                     $_SESSION['authorized'] = 1;
                     $_SESSION['emailLogged'] = $_POST['email'];
-                    $_SESSION['type'] = $_POST['tipo'];
-                    header('Location: visualizza_domande.php');
+                    $_SESSION['type'] = $tipo;
+                    header('Location: visualizza_sondaggi.php');
                 }
             }
         ?>

@@ -14,13 +14,12 @@
 <body>
 
 <?php
-
-$host = "localhost";
-$dbName = "PollDB";
-$username = "root";
-$pass = "root";
+ 
+require 'connectionManager.php';
+$pdo = connectToDB();
 session_start();
-
+$emailUtente = $_SESSION['emailLogged'];
+$type = $_SESSION['type'];
 $_SESSION['emailCreatore'] = 'nome.esempio@email.com';
 
 
@@ -45,7 +44,6 @@ if(!isset($_SESSION['dominiSelezionati'])){
 
 
 try {
-    $pdo = new PDO('mysql:host='.$host.';dbname='.$dbName, $username, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     echo("[ERRORE] Connessione al DB non riuscita. Errore: " . $e->getMessage());
