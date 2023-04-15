@@ -58,10 +58,12 @@ CREATE TABLE Appartenenza(
 
 CREATE TABLE Domanda(
 	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    Testo VARCHAR(200) NOT NULL
-    
+    Testo VARCHAR(200) NOT NULL,
+    Punteggio INT,
+    Foto VARCHAR(50)
 ) ENGINE = "INNODB";
 
+/*
 CREATE TABLE Punteggio(
 	IdDomanda INT NOT NULL PRIMARY KEY,
     Punteggio INT NOT NULL,
@@ -75,19 +77,16 @@ CREATE TABLE Foto(
     
     FOREIGN KEY(IdDomanda) REFERENCES Domanda(Id)
 ) ENGINE = "INNODB";
+*/
 
 CREATE TABLE DomandaAperta(
     Id INT NOT NULL PRIMARY KEY,
-    Testo VARCHAR(200) NOT NULL,
-    MaxCaratteri INT,
-    
+    MaxCaratteri INT,   
     FOREIGN KEY(Id) REFERENCES Domanda(Id)
 ) ENGINE = "INNODB";
 
 CREATE TABLE DomandaChiusa(
-    Id INT NOT NULL PRIMARY KEY,
-    Testo VARCHAR(200) NOT NULL,
-    
+    Id INT NOT NULL PRIMARY KEY,    
     FOREIGN KEY(Id) REFERENCES Domanda(Id)
 ) ENGINE = "INNODB";
 
@@ -226,8 +225,7 @@ CREATE TABLE Composizione(
     IdDomanda INT,
     PRIMARY KEY(IdDomanda, CodiceSondaggio),
     FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice),
-    FOREIGN KEY (IdDomanda) REFERENCES DomandaChiusa(Id),
-	FOREIGN KEY (IdDomanda) REFERENCES DomandaAperta(Id)
+    FOREIGN KEY (IdDomanda) REFERENCES Domanda(Id)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Selezione(
@@ -246,20 +244,20 @@ CREATE TABLE Interessamento(
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
-#DROP PROCEDURE InserisciDomandaChiusa
 #Insercisci domanda aperta sondaggio
 DELIMITER $
-CREATE PROCEDURE InserisciDomandaAperta (IN Testo VARCHAR(200), Punteggio INT, Foto VARCHAR(50), MaxCaratteri INT)
+CREATE PROCEDURE InserisciDomandaAperta (IN Testo VARCHAR(200), Punteggio INT, Foto VARCHAR(50), MaxCaratteri INT, CodiceSondaggio INT)
 BEGIN
 	INSERT INTO Domanda (Testo, Punteggio, Foto)  VALUES (Testo, Punteggio, Foto);
 	SET @last_id = LAST_INSERT_ID(); 
 	INSERT INTO DomandaAperta (Id, MaxCaratteri) VALUES (@last_id, MaxCaratteri); 
+    INSERT INTO Composizione (CodiceSondaggio, IdDomanda) VALUES (CodiceSondaggio, @last_id); 
 END
 $ DELIMITER ;
 
 #Insercisci domanda chiusa sondaggio
 DELIMITER $
-CREATE PROCEDURE InserisciDomandaChiusa (IN Testo VARCHAR(200), Punteggio INT, Foto VARCHAR(50), Opzione1 VARCHAR(50), Opzione2 VARCHAR(50), Opzione3 VARCHAR(50), Opzione4 VARCHAR(50))
+CREATE PROCEDURE InserisciDomandaChiusa (IN Testo VARCHAR(200), Punteggio INT, Foto VARCHAR(50), Opzione1 VARCHAR(50), Opzione2 VARCHAR(50), Opzione3 VARCHAR(50), Opzione4 VARCHAR(50), CodiceSondaggio INT)
 BEGIN
 	INSERT INTO Domanda (Testo, Punteggio, Foto)  VALUES (Testo, Punteggio, Foto);
 	SET @last_id = LAST_INSERT_ID(); 
@@ -267,7 +265,8 @@ BEGIN
     INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione1, @last_id); 
 	INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione2, @last_id); 
     INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione3, @last_id); 
-    INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione4, @last_id); 
+    INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione4, @last_id);
+    INSERT INTO Composizione (CodiceSondaggio, IdDomanda) VALUES (CodiceSondaggio, @last_id); 
 END
 $ DELIMITER ;
 

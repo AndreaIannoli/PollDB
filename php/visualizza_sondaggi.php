@@ -26,7 +26,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <nav class="navbar navbar-expand-lg">
-                        <a class="navbar-brand" href="../homepage/home.html">
+                        <a class="navbar-brand" href="home.php">
                             <img src="../img/logoPollDBWhite.png" alt="Logo"  style="width: 150px"/>
                         </a>
                         <button

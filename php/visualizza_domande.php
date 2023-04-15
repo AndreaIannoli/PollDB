@@ -28,6 +28,9 @@
     $CodiceSondaggio = $_GET['CodiceSondaggio']; 
     $TitoloSondaggio = $_GET['titoloSondaggio']; 
 
+    session_start();
+    $type = $_SESSION['type'];
+
 
   ?>
 
@@ -37,7 +40,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <nav class="navbar navbar-expand-lg">
-                        <a class="navbar-brand" href="../homepage/home.html">
+                        <a class="navbar-brand" href="home.php">
                             <img src="../img/logoPollDBWhite.png" alt="Logo"  style="width: 150px"/>
                         </a>
                         <button
@@ -132,7 +135,13 @@
             echo '</div>';
           }
         ?>
-         
+   
+   <?php
+        
+        if($type != "Utente"){
+            echo '<button class="btn btn-primary" onclick="location.href=\'inserisci_dom.php?CodiceSondaggio=\' + encodeURIComponent(\'' . $CodiceSondaggio . '\')">Crea nuova domanda</button>';        }
+    ?>
+
     </div>
       
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
