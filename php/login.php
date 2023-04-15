@@ -12,6 +12,7 @@
             require 'connectionManager.php';
             require 'accountManager.php';
 
+
             $pdo = connectToDB();
 
             $checkEmailRes = false;
@@ -27,12 +28,13 @@
 
             if($passwordInserted and $checkEmailRes){
                 $checkPassRes = checkCredentials($_POST['email'], $_POST['password'], $pdo);
-                echo($checkPassRes);
+                $tipo = checkType($_POST['email'],$pdo);
                 if($checkPassRes){
                     session_start();
                     $_SESSION['authorized'] = 1;
                     $_SESSION['emailLogged'] = $_POST['email'];
-                    header('dashboard.php');
+                    $_SESSION['type'] = $_POST['tipo'];
+                    header('Location: visualizza_domande.php');
                 }
             }
         ?>
