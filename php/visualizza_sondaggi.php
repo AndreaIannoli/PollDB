@@ -120,7 +120,7 @@
                 echo '<a href="invitoUtentePremium.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '&MaxUtenti=' . urlencode($MaxUtenti) . '"><button  type="button" class="btn btn-light">Invita Semplice</button></a>';
             }
           }else{
-            $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailPremium='$emailUtente'";
+            $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailPremium='$emailUtente'"; //l'utente premium vede tutti o solo i suoi sondaggi?
             $res=$pdo->query($sql);
             foreach($res as $row) {
                 $CodiceSondaggio = $row["Codice"];

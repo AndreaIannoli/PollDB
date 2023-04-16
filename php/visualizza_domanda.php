@@ -160,7 +160,7 @@
           </p>
         </div>
 
-        <!--PREMIUM ONLY!!!-->
+        <!--PREMIUM ONLY!!! forse da togliere visto che anche gli utenti normali possono visualizzare le risposte dei sondaggi a cui hanno partecipato-->
         <?php
           if($type == "Premium"){
             if($tipologia == 'APERTA'){
