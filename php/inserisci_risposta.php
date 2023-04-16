@@ -12,10 +12,10 @@
         throw $e;
     }
 
-   #Questi paramentri sono statici ma dovremmo prenderli dalla pagina visualizza_domanda 
-    $emailUtente = "Email";
-    $IdDomanda = 19; #bisogna inserire l'id passato nell'url
-    $tipologia = "CHIUSA";
+    session_start();
+    $emailUtente = $_SESSION['emailLogged'];
+    $IdDomanda = $_POST['IdDomanda'];
+    $tipologia = $_POST['tipologia'];
 
     $testoRisposta = $_POST['testoRisposta'];
     $selections = $_POST['selections'];
@@ -34,15 +34,19 @@
       } else {
   
         try{
+            $risposta = "";
             foreach($selections as $selection) {
-                $sql="CALL InserisciRispostaChiusa('$selection', '$IdDomanda', '$emailUtente')";
-                $res=$pdo->exec($sql);                
+                $risposta .= $selection . "\n";
             }
+            $sql="CALL InserisciRispostaChiusa('$risposta', '$IdDomanda', '$emailUtente')";
+            $res=$pdo->exec($sql); 
         } catch (PDOException $e) {
           echo("Abbiamo un problema: " . $e->getMessage());
           throw $e;
         }
         
       }
+
+      header('Location: ' . $_SERVER['HTTP_REFERER']);
 
 ?>

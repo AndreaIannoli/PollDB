@@ -131,7 +131,7 @@
             echo '<h4 class="t2">Domanda: ' . $row2["Id"] . '</h4>';
             echo '<p class="t2">' . $row2["Testo"] . '</p>';
             echo '<p class="info"> Punteggio: ' . $row2["Punteggio"] .  '</p>';
-            echo '<a href="../visualizza_domanda/visualizza_domanda.php?IdDomanda=' . $iddomanda . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+            echo '<a href="../php/visualizza_domanda.php?IdDomanda=' . $iddomanda . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domanda</button></a>';
             echo '</div>';
           }
         ?>

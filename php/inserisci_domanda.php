@@ -47,7 +47,8 @@
       
     }
 
-   
+    header('Location: ' . $_SERVER['HTTP_REFERER']); //per tornare indietro una volta fatto l'inserimento
+
   
 
 
