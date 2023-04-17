@@ -35,7 +35,6 @@ CREATE TABLE UtentePremium(
 ) ENGINE = "INNODB";
 
 CREATE TABLE Sondaggio(
-    Codice INT NOT NULL PRIMARY KEY auto_increment,
     Codice INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     MaxUtenti INT NOT NULL,
     Stato ENUM ('APERTO', 'CHIUSO'),
