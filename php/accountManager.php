@@ -35,8 +35,6 @@
             echo("[ERRORE] Query SQL CheckCredentials() non riuscita. Errore: ".$e->getMessage());
             exit();
         }
-<<<<<<< HEAD
-=======
     }
 
     function getUser($email, PDO $pdo) {
@@ -50,7 +48,6 @@
             echo("[ERRORE] Query SQL returnUser() non riuscita. Errore: ".$e->getMessage());
             exit();
         }
->>>>>>> 0958797 (Random Invite users)
     }
 
     function checkType($email, PDO $pdo){
