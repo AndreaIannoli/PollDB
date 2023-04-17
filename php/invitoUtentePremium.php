@@ -7,7 +7,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
         <link rel="stylesheet" href="../stylesheets/style.css">
-        <link href="../stylesheets/invito_utente_premium.css" rel="stylesheet">
+        <link href="../stylesheets/invitoUtentePremium.css" rel="stylesheet">
 
     </head>
         <body>
@@ -20,7 +20,8 @@
         $pass = "root";
         session_start();
 
-        $_SESSION['emailCreatore'] = 'nome.esempio@email.com';
+        //$_SESSION['emailCreatore'] = 'nome.esempio@email.com';
+
 
 
         if(!isset($_SESSION["arrayDomini"])){
@@ -53,7 +54,10 @@
 
         <?php
 
-        $email = $_SESSION["emailCreatore"];
+        $email = $_GET['emailUtente'];
+
+        //echo("emial: ".$email);
+
         $CodiceSondaggio = $_GET['CodiceSondaggio'];
         $TitoloSondaggio = $_GET['titoloSondaggio'];
         $MaxUtenti = $_GET["MaxUtenti"];
@@ -78,7 +82,7 @@
 
             $dominioSondaggio = $_POST['selectDominio'];
 
-            $email = $_SESSION["emailCreatore"];
+            //$email = $_SESSION["emailCreatore"];
 
         }
 
@@ -162,11 +166,17 @@
             <div class="row align-items-center" id="rowAlignCenter">
 
 
-                <div class="">
+                <div class="col">
 
                 </div>
 
-                <div class="" id="addPoll-container" style="max-width: 1000px">
+                <div class="col">
+
+                </div>
+
+                <div class="col" id="addPoll-container" style="max-width: 700px">
+
+
 
                     <form method="post" class="row g-3 needs-validation" id="addPoll-form" >
 
@@ -204,11 +214,11 @@
 
                                         <?php
 
-
                                             try {
-                                                $sql = 'CALL returnUtenti()';
+                                                $sql = 'CALL returnUtenti(?)';
                                                 $res = $pdo->prepare($sql);
 
+                                                $res->bindValue(1, $CodiceSondaggio, PDO::PARAM_STR);
 
                                                 $res->execute();
                                             } catch (PDOException $e){
@@ -222,8 +232,13 @@
 
                                             $utenti = [];
                                             for($x=0; $x < $res -> rowCount(); $x++){
+
                                                 $row = $res->fetch();
-                                                array_push($utenti, $row[0]);
+
+                                                if($row[0] != $email){
+                                                    array_push($utenti, $row[0]);
+
+                                                }
                                             }
 
                                             $res->closeCursor();
@@ -322,6 +337,7 @@
 
 
                             if (isset($_POST["buttonAggiungi"])) {
+
 
 
                                 $arrayNuovo = array();

@@ -35,7 +35,7 @@ CREATE TABLE UtentePremium(
 ) ENGINE = "INNODB";
 
 CREATE TABLE Sondaggio(
-    Codice INT NOT NULL PRIMARY KEY,
+    Codice INT NOT NULL PRIMARY KEY auto_increment,
     MaxUtenti INT NOT NULL,
     Stato ENUM ('APERTO', 'CHIUSO'),
 	Titolo VARCHAR(30) NOT NULL,
@@ -235,6 +235,60 @@ CREATE TABLE Interessamento(
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
+
+
+INSERT INTO `Azienda`(`CodiceFiscale`, `Nome`, `Sede`, `IndirizzoEmail`) 
+	VALUES ('IOFCNUFIDK','Sega s.p.a.','Godo','email.azienda@email.com');
+    
+INSERT INTO `utente`(`Email`, `Pass`, `Nome`, `Cognome`, `DataDiNascita`, `LuogoNascita`, `TotaleBonus`) 
+	VALUES ('utente@gmail.com','1234','mao','tse-thung','2023-03-31','pekin','0');
+    
+INSERT INTO `utentepremium`(`Emailutente`, `InizioAbbonamento`, `FineAbbonamento`, `Costo`, `NumSondaggi`) 
+	VALUES ('utente@gmail.com','2023-03-31','2026-03-31','0','1');
+
+
+
+
+INSERT INTO `utente`(`Email`, `Pass`, `Nome`, `Cognome`, `DataDiNascita`, `LuogoNascita`, `TotaleBonus`) 
+	VALUES ('utente1@gmail.com','1234','mao','tse-thung','2023-03-31','pekin','0');
+    
+INSERT INTO `utente`(`Email`, `Pass`, `Nome`, `Cognome`, `DataDiNascita`, `LuogoNascita`, `TotaleBonus`) 
+	VALUES ('utente2@gmail.com','1234','mao','tse-thung','2023-03-31','pekin','0');
+    
+INSERT INTO `utente`(`Email`, `Pass`, `Nome`, `Cognome`, `DataDiNascita`, `LuogoNascita`, `TotaleBonus`) 
+	VALUES ('utente3@gmail.com','1234','mao','tse-thung','2023-03-31','pekin','0');
+    
+INSERT INTO `utente`(`Email`, `Pass`, `Nome`, `Cognome`, `DataDiNascita`, `LuogoNascita`, `TotaleBonus`) 
+	VALUES ('utente4@gmail.com','1234','mao','tse-thung','2023-03-31','pekin','0');
+
+INSERT INTO `utente`(`Email`, `Pass`, `Nome`, `Cognome`, `DataDiNascita`, `LuogoNascita`, `TotaleBonus`) 
+	VALUES ('utente5@gmail.com','1234','mao','tse-thung','2023-03-31','pekin','0');
+
+INSERT INTO `utente`(`Email`, `Pass`, `Nome`, `Cognome`, `DataDiNascita`, `LuogoNascita`, `TotaleBonus`) 
+	VALUES ('utente6@gmail.com','1234','mao','tse-thung','2023-03-31','pekin','0');
+
+
+
+
+/*INSERT INTO `Sondaggio`(`MaxUtenti`, `Stato`, `Titolo`, `DataChiusura`, `DataCreazione`, `ArgomentoDominio`, `EmailPremium`) 
+VALUES ('3','APERTO','BerlusconiMorto','20-07-2021','10-03-2024','Cinema','email.azienda@email.com');
+*/
+
+
+
+INSERT INTO Sondaggio (Titolo, MaxUtenti, DataCreazione, DataChiusura, Stato, EmailPremium) 
+		VALUES ("Prova", 3, current_date(), "2023-03-31", "APERTO", "email.azienda@email.com");
+        
+        
+        
+DELIMITER $
+CREATE PROCEDURE randomUtenti ()
+BEGIN
+	SELECT Email FROM Utente ORDER BY RAND();
+END
+$ DELIMITER ;
+
+
 #DROP PROCEDURE InserisciDomandaChiusa
 #Insercisci domanda aperta sondaggio
 DELIMITER $
@@ -362,7 +416,7 @@ CREATE PROCEDURE AddInvito (IN Email_Inserita VARCHAR(30))
 BEGIN
 	SELECT * FROM Notifica;
 END 
-$
+$ 
 DELIMITER ;
 
 
@@ -374,7 +428,7 @@ DELIMITER $
 CREATE PROCEDURE searchUtentePremium(IN email varchar(30))
 BEGIN
 
-	SELECT EmailUtente FROM UtenntePremium WHERE EmailUtente = email;
+	SELECT EmailUtente FROM UtentePremium WHERE EmailUtente = email;
 
     
 END
@@ -424,10 +478,6 @@ BEGIN
     
 END
 $ DELIMITER ;
-
-
-
-
 
 
 DELIMITER $
@@ -547,8 +597,7 @@ BEGIN
 
 	
 END
-$
-DELIMITER ;
+$ DELIMITER ;
 
 
 

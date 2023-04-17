@@ -13,6 +13,7 @@
   <body>
 
   <?php
+
     $host = "localhost:3306";
     $dbName = "PollDB";
     $username = "root";
@@ -25,7 +26,7 @@
         throw $e;
     }
 
-    $emailUtente = "email.azienda@email.com";
+    $emailUtente = "utente@gmail.com";
 
 
   try {
@@ -48,8 +49,6 @@
   $azienda = $row[0];
 
   $res->closeCursor();
-
-
 
 
   try {
@@ -75,8 +74,6 @@
 
   //echo("azienda: ".$azienda);
   //echo("utenteP: ".$utenteP);
-
-
 
   ?>
 
@@ -167,7 +164,7 @@
           foreach($res as $row) {
             $CodiceSondaggio = $row["Codice"];
             $titoloSondaggio = $row["Titolo"];
-              $MaxUtenti = $row["MaxUtenti"];
+            $MaxUtenti = $row["MaxUtenti"];
 
 
               echo '<div class="box answer">';
@@ -180,18 +177,54 @@
 
                 if(is_null($azienda)){
 
-                    echo '<a href="invitoUtentePremium.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '&MaxUtenti=' . urlencode($MaxUtenti) . '"><button  type="button" class="btn btn-light">invita</button></a>';
+                    echo '<a href="invitoUtentePremium.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '&MaxUtenti=' . urlencode($MaxUtenti)  . '&emailUtente=' . urlencode($emailUtente).'"><button  type="button" class="btn btn-light">invita</button></a>';
 
                 }else {
 
                     echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
 
+
+                    try{
+
+                        // execute the stored procedure
+                        $sql = "CALL randomUtenti()";
+                        // call the stored procedure
+
+                        $res = $pdo -> prepare($sql);
+
+                        $res -> execute();
+
+
+                    }catch (PDOException $e) {
+                        die("Error occurred:" . $e->getMessage());
+                    }
+
+                    $utentiInvitati = [];
+
+                    for($x=0; $x < $res -> rowCount(); $x++){
+
+                        $row = $res->fetch();
+                        array_push($utentiInvitati, $row[0]);
+
+                        //echo("utente preso: ".$utentiInvitati[$x]);
+
+                        if(sizeof($utentiInvitati) == $MaxUtenti){
+
+                            $x = $res -> rowCount();
+                        }
+
+                    }
+
+
+                    $res->closeCursor();
+
+
                 }
 
               echo '</div>';
           }
+
         ?>
-         
     </div>
       
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>

@@ -6,7 +6,7 @@
 
     <title>creazione sondaggio</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-    <link href="aggiungiSondaggio.css" rel="stylesheet">
+    <link href="../stylesheets/aggiungiSondaggio.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
 
 </head>
@@ -69,6 +69,7 @@ $statoSondaggio = $_POST["statoSondaggioRadio"];
 $dominiSelezionati = array();
 
 
+
 if(isset($_POST["statoSondaggioRadio"])){
     $statoSondaggio = $_POST["statoSondaggioRadio"];
 }else {
@@ -78,9 +79,6 @@ if(isset($_POST["statoSondaggioRadio"])){
 
 
 $dataCreazione = $_POST[date("y-m-d")];
-
-
-
 
 
 //salva i dati nel database
@@ -350,7 +348,7 @@ function getDominiSelezionati(){
                         echo($_POST["numeroMaxPartecipanti"]);
                     }
 
-                    ?>" width="50">
+                    ?>" width="50" required>
 
                 </div>
 
@@ -359,7 +357,7 @@ function getDominiSelezionati(){
 
                     <label for="start">Start date:</label>
 
-                    <input type="date" id="chiusuraSondaggioData" name="chiusuraSondaggioData" min="<?php echo date('Y-m-d'); ?>">
+                    <input type="date" id="chiusuraSondaggioData" name="chiusuraSondaggioData" min="<?php echo date('Y-m-d'); ?>" required>
 
 
                 </div>
@@ -486,6 +484,13 @@ function getDominiSelezionati(){
                                 echo 'exception: ' . $e;
                             }
                         }
+
+
+
+
+
+
+
 
                     }
 
