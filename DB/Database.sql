@@ -379,12 +379,11 @@ DELIMITER ;
 
 
 
-
 DELIMITER $
 CREATE PROCEDURE searchUtentePremium(IN email varchar(30))
 BEGIN
 
-	SELECT EmailUtente FROM UtenntePremium WHERE EmailUtente = email;
+	SELECT EmailUtente FROM UtentePremium WHERE EmailUtente = email;
 
     
 END
@@ -575,3 +574,62 @@ BEGIN
 END 
 $
 DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE GetNotificationType (IN CodiceNotifica_Inserito VARCHAR(36))
+BEGIN
+	DECLARE Tipo VARCHAR(10);
+    
+	IF(SELECT count(*) FROM Invito WHERE(CodiceNotifica = CodiceNotifica_Inserito)>0) THEN
+		SET Tipo = "Invito";
+    END IF;
+    
+    SELECT Tipo;
+END 
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE returnSondaggio(IN codiceS varchar(36))
+BEGIN
+
+	SELECT * FROM Sondaggio WHERE Codice = codiceS;
+    
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE ReturnUtente(IN EmailInserita varchar(36))
+BEGIN
+
+	SELECT * FROM Utente WHERE Email = EmailInserita;
+    
+END
+$ DELIMITER ;
+]
+DELIMITER $
+CREATE PROCEDURE RandomInvite(IN CodiceSondaggio_Inserito INT)
+BEGIN
+	DECLARE MaxUtentiSondaggio INT;
+    SET MaxUtentiSondaggio := (SELECT MaxUtenti FROM Sondaggio WHERE Codice = CodiceSondaggio_Inserito);
+    DROP TEMPORARY TABLE IF EXISTS UserEligible;
+    IF(SELECT count(*) FROM Utente WHERE((Email NOT IN (SELECT EmailUtente FROM Notifica WHERE(Codice IN (SELECT CodiceNotifica FROM Invito) AND Archiviata = false))) AND (SELECT count(*) FROM Interessamento WHERE((EmailUtente=Email) AND (Argomento IN (SELECT ArgomentoDominio FROM Appartenenza WHERE CodiceSondaggio = CodiceSondaggio_Inserito))))) > 0) THEN 
+		CREATE TEMPORARY TABLE UserEligible SELECT Email FROM Utente WHERE((Email NOT IN (SELECT EmailUtente FROM Notifica WHERE(Codice IN (SELECT CodiceNotifica FROM Invito) AND Archiviata = false))) AND (SELECT count(*) FROM Interessamento WHERE((EmailUtente=Email) AND (Argomento IN (SELECT ArgomentoDominio FROM Appartenenza WHERE CodiceSondaggio = CodiceSondaggio_Inserito)))));
+	ELSE
+		CREATE TEMPORARY TABLE UserEligible SELECT Email FROM Utente LIMIT 0;
+    END IF;
+    IF(MaxUtentiSondaggio < (SELECT count(*) FROM UserEligible)) THEN
+		SET @max := MaxUtentiSondaggio;
+	ELSE
+		SET @max := (SELECT count(*) FROM UserEligible);
+    END IF;
+    SET @i := 0;
+    WHILE @i < @max DO
+		SET @CurrentUser = (SELECT Email FROM UserEligible ORDER BY RAND() LIMIT 1);
+        IF((@CurrentUser NOT IN (SELECT EmailUtente FROM Notifica WHERE(Codice IN (SELECT CodiceNotifica FROM Invito) AND Archiviata = false)))) THEN
+            CALL creaInvito(CodiceSondaggio_Inserito, @CurrentUser);
+            SET @i = @i + 1;
+        END IF;
+    END WHILE;
+END
+$ DELIMITER ;

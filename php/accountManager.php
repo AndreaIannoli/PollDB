@@ -35,6 +35,22 @@
             echo("[ERRORE] Query SQL CheckCredentials() non riuscita. Errore: ".$e->getMessage());
             exit();
         }
+<<<<<<< HEAD
+=======
+    }
+
+    function getUser($email, PDO $pdo) {
+        try {
+            $sql = "CALL ReturnUtente(?)";
+            $res = $pdo->prepare($sql);
+            $res->bindValue( 1, $email, PDO::PARAM_STR);
+            $res->execute();
+            return $res;
+        } catch (PDOException $e) {
+            echo("[ERRORE] Query SQL returnUser() non riuscita. Errore: ".$e->getMessage());
+            exit();
+        }
+>>>>>>> 0958797 (Random Invite users)
     }
 
     function checkType($email, PDO $pdo){
