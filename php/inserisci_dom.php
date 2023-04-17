@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="../stylesheets/style.css">
   </head>
   <body>
+    <?php
+          $CodiceSondaggio = $_GET['CodiceSondaggio']; 
+      ?>
 
       <!--====== NAVBAR ONE PART START ======-->
       <section class="navbar-area navbar-one">
@@ -92,6 +95,7 @@
         <h1>Inserisci informazioni</h1>
 
         <form action="inserisci_domanda.php" method="post">
+            <input type="hidden" name="CodiceSondaggio" value="<?php echo $CodiceSondaggio; ?>">
           
             <div class="mb-3">
               <label  class="form-label">Tipologia</label>
@@ -158,8 +162,6 @@
     </div>
 
     
-
-
 
 
 

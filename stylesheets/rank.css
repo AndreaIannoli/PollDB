@@ -1,0 +1,50 @@
+th, td {
+    padding: 15px !important;
+}
+
+.logo{
+    width: 10%;
+}
+
+.box2{
+    padding: 5% 10% 10% 10%;
+}
+
+.table{
+    background-color: black;
+    border-radius: 20px;
+    margin-bottom: 30px;  
+}
+
+.punteggio{
+    color: #9740EF;
+}
+
+body{
+    background-color: white !important;
+}
+
+.t2{
+    color: white;
+}
+
+.t1{
+    color: white;
+    margin: 0px !important;
+    font-size: 11px;
+}
+.t3{
+    color: black;
+}
+
+.box{
+    padding: 30px;
+}
+
+.tcampo{
+    color: white;
+}
+
+.riga{
+    padding: 10px;
+}

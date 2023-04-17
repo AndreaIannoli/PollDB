@@ -12,7 +12,8 @@ CREATE TABLE Azienda(
     CodiceFiscale VARCHAR(30) PRIMARY KEY,
     Nome VARCHAR(30),
     Sede VARCHAR(30),
-    IndirizzoEmail VARCHAR(30)
+    IndirizzoEmail VARCHAR(30),
+    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Utente(
@@ -35,7 +36,11 @@ CREATE TABLE UtentePremium(
 ) ENGINE = "INNODB";
 
 CREATE TABLE Sondaggio(
+<<<<<<< HEAD
     Codice INT NOT NULL PRIMARY KEY auto_increment,
+=======
+    Codice INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+>>>>>>> 1ca1aa179e566865f847237326847e0ca87b3a33
     MaxUtenti INT NOT NULL,
     Stato ENUM ('APERTO', 'CHIUSO'),
 	Titolo VARCHAR(30) NOT NULL,
@@ -45,12 +50,24 @@ CREATE TABLE Sondaggio(
     EmailPremium VARCHAR(30)
 ) ENGINE = "INNODB";
 
-CREATE TABLE Domanda(
-	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    Testo VARCHAR(200) NOT NULL
-    
+CREATE TABLE Appartenenza(
+	CodiceSondaggio INT NOT NULL AUTO_INCREMENT,
+	ArgomentoDominio VARCHAR(30),
+   
+	PRIMARY KEY (CodiceSondaggio, ArgomentoDominio),
+	FOREIGN KEY (CodiceSondaggio) references Sondaggio(Codice),
+	FOREIGN KEY (ArgomentoDominio) references Dominio(Argomento)
+   
 ) ENGINE = "INNODB";
 
+CREATE TABLE Domanda(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    Testo VARCHAR(200) NOT NULL,
+    Punteggio INT,
+    Foto VARCHAR(400)
+) ENGINE = "INNODB";
+
+/*
 CREATE TABLE Punteggio(
 	IdDomanda INT NOT NULL PRIMARY KEY,
     Punteggio INT NOT NULL,
@@ -64,19 +81,16 @@ CREATE TABLE Foto(
     
     FOREIGN KEY(IdDomanda) REFERENCES Domanda(Id)
 ) ENGINE = "INNODB";
+*/
 
 CREATE TABLE DomandaAperta(
     Id INT NOT NULL PRIMARY KEY,
-    Testo VARCHAR(200) NOT NULL,
-    MaxCaratteri INT,
-    
+    MaxCaratteri INT,   
     FOREIGN KEY(Id) REFERENCES Domanda(Id)
 ) ENGINE = "INNODB";
 
 CREATE TABLE DomandaChiusa(
-    Id INT NOT NULL PRIMARY KEY,
-    Testo VARCHAR(200) NOT NULL,
-    
+    Id INT NOT NULL PRIMARY KEY,    
     FOREIGN KEY(Id) REFERENCES Domanda(Id)
 ) ENGINE = "INNODB";
 
@@ -215,8 +229,7 @@ CREATE TABLE Composizione(
     IdDomanda INT,
     PRIMARY KEY(IdDomanda, CodiceSondaggio),
     FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice),
-    FOREIGN KEY (IdDomanda) REFERENCES DomandaChiusa(Id),
-	FOREIGN KEY (IdDomanda) REFERENCES DomandaAperta(Id)
+    FOREIGN KEY (IdDomanda) REFERENCES Domanda(Id)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Selezione(
@@ -235,6 +248,7 @@ CREATE TABLE Interessamento(
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
+<<<<<<< HEAD
 
 
 INSERT INTO `Azienda`(`CodiceFiscale`, `Nome`, `Sede`, `IndirizzoEmail`) 
@@ -290,19 +304,22 @@ $ DELIMITER ;
 
 
 #DROP PROCEDURE InserisciDomandaChiusa
+=======
+>>>>>>> 1ca1aa179e566865f847237326847e0ca87b3a33
 #Insercisci domanda aperta sondaggio
 DELIMITER $
-CREATE PROCEDURE InserisciDomandaAperta (IN Testo VARCHAR(200), Punteggio INT, Foto VARCHAR(50), MaxCaratteri INT)
+CREATE PROCEDURE InserisciDomandaAperta (IN Testo VARCHAR(200), Punteggio INT, Foto VARCHAR(50), MaxCaratteri INT, CodiceSondaggio INT)
 BEGIN
 	INSERT INTO Domanda (Testo, Punteggio, Foto)  VALUES (Testo, Punteggio, Foto);
 	SET @last_id = LAST_INSERT_ID(); 
 	INSERT INTO DomandaAperta (Id, MaxCaratteri) VALUES (@last_id, MaxCaratteri); 
+    INSERT INTO Composizione (CodiceSondaggio, IdDomanda) VALUES (CodiceSondaggio, @last_id); 
 END
 $ DELIMITER ;
 
 #Insercisci domanda chiusa sondaggio
 DELIMITER $
-CREATE PROCEDURE InserisciDomandaChiusa (IN Testo VARCHAR(200), Punteggio INT, Foto VARCHAR(50), Opzione1 VARCHAR(50), Opzione2 VARCHAR(50), Opzione3 VARCHAR(50), Opzione4 VARCHAR(50))
+CREATE PROCEDURE InserisciDomandaChiusa (IN Testo VARCHAR(200), Punteggio INT, Foto VARCHAR(50), Opzione1 VARCHAR(50), Opzione2 VARCHAR(50), Opzione3 VARCHAR(50), Opzione4 VARCHAR(50), CodiceSondaggio INT)
 BEGIN
 	INSERT INTO Domanda (Testo, Punteggio, Foto)  VALUES (Testo, Punteggio, Foto);
 	SET @last_id = LAST_INSERT_ID(); 
@@ -310,7 +327,8 @@ BEGIN
     INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione1, @last_id); 
 	INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione2, @last_id); 
     INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione3, @last_id); 
-    INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione4, @last_id); 
+    INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione4, @last_id);
+    INSERT INTO Composizione (CodiceSondaggio, IdDomanda) VALUES (CodiceSondaggio, @last_id); 
 END
 $ DELIMITER ;
 
@@ -418,7 +436,6 @@ BEGIN
 END 
 $ 
 DELIMITER ;
-
 
 
 
@@ -599,13 +616,6 @@ BEGIN
 END
 $ DELIMITER ;
 
-
-
-
-
-
-
-
 DELIMITER $
 CREATE PROCEDURE AcceptInvito (IN Email_Inserita VARCHAR(30))
 BEGIN
@@ -621,3 +631,62 @@ BEGIN
 END 
 $
 DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE GetNotificationType (IN CodiceNotifica_Inserito VARCHAR(36))
+BEGIN
+	DECLARE Tipo VARCHAR(10);
+    
+	IF(SELECT count(*) FROM Invito WHERE(CodiceNotifica = CodiceNotifica_Inserito)>0) THEN
+		SET Tipo = "Invito";
+    END IF;
+    
+    SELECT Tipo;
+END 
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE returnSondaggio(IN codiceS varchar(36))
+BEGIN
+
+	SELECT * FROM Sondaggio WHERE Codice = codiceS;
+    
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE ReturnUtente(IN EmailInserita varchar(36))
+BEGIN
+
+	SELECT * FROM Utente WHERE Email = EmailInserita;
+    
+END
+$ DELIMITER ;
+]
+DELIMITER $
+CREATE PROCEDURE RandomInvite(IN CodiceSondaggio_Inserito INT)
+BEGIN
+	DECLARE MaxUtentiSondaggio INT;
+    SET MaxUtentiSondaggio := (SELECT MaxUtenti FROM Sondaggio WHERE Codice = CodiceSondaggio_Inserito);
+    DROP TEMPORARY TABLE IF EXISTS UserEligible;
+    IF(SELECT count(*) FROM Utente WHERE((Email NOT IN (SELECT EmailUtente FROM Notifica WHERE(Codice IN (SELECT CodiceNotifica FROM Invito) AND Archiviata = false))) AND (SELECT count(*) FROM Interessamento WHERE((EmailUtente=Email) AND (Argomento IN (SELECT ArgomentoDominio FROM Appartenenza WHERE CodiceSondaggio = CodiceSondaggio_Inserito))))) > 0) THEN 
+		CREATE TEMPORARY TABLE UserEligible SELECT Email FROM Utente WHERE((Email NOT IN (SELECT EmailUtente FROM Notifica WHERE(Codice IN (SELECT CodiceNotifica FROM Invito) AND Archiviata = false))) AND (SELECT count(*) FROM Interessamento WHERE((EmailUtente=Email) AND (Argomento IN (SELECT ArgomentoDominio FROM Appartenenza WHERE CodiceSondaggio = CodiceSondaggio_Inserito)))));
+	ELSE
+		CREATE TEMPORARY TABLE UserEligible SELECT Email FROM Utente LIMIT 0;
+    END IF;
+    IF(MaxUtentiSondaggio < (SELECT count(*) FROM UserEligible)) THEN
+		SET @max := MaxUtentiSondaggio;
+	ELSE
+		SET @max := (SELECT count(*) FROM UserEligible);
+    END IF;
+    SET @i := 0;
+    WHILE @i < @max DO
+		SET @CurrentUser = (SELECT Email FROM UserEligible ORDER BY RAND() LIMIT 1);
+        IF((@CurrentUser NOT IN (SELECT EmailUtente FROM Notifica WHERE(Codice IN (SELECT CodiceNotifica FROM Invito) AND Archiviata = false)))) THEN
+            CALL creaInvito(CodiceSondaggio_Inserito, @CurrentUser);
+            SET @i = @i + 1;
+        END IF;
+    END WHILE;
+END
+$ DELIMITER ;

@@ -22,14 +22,13 @@
     $opzione3 = $_POST['opzione3'];
     $opzione4 = $_POST['opzione4'];
 
-
-
+    $CodiceSondaggio = $_POST['CodiceSondaggio'];
 
 
     if ($_POST['tipologiaDomanda'] == 'APERTA') {
 
       try{
-        $sql="CALL InserisciDomandaAperta('$testoDomanda', '$punteggioDomanda', '$urlfoto', '$max_caratteri')";
+        $sql="CALL InserisciDomandaAperta('$testoDomanda', '$punteggioDomanda', '$urlfoto', '$max_caratteri', '$CodiceSondaggio')";
         $res=$pdo->exec($sql);
       } catch (PDOException $e) {
         echo("[Abbiamo un problema: " . $e->getMessage());
@@ -39,7 +38,7 @@
     } else {
 
       try{
-        $sql="CALL InserisciDomandaChiusa('$testoDomanda', '$punteggioDomanda', '$urlfoto', '$opzione1', '$opzione2', '$opzione3', '$opzione4')";
+        $sql="CALL InserisciDomandaChiusa('$testoDomanda', '$punteggioDomanda', '$urlfoto', '$opzione1', '$opzione2', '$opzione3', '$opzione4','$CodiceSondaggio')";
         $res=$pdo->exec($sql);
       } catch (PDOException $e) {
         echo("Abbiamo un problema: " . $e->getMessage());
@@ -48,7 +47,8 @@
       
     }
 
-   
+    header('Location: ' . $_SERVER['HTTP_REFERER']); //per tornare indietro una volta fatto l'inserimento
+
   
 
 

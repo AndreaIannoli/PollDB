@@ -7,31 +7,17 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../stylesheets/style.css">
-    <link href="../stylesheets/visualizza_sondaggi.css" rel="stylesheet">
+    <link href="../stylesheets/rank.css" rel="stylesheet">
 
   </head>
   <body>
 
   <?php
-    $host = "localhost:3306";
-    $dbName = "PollDB";
-    $username = "root";
-    $pass = "PollDB";
-    try {
-        $pdo = new PDO('mysql:host='.$host.';dbname='.$dbName, $username, $pass);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
-        echo("[ERRORE] Connessione al DB non riuscita. Errore: " . $e->getMessage());
-        throw $e;
-    }
-
-    $CodiceSondaggio = $_GET['CodiceSondaggio']; 
-    $TitoloSondaggio = $_GET['titoloSondaggio']; 
-
-    session_start();
-    $type = $_SESSION['type'];
-
-
+      require 'connectionManager.php';
+      $pdo = connectToDB();
+      session_start();
+      $emailUtente = $_SESSION['emailLogged'];
+      $type = $_SESSION['type'];
   ?>
 
     <!--====== NAVBAR ONE PART START ======-->
@@ -89,12 +75,12 @@
                         <div class="navbar-btn d-none d-sm-inline-block">
                             <ul>
                                 <li>
-                                    <a class="btn primary-btn-outline" href="../login/login.html"
+                                    <a class="btn primary-btn-outline" href="../php/login.php"
                                     >Login</a
                                     >
                                 </li>
                                 <li>
-                                    <a class="btn primary-btn" href="../login/register.html"
+                                    <a class="btn primary-btn" href="../php/registration.php"
                                     >Registrati</a
                                     >
                                 </li>
@@ -111,37 +97,36 @@
     <!--====== NAVBAR ONE PART ENDS ======-->
     
     <div class="container box2">
-        <h1 class="t3">
-            <?php
-                echo $TitoloSondaggio;
-            ?>
-        </h1>
-        <p class="t3" style="margin-bottom: 8%;">Visualizza la lista delle domande di questo sondaggio. Non perderti mai nessuna informazione e resta aggiornato sui risultati dei sondaggi!</p>
+        <h1 class="t3">Classifica Utenti</h1>
+        <p class="t3" style="margin-bottom: 8%;">Visualizza la classifica degli utenti e cerca di ottenere sempre più punti per vincere premi più prestigiosi</p>
 
+        <!-- questa parte dovrebbe contenere i sondaggi che hai creato se sei premium, quelli a cui hai partecipato se sei utente-->
 
-        <?php
-          $sql="SELECT IdDomanda FROM Composizione WHERE CodiceSondaggio='$CodiceSondaggio'";
-          $res=$pdo->query($sql);
-          foreach($res as $row) {
-            $iddomanda = $row["IdDomanda"];
-            $sql="SELECT Id, Testo, Punteggio FROM Domanda WHERE Id='$iddomanda'";
-            $res=$pdo->query($sql);
-            $row2 = $res->fetch();
-            echo '<div class="box answer">';
-            echo '<h4 class="t2">Domanda: ' . $row2["Id"] . '</h4>';
-            echo '<p class="t2">' . $row2["Testo"] . '</p>';
-            echo '<p class="info"> Punteggio: ' . $row2["Punteggio"] .  '</p>';
-            echo '<a href="../php/visualizza_domanda.php?IdDomanda=' . $iddomanda . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domanda</button></a>';
-            echo '</div>';
-          }
+    <table class="table">
+    <tr>
+        <th class="tcampo"></th>
+        <th class="tcampo">Nome</th>
+        <th class="tcampo">Cognome</th>
+        <th class="punteggio">Totale Bonus</th>
+    </tr>
+    <?php     
+                $sql="SELECT Nome, Cognome, TotaleBonus FROM Utente ORDER BY TotaleBonus DESC";
+                $res=$pdo->query($sql);
+                foreach($res as $index => $row) {
+                    $Nome = $row["Nome"];
+                    $Cognome = $row["Cognome"];
+                    $TotaleBonus = $row["TotaleBonus"];
+                    echo '<tr class="riga">';
+                    echo '<td class="tcampo">' . $index+1 . '</td>';
+                    echo '<td class="tcampo">' . $row["Nome"] . '</td>';
+                    echo '<td class="tcampo">' . $row["Cognome"] .  '</td>';
+                    echo '<td class="punteggio">' . $row["TotaleBonus"] .  '</td>';
+                    echo '</tr>';
+                }
         ?>
-   
-   <?php
-        
-        if($type != "Utente"){
-            echo '<button class="btn btn-primary" onclick="location.href=\'inserisci_dom.php?CodiceSondaggio=\' + encodeURIComponent(\'' . $CodiceSondaggio . '\')">Crea nuova domanda</button>';        }
-    ?>
+    </table>
 
+         
     </div>
       
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>

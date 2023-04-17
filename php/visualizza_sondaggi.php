@@ -13,6 +13,7 @@
   <body>
 
   <?php
+<<<<<<< HEAD
 
     $host = "localhost:3306";
     $dbName = "PollDB";
@@ -75,6 +76,13 @@
   //echo("azienda: ".$azienda);
   //echo("utenteP: ".$utenteP);
 
+=======
+      require 'connectionManager.php';
+      $pdo = connectToDB();
+      session_start();
+      $emailUtente = $_SESSION['emailLogged'];
+      $type = $_SESSION['type'];
+>>>>>>> 1ca1aa179e566865f847237326847e0ca87b3a33
   ?>
 
     <!--====== NAVBAR ONE PART START ======-->
@@ -83,7 +91,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <nav class="navbar navbar-expand-lg">
-                        <a class="navbar-brand" href="../homepage/home.html">
+                        <a class="navbar-brand" href="home.php">
                             <img src="../img/logoPollDBWhite.png" alt="Logo"  style="width: 150px"/>
                         </a>
                         <button
@@ -132,12 +140,12 @@
                         <div class="navbar-btn d-none d-sm-inline-block">
                             <ul>
                                 <li>
-                                    <a class="btn primary-btn-outline" href="../login/login.html"
+                                    <a class="btn primary-btn-outline" href="../php/login.php"
                                     >Login</a
                                     >
                                 </li>
                                 <li>
-                                    <a class="btn primary-btn" href="../login/register.html"
+                                    <a class="btn primary-btn" href="../php/registration.php"
                                     >Registrati</a
                                     >
                                 </li>
@@ -157,8 +165,10 @@
         <h1 class="t3">I tuoi sondaggi</h1>
         <p class="t3" style="margin-bottom: 8%;">Visualizza la lista dei sondaggi a cui hai partecipato, assieme alla lista di domande e le loro relative risposte. Non perderti mai nessuna informazione e resta aggiornato sui risultati dei sondaggi!</p>
 
+        <!-- questa parte dovrebbe contenere i sondaggi che hai creato se sei premium, quelli a cui hai partecipato se sei utente-->
 
         <?php
+<<<<<<< HEAD
           $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailPremium='$emailUtente'";
           $res=$pdo->query($sql);
           foreach($res as $row) {
@@ -168,11 +178,22 @@
 
 
               echo '<div class="box answer">';
+=======
+          if ($type == "Utente") {
+            $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio WHERE EmailUtente='$emailUtente'";
+            $res=$pdo->query($sql);
+            foreach($res as $row) {
+                $CodiceSondaggio = $row["Codice"];
+                $titoloSondaggio = $row["Titolo"];
+                $MaxUtenti = $row["MaxUtenti"];
+                echo '<div class="box answer">';
+>>>>>>> 1ca1aa179e566865f847237326847e0ca87b3a33
                 echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
                 # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
                 echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
                 echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
                 echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
+<<<<<<< HEAD
                 echo '<a href="../visualizza_domande/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
 
                 if(is_null($azienda)){
@@ -224,6 +245,29 @@
               echo '</div>';
           }
 
+=======
+                echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+                echo '<a href="invitoUtentePremium.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '&MaxUtenti=' . urlencode($MaxUtenti) . '"><button  type="button" class="btn btn-light">Invita Semplice</button></a>';
+            }
+          }else{
+            $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailPremium='$emailUtente'"; //l'utente premium vede tutti o solo i suoi sondaggi?
+            $res=$pdo->query($sql);
+            foreach($res as $row) {
+                $CodiceSondaggio = $row["Codice"];
+                $titoloSondaggio = $row["Titolo"];
+                $MaxUtenti = $row["MaxUtenti"];
+                echo '<div class="box answer">';
+                echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
+                # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
+                echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
+                echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
+                echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
+                echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+                echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
+                echo '</div>';
+            }
+        }
+>>>>>>> 1ca1aa179e566865f847237326847e0ca87b3a33
         ?>
     </div>
       

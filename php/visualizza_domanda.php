@@ -25,13 +25,14 @@
         throw $e;
     }
 
-
-    $emailUtente = "prova@prova.com";
+    session_start();
+    $emailUtente = $_SESSION['emailLogged'];
+    $type = $_SESSION['type'];
     $IdDomanda = $_GET['IdDomanda']; #bisogna inserire l'id passato nell'url
     $tipologia = "CHIUSA";
 
 
-    $sql="SELECT * FROM RispostaAperta WHERE IdDomanda='$IdDomanda'";
+    $sql="SELECT * FROM DomandaAperta WHERE Id='$IdDomanda'";
     $res=$pdo->query($sql);
     if ($res->rowCount() > 0) {
       $tipologia = "APERTA";
@@ -159,25 +160,30 @@
           </p>
         </div>
 
+        <!--PREMIUM ONLY!!! forse da togliere visto che anche gli utenti normali possono visualizzare le risposte dei sondaggi a cui hanno partecipato-->
         <?php
-          if($tipologia == 'APERTA'){
-            $sql="SELECT Testo FROM RispostaAperta WHERE IdDomanda='$IdDomanda'";
-          }else{
-            $sql="SELECT Testo FROM RispostaChiusa WHERE IdDomanda='$IdDomanda'";
-          }
-          $res=$pdo->query($sql);
-          foreach($res as $row) {
-            echo '<div class="box answer">';
-            echo '<h4 class="t2">Risposta:</h4>';
-            echo '<p class="t2">' . $row["Testo"] . '</p>';
-            echo '</div>';
-          }
+          if($type == "Premium"){
+            if($tipologia == 'APERTA'){
+              $sql="SELECT Testo FROM RispostaAperta WHERE IdDomanda='$IdDomanda'";
+            }else{
+              $sql="SELECT Testo FROM RispostaChiusa WHERE IdDomanda='$IdDomanda'";
+            }
+            $res=$pdo->query($sql);
+            foreach($res as $row) {
+              echo '<div class="box answer">';
+              echo '<h4 class="t2">Risposta:</h4>';
+              echo '<p class="t2">' . str_replace("\n", "<br>", $row["Testo"]) . '</p>'; //lo slash n in php viene interpretato diversamente in html
+              echo '</div>';
+            }
+          } 
         ?>
+         <!--PREMIUM ONLY!!!-->
 
         <div class="floating" style="color:white"><button type="button" class="btn bfloat" data-bs-toggle="modal" data-bs-target="#inseriscirisposta"><i class="bi bi-plus ifloat"></i></button></div>
 
     </div>
 
+    <!--inserimento risposta -->
     <div class="modal fade" id="inseriscirisposta" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -187,6 +193,8 @@
           </div>
           <div class="modal-body">
           <form action="inserisci_risposta.php" method="post">
+            <input type="hidden" name="IdDomanda" value="<?php echo $IdDomanda; ?>">
+            <input type="hidden" name="tipologia" value="<?php echo $tipologia; ?>">
             <div class="mb-3">
                 <label for="recipient-name" class="col-form-label">Testo della risposta:</label>
                 <?php
@@ -213,7 +221,7 @@
         </div>
       </div>
     </div>
-
+   <!--inserimento risposta -->
     
 
    

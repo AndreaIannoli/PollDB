@@ -21,7 +21,7 @@
     require 'NotificationManager.php';
 
     session_start();
-    $_SESSION['emailLogged'] = 'nome@esempio.it';
+    $_SESSION['emailLogged'] = 'utente2@gmail.com';
     $_SESSION['nameLogged'] = 'Andrea';
     $_SESSION['authorized'] = 1;
     if(isset($_POST['searchField'])){
@@ -122,6 +122,46 @@
                                         }
                                     ?>
                                     <ul class="dropdown-menu dropdown-menu-end"  >
+                                        <?php
+                                            $notifications = $res->fetchAll();
+                                            $res->closeCursor();
+
+                                            for($x=0; $x < $nOfNotifications; $x++){
+                                                $row = $notifications[$x];
+                                                $typeRes = getNotificationType($row['Codice'], $pdo)->fetch();
+                                                $type = $typeRes[0];
+                                                if($type == 'Invito'){
+                                                    $poll = getInvitePoll($row['Codice'], $pdo)->fetch();
+                                                    $sender = getUser($poll['EmailPremium'], $pdo)->fetch();
+                                                  echo(
+                                                    '<li class="dropdown-item-text" style="width: max-content;">
+                                                        <div class="d-flex align-items-center justify-content-center fw-bold">Invito da '.$sender['Nome'].' '.$sender['Cognome'].'</div>
+                                                        <div class="d-inline-flex gap-3 align-items-center justify-content-center" style="width: 350px">
+                                                            <div>
+                                                                <div class="profile-container">
+                                                                    <img src="http://www.cs.unibo.it/~roccetti/marco-old.jpg" alt="Profile Picture" class="profile-picture">
+                                                                </div>
+                                                            </div>
+                                                            <div class="vr" style="width: 2px">
+                                                            </div>
+                                                            <div class="text-wrap">
+                                                                '.$sender['Nome'].' '.$sender['Cognome'].' ti ha invitato a partecipare al sondaggio '.$poll['Titolo'].'
+                                                                <div class="d-flex align-items-center justify-content-center gap-2 mt-1">
+                                                                    <a class="btn primary-btn-outline" href="javascript:void(0)">
+                                                                        Accetta
+                                                                    </a>
+                                                                    <a class="btn primary-btn" href="javascript:void(0)">
+                                                                        Rifiuta
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>'
+                                                  );
+                                                }
+                                            }
+
+                                        ?>
                                         <li class="dropdown-item-text" style="width: max-content;">
                                             <div class="d-flex align-items-center justify-content-center fw-bold">Invito da ...</div>
                                             <div class="d-inline-flex gap-3 align-items-center justify-content-center" style="width: 350px">
@@ -144,8 +184,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-
-
                                         </li>
                                         <hr>
                                         <li class="dropdown-item">Another action</li>

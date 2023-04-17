@@ -236,6 +236,10 @@
                 Anno di nascita non valido!
             </div>
         </div>
+        <div class="col-12">
+            <label for="formFileMultiple" class="form-label">Multiple files input example</label>
+            <input class="form-control" type="file" id="formFileMultiple" accept=".jpg,.gif,.png">
+        </div>
         <div id="login-btn-container">
             <button class="btn btn-primary login-btn" type="submit">Registrati</button>
         </div>
