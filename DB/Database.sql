@@ -248,7 +248,6 @@ CREATE TABLE Interessamento(
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
-<<<<<<< HEAD
 
 
 INSERT INTO `Azienda`(`CodiceFiscale`, `Nome`, `Sede`, `IndirizzoEmail`) 
@@ -304,8 +303,7 @@ $ DELIMITER ;
 
 
 #DROP PROCEDURE InserisciDomandaChiusa
-=======
->>>>>>> 1ca1aa179e566865f847237326847e0ca87b3a33
+
 #Insercisci domanda aperta sondaggio
 DELIMITER $
 CREATE PROCEDURE InserisciDomandaAperta (IN Testo VARCHAR(200), Punteggio INT, Foto VARCHAR(50), MaxCaratteri INT, CodiceSondaggio INT)
@@ -464,14 +462,25 @@ $ DELIMITER ;
 
 
 
+DELIMITER $
+CREATE PROCEDURE returnUtenti(IN codSondaggio INT)
+BEGIN
+
+	SELECT Email FROM Utente WHERE Email NOT IN 
+    (SELECT EmailUtente FROM Notifica WHERE (SELECT CodiceNotifica FROM Invito) = Codice AND 
+    (SELECT CodiceSondaggio FROM Invito) = codSondaggio) ;
+
+END
+$ DELIMITER ;
 
 
 DELIMITER $
-CREATE PROCEDURE returnUtenti()
+CREATE PROCEDURE returnAccettati(IN codSondaggio INT)
 BEGIN
 
-	SELECT Email FROM Utente;
-    
+	SELECT count(*) FROM RispostaInvito WHERE CodiceInvito = (SELECT CodiceNotifica FROM Invito WHERE CodiceSondaggio = codSondaggio) 
+		AND Esito = 'ACCETTATO';
+
 END
 $ DELIMITER ;
 
