@@ -12,8 +12,7 @@ CREATE TABLE Azienda(
     CodiceFiscale VARCHAR(30) PRIMARY KEY,
     Nome VARCHAR(30),
     Sede VARCHAR(30),
-    IndirizzoEmail VARCHAR(30),
-    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
+    IndirizzoEmail VARCHAR(30)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Utente(
