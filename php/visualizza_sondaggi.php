@@ -57,6 +57,9 @@
       session_start();
       $emailUtente = $_SESSION['emailLogged'];
       $type = $_SESSION['type'];
+
+  $emailUtente = "utente@gmail.com";
+  $type = "Premium";
   ?>
 
     <!--====== NAVBAR ONE PART START ======-->
@@ -141,7 +144,8 @@
         <!-- questa parte dovrebbe contenere i sondaggi che hai creato se sei premium, quelli a cui hai partecipato se sei utente-->
         <?php
               echo '<div class="box answer">';
-              if ($type == "Utente") {
+              if ($type == "Premium") {
+
                 $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio WHERE EmailUtente='$emailUtente'";
                 $res=$pdo->query($sql);
                 foreach($res as $row) {

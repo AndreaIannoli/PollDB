@@ -14,64 +14,6 @@ body{
     padding: 100px 100px 100px 100px;
 }
 
-#addPoll-form{
-
-}
-
-#login-btn-container{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-
-#navLeft{
-    margin-top: 12vh;
-    border-radius: 20px;
-    max-width: 200px;
-    background-color: black;
-
-}
-
-#v-pills-tab{
-    margin-top: 25px;
-    margin-bottom: 25px;
-    min-width: 200px;
-    max-width: 200px;
-
-}
-
-#v-pills-home-tab{
-    margin-right: 25px;
-
-}
-
-#v-pills-profile-tab{
-    margin-right: 25px;
-
-}
-
-#v-pills-permi-tab{
-    margin-right: 25px;
-
-}
-
-#v-pills-inviti-tab{
-    margin-right: 25px;
-
-}
-
-
-#v-pills-indietro-tab{
-    margin-right: 25px;
-
-}
-
-.col-12{
-    width: 400px;
-}
-
-
 
 
 

@@ -64,6 +64,7 @@
 
 
 
+
         $dominiSelezionati = array();
 
 
@@ -174,7 +175,7 @@
 
                 </div>
 
-                <div class="col" id="addPoll-container" style="max-width: 700px">
+                <div class="col-12" id="addPoll-container" style="max-width: 1000px">
 
 
 
@@ -218,15 +219,15 @@
                                                 $sql = 'CALL returnUtenti(?)';
                                                 $res = $pdo->prepare($sql);
 
+
                                                 $res->bindValue(1, $CodiceSondaggio, PDO::PARAM_STR);
+
+                                                echo("codice sondaggio: ".$CodiceSondaggio);
 
                                                 $res->execute();
                                             } catch (PDOException $e){
                                                 echo 'exception: '.$e;
                                             }
-
-
-
 
                                             //unset($_SESSION["utentiSelezionati"]);
 
@@ -249,8 +250,6 @@
                                             }
 
 
-
-
                                             for($x=0; $x < sizeof($utenti); $x++){
 
                                                 //echo 'ciclo'.$x.'';
@@ -260,13 +259,11 @@
                                                 if(isset($_POST[$x]) and $_POST[$x] == 'notInterested'
                                                     and sizeof($_SESSION["utentiSelezionati"]) < $MaxUtenti){
 
-
+                                                    echo("sono dentro");
 
                                                     array_push($_SESSION["utentiSelezionati"], $utente);
 
                                                     //print_r($_SESSION["utentiSelezionati"]);
-
-
 
                                                 }else if(isset($_POST[$x]) and $_POST[$x] == 'interested'){
                                                     //echo '      remove-------------------';

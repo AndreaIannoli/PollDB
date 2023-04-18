@@ -371,7 +371,7 @@ function getDominiSelezionati(){
                         echo($_POST['statoSondaggioRadio']);
 
                         if(!isset($_POST['statoSondaggioRadio']) or $_POST['statoSondaggioRadio'] == 'APERTO'){
-                            echo('<input class="form-check-input" type="radio" name="statoSondaggioRadio" id="flexRadioDefault" value="APERTO" checked>');
+                            echo('<input class="form-check-input" type="radio" name="statoSondaggioRadio" id="flexRadioDefault" value="" checked>');
                         } else {
                             echo('<input class="form-check-input" type="radio" name="statoSondaggioRadio" id="flexRadioDefault" value="APERTO">');
                         }
@@ -388,7 +388,7 @@ function getDominiSelezionati(){
                         <?php
 
                         if(isset($_POST['statoSondaggioRadio']) and $_POST['statoSondaggioRadio'] == 'CHIUSO'){
-                            echo('<input class="form-check-input" type="radio" name="statoSondaggioRadio" id="flexRadioDefault2" value="CHIUSO" checked>');
+                            echo('<input class="form-check-input" type="radio" name="statoSondaggioRadio" id="flexRadioDefault2" value="" checked>');
                         } else {
                             echo('<input class="form-check-input" type="radio" name="statoSondaggioRadio" id="flexRadioDefault2" value="CHIUSO">');
                         }
@@ -418,7 +418,7 @@ function getDominiSelezionati(){
                         try {
 
                             // execute the stored procedure
-                            $sql = "CALL InserisciSondaggio('$nomeSondaggio', '$numMaxUtenti', '$dataChiusura', '$statoSondaggio', '$email')";
+                            $sql = "CALL InserisciSondaggio('$nomeSondaggio', '$numMaxUtenti', '$dataChiusura', '$statoSondaggio')";
                             // call the stored procedure
 
                             $res = $pdo -> prepare($sql);
