@@ -41,8 +41,7 @@ CREATE TABLE Sondaggio(
 	Titolo VARCHAR(30) NOT NULL,
     DataChiusura Date,
     DataCreazione Date,
-    ArgomentoDominio VARCHAR(30),
-    EmailPremium VARCHAR(30)
+    ArgomentoDominio VARCHAR(30)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Appartenenza(

@@ -28,60 +28,35 @@
 
     $emailUtente = "utente@gmail.com";
 
-
   try {
       $sql = 'CALL searchAzienda(?)';
-
       $res = $pdo->prepare($sql);
-
       $res->bindValue(1, $emailUtente, PDO::PARAM_STR);
-
       $res->execute();
-
-
   } catch (PDOException $e){
       echo 'exception: '.$e;
   }
-
-
   $row = $res->fetch();
-
   $azienda = $row[0];
-
   $res->closeCursor();
-
-
   try {
       $sql = 'CALL searchUtentePremium(?)';
       $res = $pdo->prepare($sql);
-
       $res->bindValue(1, $emailUtente, PDO::PARAM_STR);
-
       $res->execute();
-
-
   } catch (PDOException $e){
       echo 'exception: '.$e;
   }
-
-
   $row = $res->fetch();
-
   $utenteP = $row[0];
-
   $res->closeCursor();
-
-
   //echo("azienda: ".$azienda);
   //echo("utenteP: ".$utenteP);
-
-
       require 'connectionManager.php';
       $pdo = connectToDB();
       session_start();
       $emailUtente = $_SESSION['emailLogged'];
       $type = $_SESSION['type'];
-
   ?>
 
     <!--====== NAVBAR ONE PART START ======-->
@@ -163,21 +138,9 @@
     <div class="container box2">
         <h1 class="t3">I tuoi sondaggi</h1>
         <p class="t3" style="margin-bottom: 8%;">Visualizza la lista dei sondaggi a cui hai partecipato, assieme alla lista di domande e le loro relative risposte. Non perderti mai nessuna informazione e resta aggiornato sui risultati dei sondaggi!</p>
-
         <!-- questa parte dovrebbe contenere i sondaggi che hai creato se sei premium, quelli a cui hai partecipato se sei utente-->
-
         <?php
-
-          $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailPremium='$emailUtente'";
-          $res=$pdo->query($sql);
-          foreach($res as $row) {
-            $CodiceSondaggio = $row["Codice"];
-            $titoloSondaggio = $row["Titolo"];
-            $MaxUtenti = $row["MaxUtenti"];
-
-
               echo '<div class="box answer">';
-
               if ($type == "Utente") {
                 $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio WHERE EmailUtente='$emailUtente'";
                 $res=$pdo->query($sql);
@@ -186,70 +149,43 @@
                     $titoloSondaggio = $row["Titolo"];
                     $MaxUtenti = $row["MaxUtenti"];
                     echo '<div class="box answer">';
-
                     echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
                     # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
                     echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
                     echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
                     echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
-
                     echo '<a href="../visualizza_domande/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
-
                     if(is_null($azienda)){
-
                         echo '<a href="invitoUtentePremium.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '&MaxUtenti=' . urlencode($MaxUtenti)  . '&emailUtente=' . urlencode($emailUtente).'"><button  type="button" class="btn btn-light">invita</button></a>';
-
                     }else {
-
                         echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
-
-
                         try{
-
                             // execute the stored procedure
                             $sql = "CALL randomUtenti()";
                             // call the stored procedure
-
                             $res = $pdo -> prepare($sql);
-
                             $res -> execute();
-
-
                         }catch (PDOException $e) {
                             die("Error occurred:" . $e->getMessage());
                         }
-
                         $utentiInvitati = [];
-
                         for($x=0; $x < $res -> rowCount(); $x++){
-
                             $row = $res->fetch();
                             array_push($utentiInvitati, $row[0]);
-
                             //echo("utente preso: ".$utentiInvitati[$x]);
-
                             if(sizeof($utentiInvitati) == $MaxUtenti){
-
                                 $x = $res -> rowCount();
                             }
-
                         }
-
-
                         $res->closeCursor();
-
-
                     }
-
                   echo '</div>';
                 }
-
-
                     echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
                     echo '<a href="invitoUtentePremium.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '&MaxUtenti=' . urlencode($MaxUtenti) . '"><button  type="button" class="btn btn-light">Invita Semplice</button></a>';
-
               }else{
-                $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailPremium='$emailUtente'"; //l'utente premium vede tutti o solo i suoi sondaggi?
+                //la select devo inserire azienda o premium e se è azienda devo andare a prendere il codiceazienda dalla tabella azienda con l'email per prendere il codiceazienda
+                $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio WHERE EmailUtente='$emailUtente'";
                 $res=$pdo->query($sql);
                 foreach($res as $row) {
                     $CodiceSondaggio = $row["Codice"];
@@ -266,8 +202,6 @@
                     echo '</div>';
                 }
               }
-          }
-
         ?>
     </div>
       
