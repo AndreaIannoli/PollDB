@@ -12,6 +12,7 @@
     <?php
         require "connectionManager.php";
         require "accountManager.php";
+        require "upload.php";
 
         $pdo = connectToDB();
         $emailInserted = false;
@@ -54,8 +55,9 @@
         if($ageInserted){
             $checkAgeRes = checkAge($_POST['age']);
         }
-
+        echo 'nome file: '.$_FILES["propicUpload"]["name"];
         if(!$checkEmailRes and $checkPassRes and $checkAgeRes){
+            uploadProPic();
             $sql = 'CALL RegistrazioneUtenteSemplice(?, ?, ?, ?, ?, ?, ?)';
             $res = $pdo->prepare($sql);
             $res->bindValue(1, $_POST['email'], PDO::PARAM_STR);
@@ -69,7 +71,7 @@
             session_start();
             $_SESSION['authorized'] = 1;
             $_SESSION['loggedEmail'] = $_POST['email'];
-            header("domainChoice.php");
+            //header("Location: domainChoice.php");
         }
     ?>
 <!--====== NAVBAR ONE PART START ======-->
@@ -149,7 +151,7 @@
 <!--====== NAVBAR ONE PART ENDS ======-->
 <div class="container-md" id="login-container">
     <img src="../img/logoPollDBBlack.png" class="img-fluid" alt="...">
-    <form class="row g-3 needs-validation" id="login-form" method="post">
+    <form class="row g-3 needs-validation" id="login-form" method="post" enctype="multipart/form-data">
         <div class="col-12">
             <label for="email">Email</label>
             <input type="email" <?php
@@ -237,8 +239,8 @@
             </div>
         </div>
         <div class="col-12">
-            <label for="formFileMultiple" class="form-label">Multiple files input example</label>
-            <input class="form-control" type="file" id="formFileMultiple" accept=".jpg,.gif,.png">
+            <label for="propicUpload" class="form-label">Immagine profilo</label>
+            <input class="form-control" type="file" id="propicUpload" name="propicUpload" accept=".jpg,.gif,.png">
         </div>
         <div id="login-btn-container">
             <button class="btn btn-primary login-btn" type="submit">Registrati</button>

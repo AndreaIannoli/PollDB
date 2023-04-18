@@ -14,14 +14,14 @@
 <body>
 
 <?php
- 
-require 'connectionManager.php';
+
+require "accountManager.php";
+require "connectionManager.php";
 $pdo = connectToDB();
 session_start();
 $emailUtente = $_SESSION['emailLogged'];
 $type = $_SESSION['type'];
-$_SESSION['emailCreatore'] = 'nome.esempio@email.com';
-
+$_SESSION['emailCreatore'] = 'email.azienda@email.com';
 
 
 
@@ -234,91 +234,91 @@ function getDominiSelezionati(){
                             <div class="row justify-content-center gap-1" style="max-height: 250px; overflow-y: scroll;" method="post">
 
                                 <?php
-                                    try {
-                                        $sql = 'CALL SearchDominio(?)';
-                                        $res = $pdo->prepare($sql);
-                                        if(isset($_POST['searchField'])) {
-                                            $res->bindValue(1, $_POST['searchField'], PDO::PARAM_STR);
-                                        } else {
-                                            $res->bindValue(1, '', PDO::PARAM_STR);
-                                        }
-                                        $res->execute();
-                                    } catch (PDOException $e){
-                                        echo 'exception: '.$e;
+                                try {
+                                    $sql = 'CALL SearchDominio(?)';
+                                    $res = $pdo->prepare($sql);
+                                    if(isset($_POST['searchField'])) {
+                                        $res->bindValue(1, $_POST['searchField'], PDO::PARAM_STR);
+                                    } else {
+                                        $res->bindValue(1, '', PDO::PARAM_STR);
+                                    }
+                                    $res->execute();
+                                } catch (PDOException $e){
+                                    echo 'exception: '.$e;
+                                }
+
+                                $domainNames = [];
+                                for($x=0; $x < $res -> rowCount(); $x++){
+                                    $row = $res->fetch();
+                                    array_push($domainNames, $row[0]);
+                                }
+
+                                $res->closeCursor();
+                                //echo sizeof($domainNames);
+
+                                if(sizeof($domainNames) == 0){
+                                    echo('Nessun dominio di interesse trovato');
+                                }
+
+                                $interests = array();
+
+                                $interests = getDominiSelezionati();
+
+                                $interestsArguments = [];
+
+
+                                for($x=0; $x < sizeof($interests); $x++){
+
+                                    $interestRow = $interests->fetch();
+
+                                    array_push($interestsArguments, $interestRow[0]);
+
+                                }
+
+
+                                for($x=0; $x < sizeof($domainNames); $x++){
+
+                                    //echo 'ciclo'.$x.'';
+                                    $domainName = $domainNames[$x];
+
+
+                                    if(isset($_POST[$domainName]) and $_POST[$domainName] == 'notInterested'){
+
+
+
+                                        array_push($_SESSION["dominiSelezionati"], $domainName);
+
+
+
+                                    } else if(isset($_POST[$domainName]) and $_POST[$domainName] == 'interested'){
+                                        //echo '      remove-------------------';
+
+                                        //unset($_SESSION["dominiSelezionati"]);
+
+
+                                        $domainKey = array_search($domainName, $_SESSION["dominiSelezionati"]);
+
+
+                                        unset($_SESSION["dominiSelezionati"][$domainKey]);
+
                                     }
 
-                                    $domainNames = [];
-                                    for($x=0; $x < $res -> rowCount(); $x++){
-                                        $row = $res->fetch();
-                                        array_push($domainNames, $row[0]);
-                                    }
-
-                                    $res->closeCursor();
-                                    //echo sizeof($domainNames);
-
-                                    if(sizeof($domainNames) == 0){
-                                        echo('Nessun dominio di interesse trovato');
-                                    }
-
-                                    $interests = array();
-
-                                    $interests = getDominiSelezionati();
-
-                                    $interestsArguments = [];
-
-
-                                    for($x=0; $x < sizeof($interests); $x++){
-
-                                        $interestRow = $interests->fetch();
-
-                                        array_push($interestsArguments, $interestRow[0]);
-
-                                    }
-
-
-                                    for($x=0; $x < sizeof($domainNames); $x++){
-
-                                        //echo 'ciclo'.$x.'';
-                                        $domainName = $domainNames[$x];
-
-
-                                        if(isset($_POST[$domainName]) and $_POST[$domainName] == 'notInterested'){
-
-
-
-                                            array_push($_SESSION["dominiSelezionati"], $domainName);
-
-
-
-                                        } else if(isset($_POST[$domainName]) and $_POST[$domainName] == 'interested'){
-                                            //echo '      remove-------------------';
-
-                                            //unset($_SESSION["dominiSelezionati"]);
-
-
-                                            $domainKey = array_search($domainName, $_SESSION["dominiSelezionati"]);
-
-
-                                            unset($_SESSION["dominiSelezionati"][$domainKey]);
-
-                                        }
-
-                                        $_POST[$domainName] = null;
-                                        //echo in_array($domainName, $_SESSION["dominiSelezionati"])? ' EXIST' : ' NOT EXIST';
-                                        if(in_array($domainName, $_SESSION["dominiSelezionati"]) == 'EXIST') {
-                                            //echo('pulsante interested'.$x);
-                                            echo("                                
+                                    $_POST[$domainName] = null;
+                                    //echo in_array($domainName, $_SESSION["dominiSelezionati"])? ' EXIST' : ' NOT EXIST';
+                                    if(in_array($domainName, $_SESSION["dominiSelezionati"]) == 'EXIST') {
+                                        //echo('pulsante interested'.$x);
+                                        echo("                                
                                                 <button class='btn btn-primary login-btn d-grid wrap-content col-sm-3 btn-square-md' value='interested' type='submit' name='" . $domainName . "'><i class='bi bi-heart-fill'></i>" . $domainName . "</button>                            
                                              ");
-                                        } else {
-                                            //echo('pulsante NOT interested'.$x);
-                                            echo("                                
+                                    } else {
+                                        //echo('pulsante NOT interested'.$x);
+                                        echo("                                
                                                 <button class='btn btn-primary login-btn d-grid wrap-content col-sm-3 btn-square-md' value='notInterested' type='submit' name='" . $domainName . "'><i class='bi bi-heart'></i>" . $domainName . "</button>                            
                                             ");
-                                        }
-                                        //echo 'fine ciclo'.$x;
-                                        //print_r($domainNames);
                                     }
+                                    //echo 'fine ciclo'.$x;
+                                    //print_r($domainNames);
+                                }
 
 
 
@@ -450,46 +450,79 @@ function getDominiSelezionati(){
                         $i = 0;
 
                         while (!empty($_SESSION["dominiSelezionati"])) {
-
                             $elemento = array_shift($_SESSION["dominiSelezionati"]);
                             $arrayNuovo[$i] = $elemento;
 
                             $i++;
-
                         }
 
                         $res->closeCursor();
 
 
                         for($i = 0; $i < sizeof($arrayNuovo); $i++){
-
                             try{
-
                                 $sql = 'CALL AggiungiAppartenenza(?, ?)';
                                 $res = $pdo->prepare($sql);
 
                                 $res->bindValue(1, $riga[0], PDO::PARAM_STR);
                                 $res->bindValue(2, $arrayNuovo[$i], PDO::PARAM_STR);
 
-
-
                                 $res->execute();
 
                                 $res->closeCursor();
-
-
                             }catch(PDOException $e) {
                                 echo 'exception: ' . $e;
                             }
                         }
 
 
+                        if(checkType($_SESSION["emailCreatore"], $pdo) == "Premium"){
+                            try{
+                                $sql = 'CALL aggiungiCreazionePremium(?, ?)';
+                                $res = $pdo->prepare($sql);
+
+                                $res->bindValue(1, $_SESSION["emailCreatore"], PDO::PARAM_STR);
+                                $res->bindValue(2,  $riga[0], PDO::PARAM_STR);
+
+                                $res->execute();
+
+                                $res->closeCursor();
+                            }catch(PDOException $e) {
+                                echo 'exception: ' . $e;
+                            }
+
+                        }else if(checkType($_SESSION["emailCreatore"], $pdo) == "Azienda"){
+                            try{
+                                $sql = 'CALL returnCodiceAzienda(?)';
+                                $res = $pdo->prepare($sql);
+
+                                echo("stampo valori: ".$riga[0]." ".$_SESSION["emailCreatore"]." ");
+
+                                $res->bindValue(1, $_SESSION["emailCreatore"], PDO::PARAM_STR);
+
+                                $res->execute();
+                            }catch(PDOException $e) {
+                                echo 'exception: ' . $e;
+                            }
+                            $row = $res->fetch();
+                            $codiceAzienda = $row[0];
+                            $res->closeCursor();
+                            try{
+                                $sql = 'CALL aggiungiCreazioneAziendale(?, ?)';
+                                $res = $pdo->prepare($sql);
+
+                                $res->bindValue(1, $riga[0], PDO::PARAM_STR);
+                                $res->bindValue(2,  $codiceAzienda, PDO::PARAM_STR);
+
+                                $res->execute();
+
+                                $res->closeCursor();
+                            }catch(PDOException $e) {
+                                echo 'exception: ' . $e;
+                            }
 
 
-
-
-
-
+                        }
                     }
 
                     ?>

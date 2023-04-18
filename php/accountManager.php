@@ -1,6 +1,5 @@
 <?php
     function checkEmail($email, PDO $pdo) {
-
         try {
             $sql = "CALL CheckEmail(?)";
             $res = $pdo->prepare($sql);

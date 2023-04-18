@@ -40,8 +40,7 @@ CREATE TABLE Sondaggio(
     Stato ENUM ('APERTO', 'CHIUSO'),
 	Titolo VARCHAR(30) NOT NULL,
     DataChiusura Date,
-    DataCreazione Date,
-    ArgomentoDominio VARCHAR(30)
+    DataCreazione Date
 ) ENGINE = "INNODB";
 
 CREATE TABLE Appartenenza(
@@ -283,8 +282,8 @@ VALUES ('3','APERTO','BerlusconiMorto','20-07-2021','10-03-2024','Cinema','email
 
 
 
-INSERT INTO Sondaggio (Titolo, MaxUtenti, DataCreazione, DataChiusura, Stato, EmailPremium) 
-		VALUES ("Prova", 3, current_date(), "2023-03-31", "APERTO", "email.azienda@email.com");
+INSERT INTO Sondaggio (Titolo, MaxUtenti, DataCreazione, DataChiusura, Stato) 
+		VALUES ("Prova", 3, current_date(), "2023-03-31", "APERTO");
         
         
         
@@ -691,5 +690,50 @@ BEGIN
             SET @i = @i + 1;
         END IF;
     END WHILE;
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE ReturnPollCreator(IN CodiceSondaggio_Inserito INT)
+BEGIN
+	
+	IF(SELECT count(*) FROM CreazionePremium WHERE(CodiceSondaggio=CodiceSondaggio_Inserito) > 0) THEN
+		SELECT EmailUtentePremium FROM CreazionePremium WHERE(CodiceSondaggio=CodiceSondaggio_Inserito);
+	END IF;
+    
+    IF(SELECT count(*) FROM CreazioneAziendale WHERE(CodiceSondaggio=CodiceSondaggio_Inserito) > 0) THEN
+		SELECT CodiceAzienda FROM CreazioneAziendale WHERE(CodiceSondaggio=CodiceSondaggio_Inserito);
+	END IF;
+    
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE aggiungiCreazionePremium(IN email varchar(30), codiceSondaggio INT)
+BEGIN
+
+	INSERT INTO CreazionePremium(EmailUtentePremium, CodiceSondaggio) VALUES (email, codiceSondaggio);
+    
+END
+$ DELIMITER ;
+
+
+
+DELIMITER $
+CREATE PROCEDURE aggiungiCreazioneAziendale(IN codiceSondaggio INT, codiceAzienda varchar(30))
+BEGIN
+
+	INSERT INTO CreazioneAziendale(CodiceSondaggio, CodiceAzienda) VALUES (codiceSondaggio, codiceAzienda);
+    
+END
+$ DELIMITER ;
+
+
+DELIMITER $
+CREATE PROCEDURE returnCodiceAzienda(IN email varchar(30))
+BEGIN
+
+		SELECT CodiceFiscale FROM Azienda WHERE IndirizzoEmail = email;
+        
 END
 $ DELIMITER ;
