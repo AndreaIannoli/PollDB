@@ -162,7 +162,7 @@
 
         <!--PREMIUM ONLY!!! forse da togliere visto che anche gli utenti normali possono visualizzare le risposte dei sondaggi a cui hanno partecipato-->
         <?php
-          if($type == "Premium"){
+          //if($type == "Premium"){
             if($tipologia == 'APERTA'){
               $sql="SELECT Testo FROM RispostaAperta WHERE IdDomanda='$IdDomanda'";
             }else{
@@ -175,7 +175,7 @@
               echo '<p class="t2">' . str_replace("\n", "<br>", $row["Testo"]) . '</p>'; //lo slash n in php viene interpretato diversamente in html
               echo '</div>';
             }
-          } 
+          //} 
         ?>
          <!--PREMIUM ONLY!!!-->
 

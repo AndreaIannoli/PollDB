@@ -14,18 +14,14 @@
 
   <?php
 
-    $host = "localhost:3306";
-    $dbName = "PollDB";
-    $username = "root";
-    $pass = "root";
-    try {
-        $pdo = new PDO('mysql:host='.$host.';dbname='.$dbName, $username, $pass);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
-        echo("[ERRORE] Connessione al DB non riuscita. Errore: " . $e->getMessage());
-        throw $e;
-    }
+    require 'connectionManager.php';
+    $pdo = connectToDB();
 
+    session_start();
+    $type = $_SESSION['type'];
+    $emailUtente = $_SESSION['emailLogged'];
+
+    /*
     $emailUtente = "utente@gmail.com";
 
   try {
@@ -60,6 +56,8 @@
 
   $emailUtente = "utente@gmail.com";
   $type = "Premium";
+  */
+
   ?>
 
     <!--====== NAVBAR ONE PART START ======-->
@@ -143,9 +141,7 @@
         <p class="t3" style="margin-bottom: 8%;">Visualizza la lista dei sondaggi a cui hai partecipato, assieme alla lista di domande e le loro relative risposte. Non perderti mai nessuna informazione e resta aggiornato sui risultati dei sondaggi!</p>
         <!-- questa parte dovrebbe contenere i sondaggi che hai creato se sei premium, quelli a cui hai partecipato se sei utente-->
         <?php
-              echo '<div class="box answer">';
-              if ($type == "Premium") {
-
+              if ($type == "Utente") {
                 $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio WHERE EmailUtente='$emailUtente'";
                 $res=$pdo->query($sql);
                 foreach($res as $row) {
@@ -189,21 +185,86 @@
                     echo '<a href="invitoUtentePremium.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '&MaxUtenti=' . urlencode($MaxUtenti) . '"><button  type="button" class="btn btn-light">Invita Semplice</button></a>';
               }else{
                 //la select devo inserire azienda o premium e se è azienda devo andare a prendere il codiceazienda dalla tabella azienda con l'email per prendere il codiceazienda
-                $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio WHERE EmailUtente='$emailUtente'";
-                $res=$pdo->query($sql);
-                foreach($res as $row) {
-                    $CodiceSondaggio = $row["Codice"];
-                    $titoloSondaggio = $row["Titolo"];
-                    $MaxUtenti = $row["MaxUtenti"];
-                    echo '<div class="box answer">';
-                    echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
-                    # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
-                    echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
-                    echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
-                    echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
-                    echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
-                    echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
-                    echo '</div>';
+                if ($type == "Premium") {
+                    //deve prendere i sondaggi a cui ha partecipato 
+                    $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio WHERE EmailUtente='$emailUtente'";
+                    $res=$pdo->query($sql);
+                    foreach($res as $row) {
+                        $CodiceSondaggio = $row["Codice"];
+                        $titoloSondaggio = $row["Titolo"];
+                        $MaxUtenti = $row["MaxUtenti"];
+                        echo '<div class="box answer">';
+                        echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
+                        # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
+                        echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
+                        echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
+                        echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
+                        echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+                        echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
+                        echo '</div>';
+                    }
+                    //e quelli da lui creati
+                    echo '<h1 style="margin-top:7%;" class="t3"">Sondaggi da te creati</h1>';
+                    echo '<p class="t3" style="margin-bottom: 5%;">Visualizza la lista dei sondaggi che hai creato, assieme alla lista di domande e le loro relative risposte. Non perderti mai nessuna informazione e resta aggiornato sui risultati dei sondaggi!</p>';
+                    $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN CreazionePremium ON Sondaggio.Codice = CreazionePremium.CodiceSondaggio WHERE EmailUtentePremium='$emailUtente'";
+                    $res=$pdo->query($sql);
+                    foreach($res as $row) {
+                        $CodiceSondaggio = $row["Codice"];
+                        $titoloSondaggio = $row["Titolo"];
+                        $MaxUtenti = $row["MaxUtenti"];
+                        echo '<div class="box answer">';
+                        echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
+                        # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
+                        echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
+                        echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
+                        echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
+                        echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+                        echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
+                        echo '</div>';
+                    }
+                }else{
+                    //l'azienda prende tutti i sondaggi a cui ha partecipato
+                    $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio WHERE EmailUtente='$emailUtente'";
+                    $res=$pdo->query($sql);
+                    foreach($res as $row) {
+                        $CodiceSondaggio = $row["Codice"];
+                        $titoloSondaggio = $row["Titolo"];
+                        $MaxUtenti = $row["MaxUtenti"];
+                        echo '<div class="box answer">';
+                        echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
+                        # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
+                        echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
+                        echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
+                        echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
+                        echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+                        echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
+                        echo '</div>';
+                    }
+                    //e i sondaggi creati
+                    echo '<h1 style="margin-top:7%;" class="t3"">Sondaggi da te creati</h1>';
+                    echo '<p class="t3" style="margin-bottom: 8%;">Visualizza la lista dei sondaggi che hai creato, assieme alla lista di domande e le loro relative risposte. Non perderti mai nessuna informazione e resta aggiornato sui risultati dei sondaggi!</p>';
+                    //prima deve prendere il codice azienda dall'indirizzo email
+                    $sql = "SELECT CodiceFiscale FROM Azienda WHERE IndirizzoEmail=?";
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute([$emailUtente]);
+                    $codiceazienda = $stmt->fetchColumn();
+                    //poi prende i sondaggi
+                    $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN CreazioneAziendale ON Sondaggio.Codice = CreazioneAziendale.CodiceSondaggio WHERE CodiceAzienda='$codiceazienda'";
+                    $res=$pdo->query($sql);
+                    foreach($res as $row) {
+                        $CodiceSondaggio = $row["Codice"];
+                        $titoloSondaggio = $row["Titolo"];
+                        $MaxUtenti = $row["MaxUtenti"];
+                        echo '<div class="box answer">';
+                        echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
+                        # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
+                        echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
+                        echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
+                        echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
+                        echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+                        echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
+                        echo '</div>';
+                    }
                 }
               }
         ?>
