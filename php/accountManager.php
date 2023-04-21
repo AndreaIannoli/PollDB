@@ -44,7 +44,59 @@
             $res->execute();
             return $res;
         } catch (PDOException $e) {
-            echo("[ERRORE] Query SQL returnUser() non riuscita. Errore: ".$e->getMessage());
+            echo("[ERRORE] Query SQL ReturnUtente() non riuscita. Errore: ".$e->getMessage());
+            exit();
+        }
+    }
+
+    function getAzienda($codice, PDO $pdo) {
+        try {
+            $sql = "CALL ReturnAzienda(?)";
+            $res = $pdo->prepare($sql);
+            $res->bindValue( 1, $codice, PDO::PARAM_STR);
+            $res->execute();
+            return $res;
+        } catch (PDOException $e) {
+            echo("[ERRORE] Query SQL ReturnAzienda() non riuscita. Errore: ".$e->getMessage());
+            exit();
+        }
+    }
+
+    function getPollCreator($pollCode, PDO $pdo) {
+        try {
+            $sql = "CALL ReturnPollCreator(?)";
+            $res = $pdo->prepare($sql);
+            $res->bindValue( 1, $pollCode, PDO::PARAM_INT);
+            $res->execute();
+            return $res;
+        } catch (PDOException $e) {
+            echo("[ERRORE] Query SQL ReturnPollCreator() non riuscita. Errore: ".$e->getMessage());
+            exit();
+        }
+    }
+
+    function getUserProPic($email, PDO $pdo){
+        try {
+            $sql = "CALL ReturnUserProPic(?)";
+            $res = $pdo->prepare($sql);
+            $res->bindValue( 1, $email, PDO::PARAM_STR);
+            $res->execute();
+            return $res->fetch()['UrlFoto'];
+        } catch (PDOException $e) {
+            echo("[ERRORE] Query SQL ReturnUserProPic() non riuscita. Errore: ".$e->getMessage());
+            exit();
+        }
+    }
+
+    function getAziendaProPic($codice, PDO $pdo){
+        try {
+            $sql = "CALL ReturnAziendaProPic(?)";
+            $res = $pdo->prepare($sql);
+            $res->bindValue( 1, $codice, PDO::PARAM_STR);
+            $res->execute();
+            return $res;
+        } catch (PDOException $e) {
+            echo("[ERRORE] Query SQL ReturnAziendaProPic() non riuscita. Errore: ".$e->getMessage());
             exit();
         }
     }

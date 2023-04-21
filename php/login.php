@@ -14,7 +14,7 @@
 
 
             $pdo = connectToDB();
-
+            print_r($_SESSION);
             $checkEmailRes = false;
             $checkPassRes = false;
 
@@ -22,19 +22,21 @@
             $passwordInserted = isset($_POST['password']);
 
             if($emailInserted){
-                echo('inside email inserted if');
                 $checkEmailRes = checkEmail($_POST['email'], $pdo);
             }
 
             if($passwordInserted and $checkEmailRes){
+                echo checkCredentials($_POST['email'], $_POST['password'], $pdo) ? 'autorizzato' : 'non aut';
                 $checkPassRes = checkCredentials($_POST['email'], $_POST['password'], $pdo);
                 $tipo = checkType($_POST['email'],$pdo);
                 if($checkPassRes){
                     session_start();
                     $_SESSION['authorized'] = 1;
                     $_SESSION['emailLogged'] = $_POST['email'];
-                    $_SESSION['type'] = $tipo;
-                    header('Location: visualizza_sondaggi.php');
+                    $_SESSION['nameLogged'] = getUser($_POST['email'], $pdo)->fetch()['Nome'];
+                    $_SESSION['userType'] = $tipo;
+                    $_SESSION['userProPicURI'] = getUserProPic($_POST['email'], $pdo);
+                    header('Location: domainChoice.php');
                 }
             }
         ?>

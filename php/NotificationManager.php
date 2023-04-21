@@ -51,4 +51,28 @@
         }
         return $res;
     }
+
+    function acceptInvite($notificationCode, PDO $pdo){
+        try {
+            $sql = "CALL AcceptInvito(?)";
+            $res = $pdo->prepare($sql);
+            $res->bindValue( 1, $notificationCode, PDO::PARAM_STR);
+            $res->execute();
+        } catch (PDOException $e) {
+            echo("[ERRORE] Query SQL AcceptInvito() non riuscita. Errore: ".$e->getMessage());
+            exit();
+        }
+    }
+
+function denyInvite($notificationCode, PDO $pdo){
+    try {
+        $sql = "CALL DenyInvito(?)";
+        $res = $pdo->prepare($sql);
+        $res->bindValue( 1, $notificationCode, PDO::PARAM_STR);
+        $res->execute();
+    } catch (PDOException $e) {
+        echo("[ERRORE] Query SQL DenyInvito() non riuscita. Errore: ".$e->getMessage());
+        exit();
+    }
+}
 ?>

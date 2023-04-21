@@ -10,6 +10,7 @@
 </head>
 <body>
     <?php
+        session_start();
         require "connectionManager.php";
         require "accountManager.php";
         require "upload.php";
@@ -21,7 +22,6 @@
         $checkEmailRes = true;
         $checkPassRes = false;
         $checkAgeRes = false;
-
         function checkPasswordLength($pass){
             if(strlen($pass) >= 8){
                 return true;
@@ -55,23 +55,31 @@
         if($ageInserted){
             $checkAgeRes = checkAge($_POST['age']);
         }
-        echo 'nome file: '.$_FILES["propicUpload"]["name"];
+
         if(!$checkEmailRes and $checkPassRes and $checkAgeRes){
-            uploadProPic();
-            $sql = 'CALL RegistrazioneUtenteSemplice(?, ?, ?, ?, ?, ?, ?)';
-            $res = $pdo->prepare($sql);
-            $res->bindValue(1, $_POST['email'], PDO::PARAM_STR);
-            $res->bindValue(2, $_POST['password'], PDO::PARAM_STR);
-            $res->bindValue(3, $_POST['name'], PDO::PARAM_STR);
-            $res->bindValue(4, $_POST['surname'], PDO::PARAM_STR);
-            $res->bindValue(5, $_POST['date'], PDO::PARAM_STR);
-            $res->bindValue(6, $_POST['placeOfBirth'], PDO::PARAM_STR);
-            $res->bindValue(7, 0, PDO::PARAM_INT);
-            $res->execute();
-            session_start();
+            try {
+                $sql = 'CALL RegistrazioneUtenteSemplice(?, ?, ?, ?, ?, ?, ?, ?)';
+                $res = $pdo->prepare($sql);
+                $res->bindValue(1, $_POST['email'], PDO::PARAM_STR);
+                $res->bindValue(2, $_POST['password'], PDO::PARAM_STR);
+                $res->bindValue(3, $_POST['name'], PDO::PARAM_STR);
+                $res->bindValue(4, $_POST['surname'], PDO::PARAM_STR);
+                $res->bindValue(5, $_POST['date'], PDO::PARAM_STR);
+                $res->bindValue(6, $_POST['placeOfBirth'], PDO::PARAM_STR);
+                $res->bindValue(7, 0, PDO::PARAM_INT);
+                $res->bindValue(8, uploadProPic(), PDO::PARAM_STR);
+                $res->execute();
+            } catch (PDOException $e) {
+                echo("[ERRORE] Query SQL RegistrazioneUtenteSemplice() non riuscita. Errore: ".$e->getMessage());
+                exit();
+            }
+
             $_SESSION['authorized'] = 1;
-            $_SESSION['loggedEmail'] = $_POST['email'];
-            //header("Location: domainChoice.php");
+            $_SESSION['emailLogged'] = $_POST['email'];
+            $_SESSION['nameLogged'] = $_POST['name'];
+            $_SESSION['userType'] = 'Utente';
+            $_SESSION['userProPicURI'] = getUserProPic($_POST['email'], $pdo);
+            header("Location: domainChoice.php");
         }
     ?>
 <!--====== NAVBAR ONE PART START ======-->

@@ -12,8 +12,13 @@ CREATE TABLE Azienda(
     CodiceFiscale VARCHAR(30) PRIMARY KEY,
     Nome VARCHAR(30),
     Sede VARCHAR(30),
-    IndirizzoEmail VARCHAR(30),
-    FOREIGN KEY (IndirizzoEmail) REFERENCES Utente(Email)
+    IndirizzoEmail VARCHAR(30)
+) ENGINE = "INNODB";
+
+CREATE TABLE FotoAzienda(
+	CodiceFiscaleAzienda VARCHAR(30) PRIMARY KEY,
+    UrlFoto TEXT,
+    FOREIGN KEY (CodiceFiscaleAzienda) REFERENCES Azienda(CodiceFiscale)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Utente(
@@ -24,6 +29,12 @@ CREATE TABLE Utente(
     DataDiNascita DATE,
     LuogoNascita VARCHAR(30),
     TotaleBonus INT
+) ENGINE = "INNODB";
+
+CREATE TABLE FotoUtente(
+	EmailUtente VARCHAR(30) NOT NULL PRIMARY KEY,
+    UrlFoto TEXT,
+    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
 CREATE TABLE UtentePremium(
@@ -342,9 +353,10 @@ $ DELIMITER ;
 
 #Inserimento nuovo utente
 DELIMITER $
-CREATE PROCEDURE RegistrazioneUtenteSemplice (IN Email VARCHAR(30), Pass CHAR(64), Nome VARCHAR(30), Cognome VARCHAR(30), DataDiNascita DATE, LuogoDiNascita VARCHAR(30), TotaleBonus INT)
+CREATE PROCEDURE RegistrazioneUtenteSemplice (IN Email VARCHAR(30), Pass CHAR(64), Nome VARCHAR(30), Cognome VARCHAR(30), DataDiNascita DATE, LuogoDiNascita VARCHAR(30), TotaleBonus INT, UrlFoto TEXT)
 BEGIN
 	INSERT INTO Utente VALUES (Email , sha2(Pass, 256), Nome, Cognome, DataDiNascita, LuogoDiNascita, TotaleBonus);
+    INSERT INTO FotoUtente VALUES (Email, UrlFoto);
 END
 $
 DELIMITER ;
@@ -620,17 +632,20 @@ END
 $ DELIMITER ;
 
 DELIMITER $
-CREATE PROCEDURE AcceptInvito (IN Email_Inserita VARCHAR(30))
+CREATE PROCEDURE AcceptInvito (IN CodiceNotifica_Inserito VARCHAR(36))
 BEGIN
-	SELECT * FROM Notifica;
+	UPDATE Notifica SET Archiviato = true WHERE(Codice=CodiceNotifica_Inserito);
+    INSERT INTO Associazione VALUES((SELECT CodiceSondaggio FROM Invito WHERE(CodiceNotifica=CodiceNotifica_Inserito)), (SELECT EmailUtente FROM Notifica WHERE(Codice=CodiceNotifica_Inserito)));
+    INSERT INTO RispostaInvito VALUES(CodiceNotifica_Inserito, (SELECT EmailUtente FROM Notifica WHERE(Codice=CodiceNotifica_Inserito)), 'ACCETTATO');
 END 
 $
 DELIMITER ;
 
 DELIMITER $
-CREATE PROCEDURE DenyInvito (IN CodiceSondaggio INT)
+CREATE PROCEDURE DenyInvito (IN CodiceNotifica_Inserito VARCHAR(36))
 BEGIN
-	SELECT * FROM Notifica;
+	UPDATE Notifica SET Archiviato = true WHERE(Codice=CodiceNotifica_Inserito);
+    INSERT INTO RispostaInvito VALUES(CodiceNotifica_Inserito, (SELECT EmailUtente FROM Notifica WHERE(Codice=CodiceNotifica_Inserito)), 'RIFIUTATO');
 END 
 $
 DELIMITER ;
@@ -736,5 +751,26 @@ BEGIN
 
 		SELECT CodiceFiscale FROM Azienda WHERE IndirizzoEmail = email;
         
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE ReturnAzienda(IN CodiceFiscale_Inserito varchar(30))
+BEGIN
+		SELECT * FROM Azienda WHERE CodiceFiscale = CodiceFiscale_Inserito;
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE ReturnUserProPic(IN EmailUtente_Inserita varchar(30))
+BEGIN
+		SELECT * FROM FotoUtente WHERE EmailUtente = EmailUtente_Inserita;
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE ReturnAziendaProPic(IN CodiceFiscale_Inserito varchar(30))
+BEGIN
+		SELECT * FROM FotoAzienda WHERE CodiceFiscaleAzienda = CodiceFiscale_Inserito;
 END
 $ DELIMITER ;

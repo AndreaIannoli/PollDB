@@ -1,10 +1,15 @@
 <?php
     function uploadProPic(){
         $target_dir = "../img/";
-        $target_file = $target_dir . basename($_FILES["propicUpload"]["name"]);
+        $target_file = $target_dir . uniqid().'.'.pathinfo($_FILES["propicUpload"]["name"], PATHINFO_EXTENSION);
         $uploadOk = 1;
         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
         echo $_FILES["propicUpload"]["name"];
+
+        // Check if file already exists
+        while (file_exists($target_file)) {
+            $target_file = $target_dir . uniqid();
+        }
 
         // Check if image file is a actual image or fake image
         if (isset($_POST["propicUpload"])) {
@@ -18,13 +23,6 @@
             }
         }
 
-        // Check if file already exists
-        if (file_exists($target_file)) {
-            echo "Sorry, file already exists.";
-            $uploadOk = 0;
-        }
-
-        echo 'size: '.$_FILES["propicUpload"]["size"];
         // Check file size
         if ($_FILES["propicUpload"]["size"] > 500000) {
             echo "Sorry, your file is too large.";
@@ -49,5 +47,7 @@
                 echo "Sorry, there was an error uploading your file.";
             }
         }
+
+        return $target_file;
     }
 ?>

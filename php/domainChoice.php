@@ -21,16 +21,13 @@
     require 'NotificationManager.php';
 
     session_start();
-    $_SESSION['emailLogged'] = 'utente2@gmail.com';
-    $_SESSION['nameLogged'] = 'Andrea';
-    $_SESSION['authorized'] = 1;
     if(isset($_POST['searchField'])){
         $_SESSION['search'] = $_POST['searchField'];
     }
 
     $pdo = connectToDB();
     if(!isset($_SESSION['authorized']) or $_SESSION['authorized'] == 0){
-        $_SESSION['emailLogged'] = null;
+        session_unset();
         header('Location: login.php');
     }
 
@@ -47,6 +44,11 @@
         return $res;
     }
 
+    if(isset($_POST['AcceptInvite'])){
+        acceptInvite($_POST['AcceptInvite'], $pdo);
+    } else if(isset($_POST['DenyInvite'])) {
+        denyInvite($_POST['DenyInvite'], $pdo);
+    }
 ?>
 <!--====== NAVBAR ONE PART START ======-->
 <section class="navbar-area navbar-one">
@@ -132,28 +134,35 @@
                                                 $type = $typeRes[0];
                                                 if($type == 'Invito'){
                                                     $poll = getInvitePoll($row['Codice'], $pdo)->fetch();
-                                                    $sender = getUser($poll['EmailPremium'], $pdo)->fetch();
+                                                    $pollCreator = getPollCreator($poll['Codice'], $pdo)->fetch();
+                                                    if(array_key_exists('EmailUtentePremium', $pollCreator)) {
+                                                        $userSender = getUser($pollCreator['EmailUtentePremium'], $pdo)->fetch();
+                                                        $sender = $userSender['Nome'].' '.$userSender['Cognome'];
+                                                        $senderProPic = getUserProPic($userSender['Email'], $pdo);
+                                                    } else if(array_key_exists('CodiceAzienda', $pollCreator)){
+                                                        $sender = getAzienda($pollCreator['CodiceAzienda'], $pdo)->fetch()['Nome'];
+                                                    }
                                                   echo(
                                                     '<li class="dropdown-item-text" style="width: max-content;">
-                                                        <div class="d-flex align-items-center justify-content-center fw-bold">Invito da '.$sender['Nome'].' '.$sender['Cognome'].'</div>
+                                                        <div class="d-flex align-items-center justify-content-center fw-bold">Invito da '.$sender.'</div>
                                                         <div class="d-inline-flex gap-3 align-items-center justify-content-center" style="width: 350px">
                                                             <div>
                                                                 <div class="profile-container">
-                                                                    <img src="http://www.cs.unibo.it/~roccetti/marco-old.jpg" alt="Profile Picture" class="profile-picture">
+                                                                    <img src="'.$senderProPic.'" alt="Profile Picture" class="profile-picture">
                                                                 </div>
                                                             </div>
                                                             <div class="vr" style="width: 2px">
                                                             </div>
                                                             <div class="text-wrap">
-                                                                '.$sender['Nome'].' '.$sender['Cognome'].' ti ha invitato a partecipare al sondaggio '.$poll['Titolo'].'
-                                                                <div class="d-flex align-items-center justify-content-center gap-2 mt-1">
-                                                                    <a class="btn primary-btn-outline" href="javascript:void(0)">
+                                                                '.$sender.' ti ha invitato a partecipare al sondaggio '.$poll['Titolo'].'
+                                                                <form class="d-flex align-items-center justify-content-center gap-2 mt-1" method="post">
+                                                                    <button class="btn primary-btn-outline" name="AcceptInvite" value="'.$row['Codice'].'" type="submit">
                                                                         Accetta
-                                                                    </a>
-                                                                    <a class="btn primary-btn" href="javascript:void(0)">
+                                                                    </button>
+                                                                    <button class="btn primary-btn" name="DenyInvite" value="'.$row['Codice'].'" type="submit">
                                                                         Rifiuta
-                                                                    </a>
-                                                                </div>
+                                                                    </button>
+                                                                </form>
                                                             </div>
                                                         </div>
                                                     </li>'
@@ -174,14 +183,14 @@
                                                 </div>
                                                 <div class="text-wrap">
                                                     Nome ti ha invitato a partecipare al sondaggio NomeSondaggio
-                                                    <div class="d-flex align-items-center justify-content-center gap-2 mt-1">
+                                                    <form class="d-flex align-items-center justify-content-center gap-2 mt-1">
                                                         <a class="btn primary-btn-outline" href="javascript:void(0)">
                                                             Accetta
                                                         </a>
                                                         <a class="btn primary-btn" href="javascript:void(0)">
                                                             Rifiuta
                                                         </a>
-                                                    </div>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </li>
@@ -196,6 +205,11 @@
                                     echo("<p id='navbar-name'>Ciao, ".$_SESSION['nameLogged']."!</p>");
                                 ?>
                                 <div class="profile-container">
+                                    <?php
+                                     echo('
+                                             <img src="'.$_SESSION['userProPicURI'].'" alt="Profile Picture" class="profile-picture">
+                                     ');
+                                    ?>
                                     <img src="http://www.cs.unibo.it/~roccetti/marco-old.jpg" alt="Profile Picture" class="profile-picture">
                                 </div>
                             </li>
@@ -272,6 +286,7 @@
                                 $res->bindValue(2, $_SESSION['emailLogged'], PDO::PARAM_STR);
                                 $res->execute();
                                 $res->closeCursor();
+                                unset($_POST[$domainName]);
                             } catch (PDOException $e) {
                                 echo('Failed to execute Add query: '.$e);
                             }
@@ -291,6 +306,7 @@
                                 $res->bindValue(2, $_SESSION['emailLogged'], PDO::PARAM_STR);
                                 $res->execute();
                                 $res->closeCursor();
+                                unset($_POST[$domainName]);
                             } catch (PDOException $e) {
                                 echo('Failed to execute Remove query: '.$e);
                             }
