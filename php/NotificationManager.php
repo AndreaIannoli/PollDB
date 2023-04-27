@@ -6,7 +6,8 @@
             $res->bindValue(1, $email, PDO::PARAM_STR);
             $res->execute();
         } catch (PDOException $e){
-            echo 'exception: '.$e;
+            echo("[ERRORE] Query SQL GetUserNotifica() non riuscita. Errore: ".$e->getMessage());
+            exit();
         }
         return $res;
     }
@@ -19,9 +20,9 @@
             $res->execute();
             return $res;
         } catch (PDOException $e){
-            echo 'exception: '.$e;
+            echo("[ERRORE] Query SQL getNotificationType() non riuscita. Errore: ".$e->getMessage());
+            exit();
         }
-        return $res;
     }
 
     function getInvitePollCode($InviteCode, PDO $pdo){
@@ -32,9 +33,9 @@
             $res->execute();
             return $res->fetch()[0];
         } catch (PDOException $e){
-            echo 'exception: '.$e;
+            echo("[ERRORE] Query SQL returnCodiceSondaggioInvito() non riuscita. Errore: ".$e->getMessage());
+            exit();
         }
-        return $res;
     }
 
     function getInvitePoll($InviteCode, PDO $pdo){
@@ -47,9 +48,9 @@
             $res->execute();
             return $res;
         } catch (PDOException $e){
-            echo 'exception: '.$e;
+            echo("[ERRORE] Query SQL getInvitePollCode() non riuscita. Errore: ".$e->getMessage());
+            exit();
         }
-        return $res;
     }
 
     function acceptInvite($notificationCode, PDO $pdo){
@@ -64,15 +65,15 @@
         }
     }
 
-function denyInvite($notificationCode, PDO $pdo){
-    try {
-        $sql = "CALL DenyInvito(?)";
-        $res = $pdo->prepare($sql);
-        $res->bindValue( 1, $notificationCode, PDO::PARAM_STR);
-        $res->execute();
-    } catch (PDOException $e) {
-        echo("[ERRORE] Query SQL DenyInvito() non riuscita. Errore: ".$e->getMessage());
-        exit();
+    function denyInvite($notificationCode, PDO $pdo){
+        try {
+            $sql = "CALL DenyInvito(?)";
+            $res = $pdo->prepare($sql);
+            $res->bindValue( 1, $notificationCode, PDO::PARAM_STR);
+            $res->execute();
+        } catch (PDOException $e) {
+            echo("[ERRORE] Query SQL DenyInvito() non riuscita. Errore: ".$e->getMessage());
+            exit();
+        }
     }
-}
 ?>

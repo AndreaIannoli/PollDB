@@ -80,7 +80,7 @@
                                     >
                                 </li>
                                 <li>
-                                    <a class="btn primary-btn" href="../php/registration.php"
+                                    <a class="btn primary-btn" href="registrationUser.php"
                                     >Registrati</a
                                     >
                                 </li>

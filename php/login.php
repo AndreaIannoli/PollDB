@@ -5,6 +5,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>PollDB - Login</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+        <link href="../stylesheets/basicstyle.css" rel="stylesheet">
+        <link href="../stylesheets/nav.css" rel="stylesheet">
+        <link href="../stylesheets/button.css" rel="stylesheet">
         <link href="../stylesheets/login.css" rel="stylesheet">
     </head>
     <body>
@@ -14,7 +17,6 @@
 
 
             $pdo = connectToDB();
-            print_r($_SESSION);
             $checkEmailRes = false;
             $checkPassRes = false;
 
@@ -26,17 +28,17 @@
             }
 
             if($passwordInserted and $checkEmailRes){
-                echo checkCredentials($_POST['email'], $_POST['password'], $pdo) ? 'autorizzato' : 'non aut';
                 $checkPassRes = checkCredentials($_POST['email'], $_POST['password'], $pdo);
                 $tipo = checkType($_POST['email'],$pdo);
                 if($checkPassRes){
                     session_start();
+                    session_unset();
                     $_SESSION['authorized'] = 1;
                     $_SESSION['emailLogged'] = $_POST['email'];
-                    $_SESSION['nameLogged'] = getUser($_POST['email'], $pdo)->fetch()['Nome'];
+                    $_SESSION['nameLogged'] = getName($_POST['email'], $pdo);
                     $_SESSION['userType'] = $tipo;
-                    $_SESSION['userProPicURI'] = getUserProPic($_POST['email'], $pdo);
-                    header('Location: domainChoice.php');
+                    $_SESSION['userProPicURI'] = getProPic($_POST['email'], $pdo);
+                    header('Location: visualizza_sondaggi.php');
                 }
             }
         ?>
@@ -66,18 +68,15 @@
                                 <ul class="navbar-nav m-auto">
                                     <li class="nav-item">
                                         <a
-                                                class="page-scroll active"
+                                                class="page-scroll"
                                                 data-bs-toggle="collapse"
                                                 data-bs-target="#sub-nav1"
                                                 aria-controls="sub-nav1"
                                                 aria-expanded="false"
                                                 aria-label="Toggle navigation"
-                                                href="javascript:void(0)"
+                                                href="/php/home.php"
                                         >
                                             Home
-                                            <div class="sub-nav-toggler">
-                                                <span><i class="lni lni-chevron-down"></i></span>
-                                            </div>
                                         </a>
                                         <ul class="sub-menu collapse" id="sub-nav1">
                                             <li><a href="/php/home.php#project">Il progetto</a></li>
@@ -100,7 +99,7 @@
                                         >
                                     </li>
                                     <li>
-                                        <a class="btn primary-btn" href="registration.php"
+                                        <a class="btn primary-btn" href="registrationChoice.php"
                                         >Registrati</a
                                         >
                                     </li>
@@ -154,19 +153,8 @@
                         Password non corretta!
                     </div>
                 </div>
-                <div class="col-12">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="invalidCheck">
-                        <label class="form-check-label">
-                            Ricordami
-                        </label>
-                        <div class="invalid-feedback">
-                            You must agree before submitting.
-                        </div>
-                    </div>
-                </div>
                 <div id="login-btn-container">
-                    <button class="btn btn-primary" type="submit">Login</button>
+                    <button class="btn primary-btn" type="submit">Login</button>
                 </div>
             </form>
         </div>

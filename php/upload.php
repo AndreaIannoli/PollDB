@@ -1,5 +1,9 @@
 <?php
     function uploadProPic(){
+        if(empty($_FILES["propicUpload"]["name"])){
+            return "../img/standardUserImage.jpg";
+        }
+
         $target_dir = "../img/";
         $target_file = $target_dir . uniqid().'.'.pathinfo($_FILES["propicUpload"]["name"], PATHINFO_EXTENSION);
         $uploadOk = 1;

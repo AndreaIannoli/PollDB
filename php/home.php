@@ -48,9 +48,6 @@
                                     href="javascript:void(0)"
                                 >
                                     Home
-                                    <div class="sub-nav-toggler">
-                                        <span><i class="lni lni-chevron-down"></i></span>
-                                    </div>
                                 </a>
                                 <ul class="sub-menu collapse" id="sub-nav1">
                                     <li><a href="#project">Il progetto</a></li>
@@ -73,7 +70,7 @@
                                 >
                             </li>
                             <li>
-                                <a class="btn primary-btn" href="registration.php"
+                                <a class="btn primary-btn" href="registrationChoice.php"
                                 >Registrati</a
                                 >
                             </li>

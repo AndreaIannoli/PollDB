@@ -1,3 +1,54 @@
+body{
+    background-image: url("../img/bg.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+#login-container{
+    max-width: 400px;
+    margin-top: 12vh;
+    background: white;
+    border-radius: 20px;
+    padding: 0px 50px 50px 50px;
+}
+
+#login-btn-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== Buttons Css ===== */
+.primary-btn {
+    background: blue;
+    color: white;
+    box-shadow: black;
+}
+.active.primary-btn, .primary-btn:hover, .primary-btn:focus {
+    background: black;
+    color: white;
+    box-shadow: white;
+}
+.deactive.primary-btn {
+    background: gray;
+    color: black;
+    pointer-events: none;
+}
+
+.primary-btn-outline {
+    border-color: #864068;
+    color: #864068;
+}
+.active.primary-btn-outline, .primary-btn-outline:hover, .primary-btn-outline:focus {
+    background: white;
+    color: #864068;
+}
+.deactive.primary-btn-outline {
+    color: black;
+    border-color: gray;
+    pointer-events: none;
+}
+
 /*===========================
   NAVBAR css
 ===========================*/
@@ -60,7 +111,7 @@
         top: 140%;
         left: 0;
         width: 100%;
-        background-color: #864068;
+        background-color: black;
         z-index: 8;
         padding: 10px 0;
         border-radius: 0 0 5px 5px;
@@ -324,6 +375,8 @@
 }
 .navbar-one .navbar .navbar-btn ul {
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .navbar-one .navbar .navbar-btn ul li {
     display: inline-block;
@@ -340,61 +393,11 @@
 }
 .navbar-one .navbar .navbar-btn ul li a.primary-btn-outline:hover {
     background-color: white;
-    color: blue;
+    color: #864068;
 }
 .navbar-one .navbar .navbar-btn ul li a.primary-btn {
     background-color: white;
-    color: blue;
-    border-color: white;
-}
-.navbar-one .navbar .navbar-btn ul li a.primary-btn:hover {
-    background-color: transparent;
-    color: white;
-}
-
-
-/* ===== Buttons Css ===== */
-.primary-btn {
-    background: blue;
-    color: white;
-    box-shadow: black;
-}
-.active.primary-btn, .primary-btn:hover, .primary-btn:focus {
-    background: black;
-    color: white;
-    box-shadow: white;
-}
-.deactive.primary-btn {
-    background: gray;
-    color: black;
-    pointer-events: none;
-}
-
-.primary-btn-outline {
-    border-color: #864068;
     color: #864068;
-}
-.active.primary-btn-outline, .primary-btn-outline:hover, .primary-btn-outline:focus {
-    background: white;
-    color: #864068;
-}
-.deactive.primary-btn-outline {
-    color: black;
-    border-color: gray;
-    pointer-events: none;
-}
-
-.navbar-one .navbar .navbar-btn ul li a.primary-btn-outline {
-    border-color: white;
-    color: white;
-}
-.navbar-one .navbar .navbar-btn ul li a.primary-btn-outline:hover {
-    background-color: white;
-    color: blue;
-}
-.navbar-one .navbar .navbar-btn ul li a.primary-btn {
-    background-color: white;
-    color: blue;
     border-color: white;
 }
 .navbar-one .navbar .navbar-btn ul li a.primary-btn:hover {

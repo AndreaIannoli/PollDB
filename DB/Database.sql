@@ -9,16 +9,19 @@ CREATE TABLE Dominio(
 ) ENGINE = "INNODB";
 
 CREATE TABLE Azienda(
-    CodiceFiscale VARCHAR(30) PRIMARY KEY,
+    CodiceFiscale VARCHAR(30) NOT NULL,
+    Pass CHAR(64) NOT NULL,
     Nome VARCHAR(30),
     Sede VARCHAR(30),
-    IndirizzoEmail VARCHAR(30)
+    IndirizzoEmail VARCHAR(30) NOT NULL,
+    
+    PRIMARY KEY(IndirizzoEmail, CodiceFiscale)
 ) ENGINE = "INNODB";
 
 CREATE TABLE FotoAzienda(
-	CodiceFiscaleAzienda VARCHAR(30) PRIMARY KEY,
+	IndirizzoEmailAzienda VARCHAR(30) PRIMARY KEY,
     UrlFoto TEXT,
-    FOREIGN KEY (CodiceFiscaleAzienda) REFERENCES Azienda(CodiceFiscale)
+    FOREIGN KEY (IndirizzoEmailAzienda) REFERENCES Azienda(IndirizzoEmail)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Utente(
@@ -126,19 +129,19 @@ CREATE TABLE RispostaAperta(
 
 CREATE TABLE InserimentoAziendale(
     IdDomanda INT,
-    CodiceAzienda VARCHAR(30),
-    PRIMARY KEY (IdDomanda, CodiceAzienda),
+    IndirizzoEmailAzienda VARCHAR(30),
+    PRIMARY KEY (IdDomanda, IndirizzoEmailAzienda),
     FOREIGN KEY (IdDomanda) REFERENCES DomandaChiusa(Id),
     FOREIGN KEY (IdDomanda) REFERENCES DomandaAperta(Id),
-    FOREIGN KEY (CodiceAzienda) REFERENCES Azienda(CodiceFiscale)
+    FOREIGN KEY (IndirizzoEmailAzienda) REFERENCES Azienda(IndirizzoEmail)
 ) ENGINE = "INNODB";
 
 CREATE TABLE CreazioneAziendale(
     CodiceSondaggio INT,
-    CodiceAzienda VARCHAR(30),
-    PRIMARY KEY (CodiceSondaggio, CodiceAzienda),
+    IndirizzoEmailAzienda VARCHAR(30),
+    PRIMARY KEY (CodiceSondaggio, IndirizzoEmailAzienda),
     FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice),
-    FOREIGN KEY (CodiceAzienda) REFERENCES Azienda(CodiceFiscale)
+    FOREIGN KEY (IndirizzoEmailAzienda) REFERENCES Azienda(IndirizzoEmail)
 ) ENGINE = "INNODB";
 
 CREATE TABLE InserimentoPremium(
@@ -186,7 +189,8 @@ CREATE TABLE Notifica(
     EmailUtente VARCHAR(30),
     Data DATE,
     Archiviata BOOLEAN,
-    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
+    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email),
+    FOREIGN KEY (EmailUtente) REFERENCES Azienda(IndirizzoEmail)
 ) ENGINE = "INNODB";
 
 
@@ -253,61 +257,12 @@ CREATE TABLE Interessamento(
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
-
-
-INSERT INTO `Azienda`(`CodiceFiscale`, `Nome`, `Sede`, `IndirizzoEmail`) 
-	VALUES ('IOFCNUFIDK','Sega s.p.a.','Godo','email.azienda@email.com');
-    
-INSERT INTO `utente`(`Email`, `Pass`, `Nome`, `Cognome`, `DataDiNascita`, `LuogoNascita`, `TotaleBonus`) 
-	VALUES ('utente@gmail.com','1234','mao','tse-thung','2023-03-31','pekin','0');
-    
-INSERT INTO `utentepremium`(`Emailutente`, `InizioAbbonamento`, `FineAbbonamento`, `Costo`, `NumSondaggi`) 
-	VALUES ('utente@gmail.com','2023-03-31','2026-03-31','0','1');
-
-
-
-
-INSERT INTO `utente`(`Email`, `Pass`, `Nome`, `Cognome`, `DataDiNascita`, `LuogoNascita`, `TotaleBonus`) 
-	VALUES ('utente1@gmail.com','1234','mao','tse-thung','2023-03-31','pekin','0');
-    
-INSERT INTO `utente`(`Email`, `Pass`, `Nome`, `Cognome`, `DataDiNascita`, `LuogoNascita`, `TotaleBonus`) 
-	VALUES ('utente2@gmail.com','1234','mao','tse-thung','2023-03-31','pekin','0');
-    
-INSERT INTO `utente`(`Email`, `Pass`, `Nome`, `Cognome`, `DataDiNascita`, `LuogoNascita`, `TotaleBonus`) 
-	VALUES ('utente3@gmail.com','1234','mao','tse-thung','2023-03-31','pekin','0');
-    
-INSERT INTO `utente`(`Email`, `Pass`, `Nome`, `Cognome`, `DataDiNascita`, `LuogoNascita`, `TotaleBonus`) 
-	VALUES ('utente4@gmail.com','1234','mao','tse-thung','2023-03-31','pekin','0');
-
-INSERT INTO `utente`(`Email`, `Pass`, `Nome`, `Cognome`, `DataDiNascita`, `LuogoNascita`, `TotaleBonus`) 
-	VALUES ('utente5@gmail.com','1234','mao','tse-thung','2023-03-31','pekin','0');
-
-INSERT INTO `utente`(`Email`, `Pass`, `Nome`, `Cognome`, `DataDiNascita`, `LuogoNascita`, `TotaleBonus`) 
-	VALUES ('utente6@gmail.com','1234','mao','tse-thung','2023-03-31','pekin','0');
-
-
-
-
-/*INSERT INTO `Sondaggio`(`MaxUtenti`, `Stato`, `Titolo`, `DataChiusura`, `DataCreazione`, `ArgomentoDominio`, `EmailPremium`) 
-VALUES ('3','APERTO','BerlusconiMorto','20-07-2021','10-03-2024','Cinema','email.azienda@email.com');
-*/
-
-
-
-INSERT INTO Sondaggio (Titolo, MaxUtenti, DataCreazione, DataChiusura, Stato) 
-		VALUES ("Prova", 3, current_date(), "2023-03-31", "APERTO");
-        
-        
-        
 DELIMITER $
 CREATE PROCEDURE randomUtenti ()
 BEGIN
 	SELECT Email FROM Utente ORDER BY RAND();
 END
 $ DELIMITER ;
-
-
-#DROP PROCEDURE InserisciDomandaChiusa
 
 #Insercisci domanda aperta sondaggio
 DELIMITER $
@@ -364,7 +319,30 @@ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE CheckEmail (IN Email_Inserita VARCHAR(30))
 BEGIN
-	SELECT count(*) AS Counter FROM Utente WHERE(Email = Email_Inserita);
+	IF((SELECT count(*) FROM Utente WHERE(Email = Email_Inserita)) > 0) THEN
+		SELECT count(*) FROM Utente WHERE(Email = Email_Inserita);
+    END IF;
+    
+    IF((SELECT count(*) FROM Azienda WHERE(IndirizzoEmail = Email_Inserita)) > 0) THEN
+		SELECT count(*) FROM Azienda WHERE(IndirizzoEmail = Email_Inserita);
+    END IF;
+END
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE CheckFiscalCode (IN CodiceFiscale_Inserito VARCHAR(30))
+BEGIN
+    SELECT count(*) AS Counter FROM Azienda WHERE(CodiceFiscale = CodiceFiscale_Inserito);
+END
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE RegistrazioneAzienda (IN CodiceFiscale_Inserito VARCHAR(30), Pass CHAR(64), Nome_Inserito VARCHAR(30), Sede_Inserita VARCHAR(30), IndirizzoEmail_Inserita VARCHAR(30), UrlFoto TEXT)
+BEGIN
+    INSERT INTO Azienda VALUES (CodiceFiscale_Inserito, sha2(Pass, 256), Nome_Inserito, Sede_Inserita, IndirizzoEmail_Inserita);
+    INSERT INTO FotoAzienda VALUES (IndirizzoEmail_Inserita, UrlFoto);
 END
 $
 DELIMITER ;
@@ -372,7 +350,12 @@ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE CheckCredentials (IN Email_Inserita VARCHAR(30), Pass_Inserita VARCHAR(100))
 BEGIN
-	SELECT count(*) AS Authorized FROM Utente WHERE(sha2(Pass_Inserita, 256) = (SELECT Pass FROM Utente WHERE(Email = Email_Inserita)));
+	IF((SELECT count(*) AS Authorized FROM Utente WHERE(sha2(Pass_Inserita, 256) = (SELECT Pass FROM Utente WHERE(Email = Email_Inserita)))) > 0) THEN
+		SELECT count(*) AS Authorized FROM Utente WHERE(sha2(Pass_Inserita, 256) = (SELECT Pass FROM Utente WHERE(Email = Email_Inserita)));
+    END IF;
+    IF((SELECT count(*) AS Authorized FROM Azienda WHERE(sha2(Pass_Inserita, 256) = (SELECT Pass FROM Azienda WHERE(IndirizzoEmail = Email_Inserita)))) > 0) THEN
+		SELECT count(*) AS Authorized FROM Azienda WHERE(sha2(Pass_Inserita, 256) = (SELECT Pass FROM Azienda WHERE(IndirizzoEmail = Email_Inserita)));
+    END IF;
 END 
 $
 DELIMITER ;
@@ -434,48 +417,26 @@ $
 DELIMITER;
 
 DELIMITER $
-CREATE PROCEDURE AddInvito (IN Email_Inserita VARCHAR(30))
+CREATE PROCEDURE searchUtentePremium(IN email varchar(30))
 BEGIN
-	SELECT * FROM Notifica;
-END 
-$ 
-DELIMITER ;
-
-
-
+	SELECT EmailUtente FROM UtentePremium WHERE EmailUtente = email;    
+END
+$ DELIMITER ;
 
 
 DELIMITER $
-CREATE PROCEDURE searchUtentePremium(IN email varchar(30))
-BEGIN
-
-	SELECT EmailUtente FROM UtentePremium WHERE EmailUtente = email;
-
-    
-END
-$ DELIMITER ;
-
-
-  DELIMITER $
 CREATE PROCEDURE searchAzienda(IN email varchar(30))
 BEGIN
-
 	SELECT IndirizzoEmail FROM Azienda WHERE IndirizzoEmail = email;
-
-    
 END
 $ DELIMITER ;
-
-
 
 DELIMITER $
 CREATE PROCEDURE returnUtenti(IN codSondaggio INT)
 BEGIN
-
 	SELECT Email FROM Utente WHERE Email NOT IN 
     (SELECT EmailUtente FROM Notifica WHERE (SELECT CodiceNotifica FROM Invito) = Codice AND 
-    (SELECT CodiceSondaggio FROM Invito) = codSondaggio) ;
-
+    (SELECT CodiceSondaggio FROM Invito) = codSondaggio);
 END
 $ DELIMITER ;
 
@@ -483,10 +444,8 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE returnAccettati(IN codSondaggio INT)
 BEGIN
-
 	SELECT count(*) FROM RispostaInvito WHERE CodiceInvito = (SELECT CodiceNotifica FROM Invito WHERE CodiceSondaggio = codSondaggio) 
 		AND Esito = 'ACCETTATO';
-
 END
 $ DELIMITER ;
 
@@ -494,9 +453,7 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE returnCodiceNotifica(IN emailutente varchar(30))
 BEGIN
-
 	SELECT Codice FROM Notifica WHERE EmailUtente = emailutente AND Archiviata = 0;
-    
 END
 $ DELIMITER ;
 
@@ -505,9 +462,7 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE returnCodiceSondaggioInvito(IN codice varchar(36))
 BEGIN
-
 	SELECT CodiceSondaggio FROM Invito WHERE CodiceNotifica = codice;
-    
 END
 $ DELIMITER ;
 
@@ -515,9 +470,7 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE returnNomeSondaggio(IN codiceS varchar(36))
 BEGIN
-
 	SELECT Titolo FROM Sondaggio WHERE Codice = codiceS;
-    
 END
 $ DELIMITER ;
 
@@ -526,22 +479,14 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE returnInvitati()
 BEGIN
-
 	SELECT COUNT(*) FROM Utente;
-    
 END
 $ DELIMITER ;
 
 DELIMITER $
 CREATE PROCEDURE creaNotifica(IN email varchar(30))
 BEGIN
-
-
 	INSERT INTO Notifica(EmailUtente, Data, Archiviata) VALUES(email, current_date(), false);
-
-	
-
-
 END
 $ DELIMITER ;
 
@@ -549,12 +494,8 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE prendiCodiceNotifica()
 BEGIN
-
-	SELECT CodiceNotifica FROM Notifica  ;
-
+	SELECT CodiceNotifica FROM Notifica;
 	INSERT INTO Notifica(EmailUtente, Data, Archiviata) VALUES(email, current_date(), false);
-
-
 END
 $ DELIMITER;
 
@@ -593,12 +534,9 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE AggiungiAppartenenza (IN codiceSondaggio int, argomentoDominio varchar(30))
 
-BEGIN 
-
+BEGIN
 	INSERT INTO Appartenenza (CodiceSondaggio, ArgomentoDominio) 
 		VALUES (codiceSondaggio, argomentoDominio);
-        
-      
 END
 $
 DELIMITER;
@@ -606,28 +544,16 @@ DELIMITER;
 DELIMITER $
 CREATE PROCEDURE SearchCodiceSondaggio (IN titoloSondaggio varchar(30))
 BEGIN
-
-
 	SELECT Codice FROM Sondaggio WHERE (Sondaggio.Titolo = titoloSondaggio);
-    
-
 END 
 $
 DELIMITER ;
 
-
-
-
-
 DELIMITER $
-CREATE PROCEDURE InserisciSondaggio (IN titolo varchar(30),  utentiMax INT, dataChiusura DATE, statoSondaggio varchar(30), emailCreatore varchar(30))
-
-BEGIN 
-
-	INSERT INTO Sondaggio (Titolo, MaxUtenti, DataCreazione, DataChiusura, Stato, EmailPremium) 
-		VALUES (titolo, utentiMax, current_date(), dataChiusura, statoSondaggio, emailCreatore);
-
-	
+CREATE PROCEDURE InserisciSondaggio (IN titolo varchar(30),  utentiMax INT, dataChiusura DATE, statoSondaggio varchar(30))
+BEGIN
+	INSERT INTO Sondaggio (Titolo, MaxUtenti, DataCreazione, DataChiusura, Stato) 
+		VALUES (titolo, utentiMax, current_date(), dataChiusura, statoSondaggio);
 END
 $ DELIMITER ;
 
@@ -667,9 +593,7 @@ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE returnSondaggio(IN codiceS varchar(36))
 BEGIN
-
 	SELECT * FROM Sondaggio WHERE Codice = codiceS;
-    
 END
 $ DELIMITER ;
 
@@ -712,35 +636,29 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE ReturnPollCreator(IN CodiceSondaggio_Inserito INT)
 BEGIN
-	
 	IF(SELECT count(*) FROM CreazionePremium WHERE(CodiceSondaggio=CodiceSondaggio_Inserito) > 0) THEN
 		SELECT EmailUtentePremium FROM CreazionePremium WHERE(CodiceSondaggio=CodiceSondaggio_Inserito);
 	END IF;
     
     IF(SELECT count(*) FROM CreazioneAziendale WHERE(CodiceSondaggio=CodiceSondaggio_Inserito) > 0) THEN
-		SELECT CodiceAzienda FROM CreazioneAziendale WHERE(CodiceSondaggio=CodiceSondaggio_Inserito);
+		SELECT IndirizzoEmail FROM CreazioneAziendale WHERE(CodiceSondaggio=CodiceSondaggio_Inserito);
 	END IF;
-    
 END
 $ DELIMITER ;
 
 DELIMITER $
 CREATE PROCEDURE aggiungiCreazionePremium(IN email varchar(30), codiceSondaggio INT)
 BEGIN
-
 	INSERT INTO CreazionePremium(EmailUtentePremium, CodiceSondaggio) VALUES (email, codiceSondaggio);
-    
 END
 $ DELIMITER ;
 
 
 
 DELIMITER $
-CREATE PROCEDURE aggiungiCreazioneAziendale(IN codiceSondaggio INT, codiceAzienda varchar(30))
+CREATE PROCEDURE aggiungiCreazioneAziendale(IN CodiceSondaggio_Inserito INT, Email_Inserita varchar(30))
 BEGIN
-
-	INSERT INTO CreazioneAziendale(CodiceSondaggio, CodiceAzienda) VALUES (codiceSondaggio, codiceAzienda);
-    
+	INSERT INTO CreazioneAziendale(CodiceSondaggio, IndirizzoEmailAzienda) VALUES (CodiceSondaggio_Inserito, Email_Inserita);
 END
 $ DELIMITER ;
 
@@ -748,9 +666,7 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE returnCodiceAzienda(IN email varchar(30))
 BEGIN
-
 		SELECT CodiceFiscale FROM Azienda WHERE IndirizzoEmail = email;
-        
 END
 $ DELIMITER ;
 
@@ -762,15 +678,57 @@ END
 $ DELIMITER ;
 
 DELIMITER $
-CREATE PROCEDURE ReturnUserProPic(IN EmailUtente_Inserita varchar(30))
+CREATE PROCEDURE ReturnProPic(IN Email_Inserita varchar(30))
 BEGIN
-		SELECT * FROM FotoUtente WHERE EmailUtente = EmailUtente_Inserita;
+	IF((SELECT count(*) FROM FotoUtente WHERE(EmailUtente = Email_Inserita)) > 0) THEN
+		SELECT * FROM FotoUtente WHERE(EmailUtente = Email_Inserita);
+    END IF;
+    
+    IF((SELECT count(*) FROM FotoAzienda WHERE(IndirizzoEmailAzienda = Email_Inserita)) > 0) THEN
+		SELECT * FROM FotoAzienda WHERE(IndirizzoEmailAzienda = Email_Inserita);
+    END IF;
 END
 $ DELIMITER ;
 
 DELIMITER $
-CREATE PROCEDURE ReturnAziendaProPic(IN CodiceFiscale_Inserito varchar(30))
+CREATE PROCEDURE ReturnName(IN Email_Inserita varchar(30))
 BEGIN
-		SELECT * FROM FotoAzienda WHERE CodiceFiscaleAzienda = CodiceFiscale_Inserito;
+	IF((SELECT count(*) FROM Utente WHERE(Email = Email_Inserita)) > 0) THEN
+		SELECT Nome FROM Utente WHERE(Email = Email_Inserita);
+    END IF;
+    
+    IF((SELECT count(*) FROM Azienda WHERE(IndirizzoEmail = Email_Inserita)) > 0) THEN
+		SELECT Nome FROM Azienda WHERE(IndirizzoEmail = Email_Inserita);
+    END IF;
 END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE ReturnUserType(IN Email_Inserita varchar(30))
+sp1:BEGIN
+		DROP TEMPORARY TABLE IF EXISTS UserType;
+		CREATE TEMPORARY TABLE UserType(
+			Tipo Varchar(14)
+		);
+        IF((SELECT count(*) FROM UtenteAmministratore WHERE(EmailUtente = Email_Inserita)) > 0) THEN
+			INSERT INTO UserType VALUES("Amministratore");
+			SELECT * FROM UserType;
+			LEAVE sp1;
+		END IF;
+		IF((SELECT count(*) FROM UtentePremium WHERE(EmailUtente = Email_Inserita)) > 0) THEN
+			INSERT INTO UserType VALUES("Premium");
+			SELECT * FROM UserType;
+			LEAVE sp1;
+		END IF;
+		IF((SELECT count(*) FROM Azienda WHERE(IndirizzoEmail = Email_Inserita)) > 0) THEN
+			INSERT INTO UserType VALUES("Azienda");
+			SELECT * FROM UserType;
+			LEAVE sp1;
+		END IF;
+		IF((SELECT count(*) FROM Utente WHERE(Email = Email_Inserita)) > 0) THEN
+			INSERT INTO UserType VALUES("Utente");
+			SELECT * FROM UserType;
+			LEAVE sp1;
+		END IF;
+	END
 $ DELIMITER ;

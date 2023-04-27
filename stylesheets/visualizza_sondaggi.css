@@ -3,7 +3,14 @@
 }
 
 .box2{
-    padding: 5% 10% 10% 10%;
+    width: 70%;
+    padding: 3% 3% 3% 3%;
+    background-color: white;
+    border-radius: 20px;
+}
+
+.box2{
+    background-color: white;
 }
 
 .answer{
@@ -17,10 +24,6 @@
     display: inline-block;
     color: #9740EF;
     margin-right: 20px;
-}
-
-body{
-    background-color: white !important;
 }
 
 .t2{

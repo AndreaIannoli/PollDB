@@ -123,7 +123,7 @@
                                             ');
                                         }
                                     ?>
-                                    <ul class="dropdown-menu dropdown-menu-end"  >
+                                    <ul class="dropdown-menu dropdown-menu-end">
                                         <?php
                                             $notifications = $res->fetchAll();
                                             $res->closeCursor();

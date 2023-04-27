@@ -1,0 +1,33 @@
+/* ===== Buttons Css ===== */
+.primary-btn {
+    background: black !important;
+    color: white !important;
+    box-shadow: black !important;
+    font-weight: bold !important;
+}
+.active.primary-btn, .primary-btn:hover, .primary-btn:focus {
+    background: white !important;
+    color: #864068 !important;
+    font-weight: bold !important;
+    box-shadow: white !important;
+    border-color: black !important;
+}
+.deactive.primary-btn {
+    background: gray;
+    color: black;
+    pointer-events: none;
+}
+
+.primary-btn-outline {
+    border-color: #864068;
+    color: #864068;
+}
+.active.primary-btn-outline, .primary-btn-outline:hover, .primary-btn-outline:focus {
+    background: white;
+    color: #864068;
+}
+.deactive.primary-btn-outline {
+    color: black;
+    border-color: gray;
+    pointer-events: none;
+}

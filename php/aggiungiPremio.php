@@ -99,7 +99,7 @@
                                         >
                                     </li>
                                     <li>
-                                        <a class="btn primary-btn" href="registration.php"
+                                        <a class="btn primary-btn" href="registrationUser.php"
                                         >Registrati</a
                                         >
                                     </li>
