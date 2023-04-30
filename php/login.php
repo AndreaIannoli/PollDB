@@ -38,7 +38,11 @@
                     $_SESSION['nameLogged'] = getName($_POST['email'], $pdo);
                     $_SESSION['userType'] = $tipo;
                     $_SESSION['userProPicURI'] = getProPic($_POST['email'], $pdo);
-                    header('Location: visualizza_sondaggi.php');
+                    if($_SESSION['userType'] == 'Amministratore'){
+                        header('Location: AdminDashboard.php');
+                    } else {
+                        header('Location: visualizza_sondaggi.php');
+                    }
                 }
             }
         ?>

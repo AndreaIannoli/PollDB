@@ -7,6 +7,9 @@ CALL RegistrazioneUtenteSemplice('utente4@gmail.com','1234','Alessandro','Mazzin
 CALL RegistrazioneUtenteSemplice('utente5@gmail.com','1234','Andrea','Iannoli','2023-03-31','pekin','0', '../img/standardUserImage.jpg');
 CALL RegistrazioneUtenteSemplice('utente6@gmail.com','1234','Gabriele','Centonze','2023-03-31','pekin','0', '../img/standardUserImage.jpg');
 
+CALL RegistrazioneUtenteSemplice('utenteAdmin@gmail.com','1234','Amministratore','Admin','2023-03-31','pekin','0', '../img/standardUserImage.jpg');
+CALL PromoteToAdmin('utenteAdmin@gmail.com');
+
 CALL InserisciSondaggio("Prova", 3, "2023-05-31", "APERTO");
 CALL aggiungiCreazioneAziendale('1', 'azienda1@email.com');
         

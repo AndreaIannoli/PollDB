@@ -63,8 +63,8 @@ CREATE TABLE Appartenenza(
 	ArgomentoDominio VARCHAR(30),
    
 	PRIMARY KEY (CodiceSondaggio, ArgomentoDominio),
-	FOREIGN KEY (CodiceSondaggio) references Sondaggio(Codice),
-	FOREIGN KEY (ArgomentoDominio) references Dominio(Argomento)
+	FOREIGN KEY (CodiceSondaggio) references Sondaggio(Codice) ON DELETE CASCADE,
+	FOREIGN KEY (ArgomentoDominio) references Dominio(Argomento) ON DELETE CASCADE
    
 ) ENGINE = "INNODB";
 
@@ -253,8 +253,8 @@ CREATE TABLE Interessamento(
     Argomento VARCHAR(30),
     EmailUtente VARCHAR(30),
     PRIMARY KEY(Argomento, EmailUtente),
-    FOREIGN KEY (Argomento) REFERENCES Dominio(Argomento),
-    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
+    FOREIGN KEY (Argomento) REFERENCES Dominio(Argomento) ON DELETE CASCADE,
+    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email) ON DELETE CASCADE
 ) ENGINE = "INNODB";
 
 DELIMITER $
@@ -731,4 +731,32 @@ sp1:BEGIN
 			LEAVE sp1;
 		END IF;
 	END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE PromoteToAdmin(IN Email_Inserita varchar(30))
+BEGIN
+	INSERT INTO UtenteAmministratore VALUES(Email_Inserita);
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE AddDomain(IN  Argomento_Inserito VARCHAR(30), Descrizione_Inserita VARCHAR(30))
+BEGIN
+	INSERT INTO Dominio VALUES(Argomento_Inserito, Descrizione_Inserita);
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE RemoveDomain(IN  Argomento_Inserito VARCHAR(30))
+BEGIN
+	DELETE FROM Dominio WHERE(Argomento = Argomento_Inserito);
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE CheckDomain(IN  Argomento_Inserito VARCHAR(30))
+BEGIN
+	SELECT count(*) FROM Dominio WHERE(Argomento = Argomento_Inserito);
+END
 $ DELIMITER ;
