@@ -12,4 +12,5 @@ CALL PromoteToAdmin('utenteAdmin@gmail.com');
 
 CALL InserisciSondaggio("Prova", 3, "2023-05-31", "APERTO");
 CALL aggiungiCreazioneAziendale('1', 'azienda1@email.com');
-        
+
+CALL AddDominio('Calcio', 'Si calcia');

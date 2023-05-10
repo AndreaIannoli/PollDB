@@ -5,7 +5,7 @@ USE PollDB;
 
 CREATE TABLE Dominio(
     Argomento VARCHAR(30) PRIMARY KEY,
-    Descrizione VARCHAR(30)
+    Descrizione VARCHAR(300)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Azienda(
@@ -14,14 +14,9 @@ CREATE TABLE Azienda(
     Nome VARCHAR(30),
     Sede VARCHAR(30),
     IndirizzoEmail VARCHAR(30) NOT NULL,
+    UrlFoto TEXT, /*DA DECIDERE*/
     
-    PRIMARY KEY(IndirizzoEmail, CodiceFiscale)
-) ENGINE = "INNODB";
-
-CREATE TABLE FotoAzienda(
-	IndirizzoEmailAzienda VARCHAR(30) PRIMARY KEY,
-    UrlFoto TEXT,
-    FOREIGN KEY (IndirizzoEmailAzienda) REFERENCES Azienda(IndirizzoEmail)
+    PRIMARY KEY(IndirizzoEmail)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Utente(
@@ -31,20 +26,15 @@ CREATE TABLE Utente(
     Cognome VARCHAR(30),
     DataDiNascita DATE,
     LuogoNascita VARCHAR(30),
-    TotaleBonus INT
-) ENGINE = "INNODB";
-
-CREATE TABLE FotoUtente(
-	EmailUtente VARCHAR(30) NOT NULL PRIMARY KEY,
-    UrlFoto TEXT,
-    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
+    TotaleBonus INT,
+    UrlFoto TEXT /*DA DECIDERE*/
 ) ENGINE = "INNODB";
 
 CREATE TABLE UtentePremium(
     Emailutente VARCHAR(30) PRIMARY KEY,
     InizioAbbonamento Date,
     FineAbbonamento Date,
-    Costo DOUBLE(10,6),
+    Costo DOUBLE,
     NumSondaggi INT,
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
@@ -65,31 +55,14 @@ CREATE TABLE Appartenenza(
 	PRIMARY KEY (CodiceSondaggio, ArgomentoDominio),
 	FOREIGN KEY (CodiceSondaggio) references Sondaggio(Codice) ON DELETE CASCADE,
 	FOREIGN KEY (ArgomentoDominio) references Dominio(Argomento) ON DELETE CASCADE
-   
 ) ENGINE = "INNODB";
 
 CREATE TABLE Domanda(
 	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Testo VARCHAR(200) NOT NULL,
     Punteggio INT,
-    Foto VARCHAR(400)
+    Foto TEXT
 ) ENGINE = "INNODB";
-
-/*
-CREATE TABLE Punteggio(
-	IdDomanda INT NOT NULL PRIMARY KEY,
-    Punteggio INT NOT NULL,
-    
-    FOREIGN KEY(IdDomanda) REFERENCES Domanda(Id)
-) ENGINE = "INNODB";
-
-CREATE TABLE Foto(
-	IdDomanda INT NOT NULL PRIMARY KEY,
-    UrlFoto VARCHAR(100) NOT NULL,
-    
-    FOREIGN KEY(IdDomanda) REFERENCES Domanda(Id)
-) ENGINE = "INNODB";
-*/
 
 CREATE TABLE DomandaAperta(
     Id INT NOT NULL PRIMARY KEY,
@@ -114,7 +87,10 @@ CREATE TABLE RispostaChiusa(
     Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Testo VARCHAR(30),
     IdDomanda INT,
-    EmailUtente VARCHAR(30)
+    EmailUtente VARCHAR(30),
+    
+	FOREIGN KEY (IdDomanda) REFERENCES DomandaChiusa(Id),
+    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
 CREATE TABLE RispostaAperta(
@@ -127,6 +103,7 @@ CREATE TABLE RispostaAperta(
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
+/*
 CREATE TABLE InserimentoAziendale(
     IdDomanda INT,
     IndirizzoEmailAzienda VARCHAR(30),
@@ -135,6 +112,7 @@ CREATE TABLE InserimentoAziendale(
     FOREIGN KEY (IdDomanda) REFERENCES DomandaAperta(Id),
     FOREIGN KEY (IndirizzoEmailAzienda) REFERENCES Azienda(IndirizzoEmail)
 ) ENGINE = "INNODB";
+*/
 
 CREATE TABLE CreazioneAziendale(
     CodiceSondaggio INT,
@@ -144,6 +122,7 @@ CREATE TABLE CreazioneAziendale(
     FOREIGN KEY (IndirizzoEmailAzienda) REFERENCES Azienda(IndirizzoEmail)
 ) ENGINE = "INNODB";
 
+/*
 CREATE TABLE InserimentoPremium(
     IdDomanda INT,
     EmailUtentePremium VARCHAR(30),
@@ -152,6 +131,7 @@ CREATE TABLE InserimentoPremium(
     FOREIGN KEY (IdDomanda) REFERENCES DomandaChiusa(Id),
 	FOREIGN KEY (EmailUtentePremium) REFERENCES UtentePremium(EmailUtente)
 ) ENGINE = "INNODB";
+*/
 
 CREATE TABLE CreazionePremium(
     EmailUtentePremium VARCHAR(30),
@@ -169,7 +149,7 @@ CREATE TABLE UtenteAmministratore(
 CREATE TABLE Premio(
     Nome VARCHAR(30) PRIMARY KEY,
     Descrizione TEXT,
-    Foto VARCHAR(30),
+    Foto TEXT,
     PuntiMin INT,
     EmailAdmin VARCHAR(30)
 ) ENGINE = "INNODB";
@@ -183,46 +163,36 @@ CREATE TABLE Vincita(
     FOREIGN KEY (NomePremio) REFERENCES Premio(Nome)
 ) ENGINE = "INNODB";
 
-
-CREATE TABLE Notifica(
-    Codice VARCHAR(36) PRIMARY KEY,
-    EmailUtente VARCHAR(30),
-    Data DATE,
-    Archiviata BOOLEAN,
-    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email),
-    FOREIGN KEY (EmailUtente) REFERENCES Azienda(IndirizzoEmail)
-) ENGINE = "INNODB";
-
-
-CREATE TABLE NotificaPartecipazione(
-	CodiceNotifica VARCHAR(36) PRIMARY KEY,
-    EmailUtentePartecipante VARCHAR(30),
-    CodiceSondaggio INT,
-    FOREIGN KEY (CodiceNotifica) REFERENCES Notifica(Codice),
-    FOREIGN KEY (EmailUtentePartecipante) REFERENCES Utente(Email),
-    FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice)
-) ENGINE = "INNODB";
-
+/*Tabella opzionale*/
 Create TABLE NotificaPremio(
 	CodiceNotifica VARCHAR(36) PRIMARY KEY,
     NomePremio VARCHAR(30),
+	EmailUtente VARCHAR(30),
+    Data DATE,
+    Archiviata BOOLEAN,
     FOREIGN KEY (CodiceNotifica) REFERENCES Notifica(Codice),
-    FOREIGN KEY (NomePremio) REFERENCES Premio(Nome)
+    FOREIGN KEY (NomePremio) REFERENCES Premio(Nome),
+    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
-
 CREATE TABLE Invito(
-    CodiceNotifica varchar(36) PRIMARY KEY,
+    Codice INT AUTO_INCREMENT PRIMARY KEY,
     CodiceSondaggio INT,
+    Esito VARCHAR(10),
     FOREIGN KEY (CodiceNotifica) REFERENCES Notifica(Codice),
     FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice)
 ) ENGINE = "INNODB";
 
-CREATE TABLE RispostaInvito(
-    CodiceInvito VARCHAR(36) PRIMARY KEY,
-    EmailUtente VARCHAR(30),
-    Esito ENUM ('ACCETTATO', 'RIFIUTATO'),
-    FOREIGN KEY (CodiceInvito) REFERENCES Invito(CodiceNotifica)
+/*Tabella opzionale*/
+CREATE TABLE NotificaInvito(
+    CodiceNotifica varchar(36) PRIMARY KEY,
+    CodiceInvito INT,
+	EmailUtente VARCHAR(30),
+    Data DATE,
+    Archiviata BOOLEAN,
+    FOREIGN KEY (CodiceNotifica) REFERENCES Notifica(Codice),
+    FOREIGN KEY (CodiceInvito) REFERENCES Invito(Codice),
+	FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Associazione(
