@@ -62,7 +62,7 @@
 
         if(!$checkEmailRes and $checkPassRes and $checkAgeRes){
             try {
-                $sql = 'CALL RegistrazioneUtenteSemplice(?, ?, ?, ?, ?, ?, ?, ?)';
+                $sql = 'CALL RegisterUtenteSemplice(?, ?, ?, ?, ?, ?, ?, ?)';
                 $res = $pdo->prepare($sql);
                 $res->bindValue(1, $_POST['email'], PDO::PARAM_STR);
                 $res->bindValue(2, $_POST['password'], PDO::PARAM_STR);

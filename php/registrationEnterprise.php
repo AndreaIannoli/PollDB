@@ -51,7 +51,7 @@
 
         if(!$checkEmailRes and $checkPassRes and !$checkFiscalCodeRes){
             try {
-                $sql = 'CALL RegistrazioneAzienda(?, ?, ?, ?, ?, ?)';
+                $sql = 'CALL RegisterAzienda(?, ?, ?, ?, ?, ?)';
                 $res = $pdo->prepare($sql);
                 $res->bindValue(1, $_POST['fiscalCode'], PDO::PARAM_STR);
                 $res->bindValue(2, $_POST['password'], PDO::PARAM_STR);

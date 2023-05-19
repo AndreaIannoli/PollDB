@@ -130,6 +130,7 @@
                                           <i class="bi bi-bell-fill"></i>
                                       </button>
                                       <?php
+                                      /*
                                       $res = getUserNotifications($_SESSION['emailLogged'], $pdo);
                                       $nOfNotifications = $res->rowCount();
                                       if($nOfNotifications != 0){
@@ -140,9 +141,11 @@
                                                 </span>
                                             ');
                                       }
+                                      */
                                       ?>
                                       <ul class="dropdown-menu dropdown-menu-end">
                                           <?php
+                                          /*
                                           $notifications = $res->fetchAll();
                                           $res->closeCursor();
 
@@ -187,7 +190,7 @@
                                                   );
                                               }
                                           }
-
+                                          */
                                           ?>
                                           <li class="dropdown-item-text" style="width: max-content;">
                                               <div class="d-flex align-items-center justify-content-center fw-bold">Invito da ...</div>
@@ -249,8 +252,10 @@
         <!-- questa parte dovrebbe contenere i sondaggi che hai creato se sei premium, quelli a cui hai partecipato se sei utente-->
         <?php
               if ($userType == "Utente") {
-                $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio WHERE EmailUtente='$emailUtente'";
-                $res=$pdo->query($sql);
+                $stmt = $pdo->prepare("CALL GetSondaggiByEmailUtente(?)");
+                $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
+                $stmt->execute();
+                $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
                 foreach($res as $row) {
                     $CodiceSondaggio = $row["Codice"];
                     $titoloSondaggio = $row["Titolo"];
