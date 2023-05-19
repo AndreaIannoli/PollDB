@@ -252,7 +252,7 @@
         <!-- questa parte dovrebbe contenere i sondaggi che hai creato se sei premium, quelli a cui hai partecipato se sei utente-->
         <?php
               if ($userType == "Utente") {
-                $stmt = $pdo->prepare("CALL GetSondaggiByEmailUtente(?)");
+                $stmt = $pdo->prepare("CALL GetSondaggiSimpleUser(?)");
                 $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
                 $stmt->execute();
                 $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
@@ -298,8 +298,10 @@
                 //la select devo inserire azienda o premium e se è azienda devo andare a prendere il codiceazienda dalla tabella azienda con l'email per prendere il codiceazienda
                 if ($userType == "Premium") {
                     //deve prendere i sondaggi a cui ha partecipato 
-                    $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio WHERE EmailUtente='$emailUtente'";
-                    $res=$pdo->query($sql);
+                    $stmt = $pdo->prepare("CALL GetSondaggiSimpleUser(?)");
+                    $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
+                    $stmt->execute();
+                    $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
                     foreach($res as $row) {
                         $CodiceSondaggio = $row["Codice"];
                         $titoloSondaggio = $row["Titolo"];
@@ -317,8 +319,10 @@
                     //e quelli da lui creati
                     echo '<h1 style="margin-top:7%;" class="t3"">Sondaggi da te creati</h1>';
                     echo '<p class="t3" style="margin-bottom: 5%;">Visualizza la lista dei sondaggi che hai creato, assieme alla lista di domande e le loro relative risposte. Non perderti mai nessuna informazione e resta aggiornato sui risultati dei sondaggi!</p>';
-                    $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN CreazionePremium ON Sondaggio.Codice = CreazionePremium.CodiceSondaggio WHERE EmailUtentePremium='$emailUtente'";
-                    $res=$pdo->query($sql);
+                    $stmt = $pdo->prepare("CALL GetSondaggiPremium(?)");
+                    $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
+                    $stmt->execute();
+                    $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
                     foreach($res as $row) {
                         $CodiceSondaggio = $row["Codice"];
                         $titoloSondaggio = $row["Titolo"];
@@ -335,8 +339,10 @@
                     }
                 }else{
                     //l'azienda prende tutti i sondaggi a cui ha partecipato
-                    $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio WHERE EmailUtente='$emailUtente'";
-                    $res=$pdo->query($sql);
+                    $stmt = $pdo->prepare("CALL GetSondaggiSimpleUser(?)");
+                    $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
+                    $stmt->execute();
+                    $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
                     foreach($res as $row) {
                         $CodiceSondaggio = $row["Codice"];
                         $titoloSondaggio = $row["Titolo"];
