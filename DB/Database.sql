@@ -158,7 +158,6 @@ Create TABLE NotificaPremio(
 	EmailUtente VARCHAR(30),
     Data DATE,
     Archiviata BOOLEAN,
-    FOREIGN KEY (CodiceNotifica) REFERENCES Notifica(Codice),
     FOREIGN KEY (NomePremio) REFERENCES Premio(Nome),
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
@@ -167,7 +166,6 @@ CREATE TABLE Invito(
     Codice INT AUTO_INCREMENT PRIMARY KEY,
     CodiceSondaggio INT,
     Esito VARCHAR(10),
-    FOREIGN KEY (CodiceNotifica) REFERENCES Notifica(Codice),
     FOREIGN KEY (CodiceSondaggio) REFERENCES Sondaggio(Codice)
 ) ENGINE = "INNODB";
 
@@ -178,7 +176,6 @@ CREATE TABLE NotificaInvito(
 	EmailUtente VARCHAR(30),
     Data DATE,
     Archiviata BOOLEAN,
-    FOREIGN KEY (CodiceNotifica) REFERENCES Notifica(Codice),
     FOREIGN KEY (CodiceInvito) REFERENCES Invito(Codice),
 	FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
@@ -691,5 +688,6 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE GetSondaggiPremium(IN emailUtente VARCHAR(30))
 BEGIN
-	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN CreazionePremium ON Sondaggio.Codice = CreazionePremium.CodiceSondaggio WHERE EmailUtentePremium='$emailUtente'END
+	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN CreazionePremium ON Sondaggio.Codice = CreazionePremium.CodiceSondaggio WHERE EmailUtentePremium='$emailUtente';
+END
 $ DELIMITER ;
