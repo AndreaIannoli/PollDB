@@ -46,10 +46,14 @@ CREATE TABLE Sondaggio(
 	Titolo VARCHAR(30) NOT NULL,
     DataChiusura Date,
     DataCreazione Date,
-    EmailCreatore VARCHAR(30),
+    EmailCreatorePremium VARCHAR(30),
+    EmailCreatoreAzienda VARCHAR(30),
     
-    FOREIGN KEY(EmailCreatore) REFERENCES UtentePremium(EmailUtente),
-    FOREIGN KEY(EmailCreatore) REFERENCES Azienda(IndirizzoEmail)
+    FOREIGN KEY(EmailCreatorePremium) REFERENCES UtentePremium(EmailUtente),
+    FOREIGN KEY(EmailCreatoreAzienda) REFERENCES Azienda(IndirizzoEmail),
+    CONSTRAINT chk1 CHECK(
+    (EmailCreatorePremium IS NOT NULL AND EmailCreatoreAzienda IS NULL) OR 
+    (EmailCreatoreAzienda IS NOT NULL AND EmailCreatorePremium IS NULL))
 ) ENGINE = "INNODB";
 
 CREATE TABLE Appartenenza(
@@ -484,10 +488,15 @@ $
 DELIMITER ;
 
 DELIMITER $
-CREATE PROCEDURE AddSondaggio (IN titolo varchar(30),  utentiMax INT, dataChiusura DATE, statoSondaggio varchar(30))
+CREATE PROCEDURE AddSondaggio (IN Titolo_Inserito varchar(30),  MaxUtenti_Inserito INT, DataChiusura_Inserita DATE, Stato_Inserito varchar(30), EmailCreatore_Inserita VARCHAR(30))
 BEGIN
-	INSERT INTO Sondaggio (Titolo, MaxUtenti, DataCreazione, DataChiusura, Stato) 
-		VALUES (titolo, utentiMax, current_date(), dataChiusura, statoSondaggio);
+	IF((SELECT count(*) FROM Azienda WHERE(IndirizzoEmail=EmailCreatore_Inserita))>0) THEN
+		INSERT INTO Sondaggio (Titolo, MaxUtenti, DataCreazione, DataChiusura, Stato, EmailCreatoreAzienda) 
+			VALUES (Titolo_Inserito, MaxUtenti_Inserito, current_date(), DataChiusura_Inserita, Stato_Inserito, EmailCreatore_Inserita);
+	ELSE
+		INSERT INTO Sondaggio (Titolo, MaxUtenti, DataCreazione, DataChiusura, Stato, EmailCreatorePremium) 
+			VALUES (Titolo_Inserito, MaxUtenti_Inserito, current_date(), DataChiusura_Inserita, Stato_Inserito, EmailCreatore_Inserita);
+    END IF;
 END
 $ DELIMITER ;
 
@@ -573,8 +582,12 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE ReturnPollCreator(IN CodiceSondaggio_Inserito INT)
 BEGIN
-    IF(SELECT count(*) FROM Sondaggio WHERE(CodiceSondaggio=CodiceSondaggio_Inserito) > 0) THEN
-		SELECT EmailCreatore FROM Sondaggio WHERE(Codice=CodiceSondaggio_Inserito);
+    IF(SELECT count(*) FROM Sondaggio WHERE(Codice=CodiceSondaggio_Inserito) > 0) THEN
+		IF((SELECT EmailCreatorePremium FROM Sondaggio WHERE(Codice=CodiceSondaggio_Inserito)) IS NULL) THEN
+			SELECT EmailCreatoreAzienda FROM Sondaggio WHERE(Codice=CodiceSondaggio_Inserito);
+        ELSE
+			SELECT EmailCreatorePremium FROM Sondaggio WHERE(Codice=CodiceSondaggio_Inserito);
+        END IF;
 	END IF;
 END
 $ DELIMITER ;
