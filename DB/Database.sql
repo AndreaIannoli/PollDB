@@ -360,7 +360,8 @@ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE GetUserNotifica (IN Email_Inserita VARCHAR(30))
 BEGIN
-	SELECT * FROM NotificaInvito,NotificaPremio WHERE(EmailUtente = Email_Inserita AND Archiviata = false) ORDER BY Data;
+	SELECT 'Invito' AS Type, CodiceNotifica AS Codice, Data FROM NotificaInvito WHERE(EmailUtente = Email_Inserita AND Archiviata = false) 
+    UNION SELECT 'Premio', CodiceNotifica, Data FROM NotificaPremio WHERE(EmailUtente = Email_Inserita AND Archiviata = false) ORDER BY Data;
 END
 $
 DELIMITER ;
@@ -439,7 +440,6 @@ BEGIN
 END
 $ DELIMITER ;
 
-
 DELIMITER $
 CREATE PROCEDURE GetCodiceNotifica()
 BEGIN
@@ -458,16 +458,12 @@ BEGIN
 END
 $ DELIMITER;
 
-
 DELIMITER $
 CREATE PROCEDURE ReturnDomains()
 BEGIN
 	SELECT Argomento FROM Dominio;
 END
 $ DELIMITER ;
-
-
-
 
 DELIMITER $
 CREATE PROCEDURE AddAppartenenza (IN codiceSondaggio int, argomentoDominio varchar(30))
