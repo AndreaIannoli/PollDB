@@ -760,7 +760,7 @@ END
 $ DELIMITER ;
 
 DELIMITER $
-CREATE PROCEDURE GetSondaggiPremium(IN emailUtente VARCHAR(30))
+CREATE PROCEDURE GetSondaggiPremium(IN emailUtent VARCHAR(30))
 BEGIN
 	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailCreatorePremium=emailUtente;
 END
