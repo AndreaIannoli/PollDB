@@ -807,3 +807,17 @@ BEGIN
     END IF;
 END
 $ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE CheckTipoDomanda(IN IdDomanda INT)
+BEGIN
+	SELECT * FROM DomandaAperta WHERE Id=IdDomanda;
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE GetDomande(IN codSondaggio INT)
+BEGIN
+	SELECT Id, Testo, Punteggio FROM Domanda WHERE Id IN (SELECT IdDomanda FROM Composizione WHERE Composizione.CodiceSondaggio= codSondaggio);
+END
+$ DELIMITER ;

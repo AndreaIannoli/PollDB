@@ -13,17 +13,9 @@
   <body>
 
   <?php
-    $host = "localhost:3306";
-    $dbName = "PollDB";
-    $username = "root";
-    $pass = "PollDB";
-    try {
-        $pdo = new PDO('mysql:host='.$host.';dbname='.$dbName, $username, $pass);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
-        echo("[ERRORE] Connessione al DB non riuscita. Errore: " . $e->getMessage());
-        throw $e;
-    }
+    require 'accountManager.php';
+    require 'connectionManager.php';
+    $pdo = connectToDB();
 
     $CodiceSondaggio = $_GET['CodiceSondaggio']; 
     $TitoloSondaggio = $_GET['titoloSondaggio']; 
@@ -120,17 +112,34 @@
 
 
         <?php
+        /*
           $sql="SELECT IdDomanda FROM Composizione WHERE CodiceSondaggio='$CodiceSondaggio'";
           $res=$pdo->query($sql);
+          */
+
+          try{
+            /*
+            $sql="SELECT IdDomanda FROM Composizione WHERE CodiceSondaggio='$CodiceSondaggio'";
+            $res=$pdo->query($sql);
+            */
+            $stmt = $pdo->prepare("CALL GetDomande(?)");
+            $stmt->bindParam(1, $CodiceSondaggio, PDO::PARAM_INT);
+            $stmt->execute();
+            $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+          }catch (PDOException $e){
+            echo 'exception'.$e;
+          }
           foreach($res as $row) {
             $iddomanda = $row["IdDomanda"];
+            /*
             $sql="SELECT Id, Testo, Punteggio FROM Domanda WHERE Id='$iddomanda'";
             $res=$pdo->query($sql);
             $row2 = $res->fetch();
+            */
             echo '<div class="box answer">';
-            echo '<h4 class="t2">Domanda: ' . $row2["Id"] . '</h4>';
-            echo '<p class="t2">' . $row2["Testo"] . '</p>';
-            echo '<p class="info"> Punteggio: ' . $row2["Punteggio"] .  '</p>';
+            echo '<h4 class="t2">Domanda: ' . $row["Id"] . '</h4>';
+            echo '<p class="t2">' . $row["Testo"] . '</p>';
+            echo '<p class="info"> Punteggio: ' . $row["Punteggio"] .  '</p>';
             echo '<a href="../php/visualizza_domanda.php?IdDomanda=' . $iddomanda . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domanda</button></a>';
             echo '</div>';
           }
