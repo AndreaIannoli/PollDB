@@ -760,6 +760,13 @@ BEGIN
 END
 $ DELIMITER ;
 
+DELIMITER $
+CREATE PROCEDURE GetSondaggiAzienda(IN emailUtente VARCHAR(30))
+BEGIN
+	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailCreatoreAzienda=emailUtente;
+END
+$ DELIMITER ;
+
 
 DELIMITER $
 CREATE PROCEDURE AddSubscription(IN EmailUtente_Inserita VARCHAR(30), FineAbbonamento_Inserito Date, Costo_Inserito DOUBLE)

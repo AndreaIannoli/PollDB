@@ -28,8 +28,8 @@
     session_start();
     $userType = $_SESSION['userType'];
     $emailUtente = $_SESSION['emailLogged'];
-    $emailUtente = "utente@gmail.com";
-    $userType = "Premium";
+    //$emailUtente = "utente@gmail.com";
+    //$userType = "Premium";
 
   /*
 
@@ -276,6 +276,8 @@ $type = "Premium";
               }else{
                 //la select devo inserire azienda o premium e se è azienda devo andare a prendere il codiceazienda dalla tabella azienda con l'email per prendere il codiceazienda
                 if ($userType == "Premium") {
+                    echo($userType);
+                    echo($emailUtente);
                     //deve prendere i sondaggi a cui ha partecipato 
                     $stmt = $pdo->prepare("CALL GetSondaggiSimpleUser(?)");
                     $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
@@ -341,13 +343,17 @@ $type = "Premium";
                     echo '<h1 style="margin-top:7%;" class="t3"">Sondaggi da te creati</h1>';
                     echo '<p class="t3" style="margin-bottom: 8%;">Visualizza la lista dei sondaggi che hai creato, assieme alla lista di domande e le loro relative risposte. Non perderti mai nessuna informazione e resta aggiornato sui risultati dei sondaggi!</p>';
                     //prima deve prendere il codice azienda dall'indirizzo email
-                    $sql = "SELECT CodiceFiscale FROM Azienda WHERE IndirizzoEmail=?";
+                    /*$sql = "SELECT CodiceFiscale FROM Azienda WHERE IndirizzoEmail=?";
                     $stmt = $pdo->prepare($sql);
                     $stmt->execute([$emailUtente]);
                     $codiceazienda = $stmt->fetchColumn();
                     //poi prende i sondaggi
                     $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailCreatoreAzienda = '$emailUtente';";
-                    $res=$pdo->query($sql);
+                    $res=$pdo->query($sql);*/
+                    $stmt = $pdo->prepare("CALL GetSondaggiAzienda(?)");
+                    $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
+                    $stmt->execute();
+                    $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
                     foreach($res as $row) {
                         $CodiceSondaggio = $row["Codice"];
                         $titoloSondaggio = $row["Titolo"];
