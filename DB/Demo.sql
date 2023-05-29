@@ -13,3 +13,14 @@ CALL PromoteToAdmin('utenteAdmin@gmail.com');
 CALL AddSondaggio("Prova", 3, "2023-05-31", "APERTO", "azienda1@email.com");
 
 CALL AddDomain('Calcio', 'Si calcia');
+CALL AddDomain('Pallavolo', 'Si palleggia');
+
+CALL AddInteressamento('Calcio', 'utente1@gmail.com');
+CALL AddInteressamento('Calcio', 'utente2@gmail.com');
+CALL AddInteressamento('Pallavolo', 'utente2@gmail.com');
+CALL AddInteressamento('Pallavolo', 'utente3@gmail.com');
+CALL AddInteressamento('Calcio', 'utente4@gmail.com');
+
+Call AddAppartenenza(1, 'Calcio');
+
+

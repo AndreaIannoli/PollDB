@@ -442,23 +442,17 @@ END
 $ DELIMITER ;
 
 DELIMITER $
-CREATE PROCEDURE creaInvito(IN codSondaggio INT, email varchar(30))
+CREATE PROCEDURE AddInvito(IN codSondaggio INT, email varchar(30))
 BEGIN
 DECLARE codInvito INT;
 	DECLARE codiceDaInserire varchar(36);
 	set codiceDaInserire = uuid();
     
 	INSERT INTO Invito(CodiceSondaggio) VALUES(codSondaggio);
-    
-    
+
     SET codInvito := (SELECT Codice FROM Invito ORDER BY Codice DESC limit 1);
     
     INSERT INTO NotificaInvito(CodiceNotifica, CodiceInvito, EmailUtente, Data, Archiviata) VALUES(codiceDaInserire, codInvito, email, current_date(), false);
-    
-	/*INSERT INTO Notifica(Codice, EmailUtente, Data, Archiviata) VALUES(codiceDaInserire, email, current_date(), false);
-	INSERT INTO Invito(CodiceNotifica, CodiceSondaggio) VALUES(codiceDaInserire, codSondaggio);*/
-
-
 END
 $ DELIMITER;
 
@@ -511,16 +505,6 @@ CREATE PROCEDURE GetCodiceNotifica()
 BEGIN
 	SELECT CodiceNotifica FROM Notifica;
 	INSERT INTO Notifica(EmailUtente, Data, Archiviata) VALUES(email, current_date(), false);
-END
-$ DELIMITER;
-
-DELIMITER $
-CREATE PROCEDURE AddInvito(IN codSondaggio INT, email varchar(30))
-BEGIN
-	DECLARE codiceDaInserire varchar(36);
-	set codiceDaInserire = uuid();
-	INSERT INTO Notifica(Codice, EmailUtente, Data, Archiviata) VALUES(codiceDaInserire, email, current_date(), false);
-	INSERT INTO Invito(CodiceNotifica, CodiceSondaggio) VALUES(codiceDaInserire, codSondaggio);
 END
 $ DELIMITER;
 
@@ -613,15 +597,14 @@ BEGIN
 END
 $ DELIMITER ;
 
-/*DA RIVEDERE*/
 DELIMITER $
 CREATE PROCEDURE RandomInvite(IN CodiceSondaggio_Inserito INT)
 BEGIN
 	DECLARE MaxUtentiSondaggio INT;
     SET MaxUtentiSondaggio := (SELECT MaxUtenti FROM Sondaggio WHERE Codice = CodiceSondaggio_Inserito);
     DROP TEMPORARY TABLE IF EXISTS UserEligible;
-    IF(SELECT count(*) FROM Utente WHERE((Email NOT IN (SELECT EmailUtente FROM Notifica WHERE(Codice IN (SELECT CodiceNotifica FROM Invito) AND Archiviata = false))) AND (SELECT count(*) FROM Interessamento WHERE((EmailUtente=Email) AND (Argomento IN (SELECT ArgomentoDominio FROM Appartenenza WHERE CodiceSondaggio = CodiceSondaggio_Inserito))))) > 0) THEN 
-		CREATE TEMPORARY TABLE UserEligible SELECT Email FROM Utente WHERE((Email NOT IN (SELECT EmailUtente FROM Notifica WHERE(Codice IN (SELECT CodiceNotifica FROM Invito) AND Archiviata = false))) AND (SELECT count(*) FROM Interessamento WHERE((EmailUtente=Email) AND (Argomento IN (SELECT ArgomentoDominio FROM Appartenenza WHERE CodiceSondaggio = CodiceSondaggio_Inserito)))));
+    IF(SELECT count(*) FROM Utente WHERE((Email NOT IN (SELECT EmailUtente FROM NotificaInvito WHERE(Archiviata = false))) AND (SELECT count(*) FROM Interessamento WHERE((EmailUtente=Email) AND (Argomento IN (SELECT ArgomentoDominio FROM Appartenenza WHERE CodiceSondaggio = CodiceSondaggio_Inserito))))) > 0) THEN 
+		CREATE TEMPORARY TABLE UserEligible SELECT Email FROM Utente WHERE((Email NOT IN (SELECT EmailUtente FROM NotificaInvito WHERE(Archiviata = false))) AND (SELECT count(*) FROM Interessamento WHERE((EmailUtente=Email) AND (Argomento IN (SELECT ArgomentoDominio FROM Appartenenza WHERE CodiceSondaggio = CodiceSondaggio_Inserito)))));
 	ELSE
 		CREATE TEMPORARY TABLE UserEligible SELECT Email FROM Utente LIMIT 0;
     END IF;
@@ -633,8 +616,8 @@ BEGIN
     SET @i := 0;
     WHILE @i < @max DO
 		SET @CurrentUser = (SELECT Email FROM UserEligible ORDER BY RAND() LIMIT 1);
-        IF((@CurrentUser NOT IN (SELECT EmailUtente FROM Notifica WHERE(Codice IN (SELECT CodiceNotifica FROM Invito) AND Archiviata = false)))) THEN
-            CALL creaInvito(CodiceSondaggio_Inserito, @CurrentUser);
+        IF((@CurrentUser NOT IN (SELECT EmailUtente FROM NotificaInvito WHERE(Archiviata = false)))) THEN
+            CALL AddInvito(CodiceSondaggio_Inserito, @CurrentUser);
             SET @i = @i + 1;
         END IF;
     END WHILE;
@@ -760,13 +743,9 @@ END
 $ DELIMITER ;
 
 DELIMITER $
-CREATE PROCEDURE GetSondaggiPremium(IN emailUtent VARCHAR(30))
+CREATE PROCEDURE GetSondaggiPremium(IN emailUtente VARCHAR(30))
 BEGIN
-<<<<<<< HEAD
 	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailCreatorePremium = emailUtente;
-=======
-	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailCreatorePremium=emailUtente;
->>>>>>> 873f8393bbdd1242839f8a94cfbf7b90081373a1
 END
 $ DELIMITER ;
 
