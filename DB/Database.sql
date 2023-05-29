@@ -35,7 +35,7 @@ CREATE TABLE UtentePremium(
     InizioAbbonamento Date,
     FineAbbonamento Date,
     Costo DOUBLE,
-    NumSondaggi INT,
+    NumSondaggi INT DEFAULT 0,
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
@@ -382,6 +382,13 @@ END
 $ DELIMITER ;
 
 DELIMITER $
+CREATE PROCEDURE SearchPremiums(IN Email_Inserita varchar(30))
+BEGIN
+	SELECT * FROM UtentePremium WHERE EmailUtente LIKE CONCAT('%', Email_Inserita,'%');  
+END
+$ DELIMITER ;
+
+DELIMITER $
 CREATE PROCEDURE SearchAzienda(IN email varchar(30))
 BEGIN
 	SELECT IndirizzoEmail FROM Azienda WHERE IndirizzoEmail = email;
@@ -693,10 +700,49 @@ BEGIN
 END
 $ DELIMITER ;
 
-
 DELIMITER $
 CREATE PROCEDURE GetSondaggiPremium(IN emailUtente VARCHAR(30))
 BEGIN
 	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN CreazionePremium ON Sondaggio.Codice = CreazionePremium.CodiceSondaggio WHERE EmailUtentePremium='$emailUtente';
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE AddSubscription(IN EmailUtente_Inserita VARCHAR(30), FineAbbonamento_Inserito Date, Costo_Inserito DOUBLE)
+BEGIN
+	INSERT INTO UtentePremium(Emailutente, InizioAbbonamento, FineAbbonamento, Costo) VALUES(Emailutente_Inserita, current_date(), FineAbbonamento_Inserito, Costo_Inserito);
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE RemoveSubscription(IN EmailUtente_Inserita VARCHAR(30))
+BEGIN
+	DELETE FROM UtentePremium WHERE(EmailUtente = EmailUtente_Inserita);
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE IncreaseSubscription(IN EmailUtente_Inserita VARCHAR(30), TipoIncremento INT)
+BEGIN
+	IF(TipoIncremento = 1) THEN
+		UPDATE UtentePremium SET FineAbbonamento=DATE_ADD(FineAbbonamento, INTERVAL 1 DAY) WHERE(EmailUtente=EmailUtente_Inserita);
+    ELSEIF(TipoIncremento = 2) THEN
+		UPDATE UtentePremium SET FineAbbonamento=DATE_ADD(FineAbbonamento, INTERVAL 1 MONTH) WHERE(EmailUtente=EmailUtente_Inserita);
+    ELSEIF(TipoIncremento = 3) THEN
+		UPDATE UtentePremium SET FineAbbonamento=DATE_ADD(FineAbbonamento, INTERVAL 1 YEAR) WHERE(EmailUtente=EmailUtente_Inserita);
+    END IF;
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE DecreaseSubscription(IN EmailUtente_Inserita VARCHAR(30), TipoDecremento INT)
+BEGIN
+	IF(TipoDecremento = 1) THEN
+		UPDATE UtentePremium SET FineAbbonamento=DATE_SUB(FineAbbonamento, INTERVAL 1 DAY) WHERE(EmailUtente=EmailUtente_Inserita);
+    ELSEIF(TipoDecremento = 2) THEN
+		UPDATE UtentePremium SET FineAbbonamento=DATE_SUB(FineAbbonamento, INTERVAL 1 MONTH) WHERE(EmailUtente=EmailUtente_Inserita);
+    ELSEIF(TipoDecremento = 3) THEN
+		UPDATE UtentePremium SET FineAbbonamento=DATE_SUB(FineAbbonamento, INTERVAL 1 YEAR) WHERE(EmailUtente=EmailUtente_Inserita);
+    END IF;
 END
 $ DELIMITER ;

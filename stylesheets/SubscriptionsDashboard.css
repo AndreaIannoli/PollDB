@@ -1,0 +1,19 @@
+#subscriptionsDashboard-container{
+    max-width: 800px;
+    margin-top: 1vw;
+    background: white;
+    border-radius: 20px;
+    padding: 0px 50px 50px 50px;
+}
+
+.btn-square-md {
+    width: 40px !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    height: 40px !important;
+    text-align: center;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

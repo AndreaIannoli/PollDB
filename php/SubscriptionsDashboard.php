@@ -10,7 +10,7 @@
     <link href="../stylesheets/basicstyle.css" rel="stylesheet">
     <link href="../stylesheets/nav.css" rel="stylesheet">
     <link href="../stylesheets/button.css" rel="stylesheet">
-    <link href="../stylesheets/AdminDashboard.css" rel="stylesheet">
+    <link href="../stylesheets/SubscriptionsDashboard.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
@@ -23,37 +23,163 @@
     require 'accountManager.php';
     require 'NotificationManager.php';
 
-    session_start();
-    if(isset($_POST['searchField'])){
-        $_SESSION['search'] = $_POST['searchField'];
-    }
-
     $pdo = connectToDB();
+    session_start();
+
     if(!isset($_SESSION['authorized']) or $_SESSION['authorized'] == 0){
         session_unset();
         header('Location: login.php');
     }
-    if($_SESSION['userType'] != 'Amministratore'){
-        header('Location: visualizza_sondaggi.php');
+
+    $emailInserted = false;
+    $checkEmailRes = false;
+    $checkPremiumRes = true;
+    $endDateInserted = false;
+    $checkEndDateRes = false;
+    $costInserted = false;
+    $checkCostRes = false;
+
+    $emailInserted = isset($_POST['email']);
+    if($emailInserted and strlen($_POST['email'])<30){
+        $checkEmailRes = checkEmail($_POST['email'], $pdo);
+        if($checkEmailRes and checkType($_POST['email'], $pdo) == "Utente"){
+            $checkPremiumRes = false;
+        }
     }
 
-    function getInteressamento($email, PDO $pdo){
-        try {
-            $sql = 'CALL GetUserInteressamento(?)';
-            $res = $pdo->prepare($sql);
-            $res->bindValue(1, $email, PDO::PARAM_STR);
-            $res->execute();
-        } catch (PDOException $e){
-            echo 'exception'.$e;
-        }
+    $endDateInserted = isset($_POST['dateOfEnd']);
+    if($endDateInserted){
+        $checkEndDateRes = checkDateValidity($_POST['dateOfEnd']);
+    }
 
-        return $res;
+    $costInserted = isset($_POST['cost']);
+    if($costInserted and $_POST['cost']>0){
+        $checkCostRes = true;
+    }
+
+    if(isset($_POST['searchField'])){
+        $_SESSION['search'] = $_POST['searchField'];
+    }
+
+    if(isset($_POST['searchField'])){
+        $_SESSION['search'] = $_POST['searchField'];
     }
 
     if(isset($_POST['AcceptInvite'])){
         acceptInvite($_POST['AcceptInvite'], $pdo);
     } else if(isset($_POST['DenyInvite'])) {
         denyInvite($_POST['DenyInvite'], $pdo);
+    }
+
+    if(isset($_POST['toDelete'])){
+        deleteSubscription($_POST['toDelete'], $pdo);
+    }
+
+    if($emailInserted and !$checkPremiumRes and isset($_POST['addSubscriptionBtn'])){
+        addSubscription($_POST['email'], $_POST['dateOfEnd'], $_POST['cost'], $pdo);
+    }
+
+    if(isset($_POST['toDelete'])){
+        deleteSubscription($_POST['toDelete'], $pdo);
+        unset($_POST['toDelete']);
+    } else if(isset($_POST['toIncrease1'])){
+        increaseSubscription($_POST['toIncrease1'], 1, $pdo);
+        unset($_POST['toIncrease1']);
+    } else if(isset($_POST['toIncrease2'])) {
+        increaseSubscription($_POST['toIncrease2'], 2, $pdo);
+        unset($_POST['toIncrease2']);
+    } else if(isset($_POST['toIncrease3'])) {
+        increaseSubscription($_POST['toIncrease3'], 3, $pdo);
+        unset($_POST['toIncrease3']);
+    } else if(isset($_POST['toDecrease1'])){
+        decreaseSubscription($_POST['toDecrease1'], 1, $pdo);
+        unset($_POST['toDecrease1']);
+    } else if(isset($_POST['toDecrease2'])) {
+        decreaseSubscription($_POST['toDecrease2'], 2, $pdo);
+        unset($_POST['toDecrease2']);
+    } else if(isset($_POST['toDecrease3'])) {
+        decreaseSubscription($_POST['toDecrease3'], 3, $pdo);
+        unset($_POST['toDecrease3']);
+    }
+
+    function checkDateValidity($date){
+        $minimumYear  = date("Y");
+        $minimumMonth = date("m");
+        $minimumDay = date("d");
+        if(date('Y', strtotime($date)) >= $minimumYear and (date('m', strtotime($date)) >= $minimumMonth or date('d', strtotime($date)) >= $minimumDay)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function addSubscription($email, $endSubscription, $cost, PDO $pdo) {
+        try {
+            $sql = "CALL AddSubscription(?, ?, ?)";
+            $res = $pdo->prepare($sql);
+            $res->bindValue( 1, $email, PDO::PARAM_STR);
+            $res->bindValue( 2, $endSubscription, PDO::PARAM_STR);
+            $res->bindValue( 3, $cost, PDO::PARAM_STR);
+            $res->execute();
+        } catch (PDOException $e) {
+            echo("[ERRORE] Query SQL AddSubscription() non riuscita. Errore: ".$e->getMessage());
+            exit();
+        }
+    }
+
+    function deleteSubscription($email, PDO $pdo) {
+        try {
+            $sql = "CALL RemoveSubscription(?)";
+            $res = $pdo->prepare($sql);
+            $res->bindValue( 1, $email, PDO::PARAM_STR);
+            $res->execute();
+        } catch (PDOException $e) {
+            echo("[ERRORE] Query SQL AddSubscription() non riuscita. Errore: ".$e->getMessage());
+            exit();
+        }
+    }
+
+    function increaseSubscription($email, $typeOfIncrement, PDO $pdo) {
+        try {
+            $sql = "CALL IncreaseSubscription(?, ?)";
+            $res = $pdo->prepare($sql);
+            $res->bindValue( 1, $email, PDO::PARAM_STR);
+            $res->bindValue( 2, $typeOfIncrement, PDO::PARAM_INT);
+            $res->execute();
+        } catch (PDOException $e) {
+            echo("[ERRORE] Query SQL IncreaseSubscription() non riuscita. Errore: ".$e->getMessage());
+            exit();
+        }
+    }
+
+    function decreaseSubscription($email, $typeOfDecrement, PDO $pdo) {
+        try {
+            $sql = "CALL DecreaseSubscription(?, ?)";
+            $res = $pdo->prepare($sql);
+            $res->bindValue( 1, $email, PDO::PARAM_STR);
+            $res->bindValue( 2, $typeOfDecrement, PDO::PARAM_INT);
+            $res->execute();
+        } catch (PDOException $e) {
+            echo("[ERRORE] Query SQL DecreaseSubscription() non riuscita. Errore: ".$e->getMessage());
+            exit();
+        }
+    }
+
+    function searchPremiums(PDO $pdo){
+        try {
+            $sql = 'CALL SearchPremiums(?)';
+            $res = $pdo->prepare($sql);
+            if(!empty($_SESSION['search'])) {
+                $res->bindValue(1, $_SESSION['search'], PDO::PARAM_STR);
+            } else {
+                $res->bindValue(1, '', PDO::PARAM_STR);
+            }
+            $res->execute();
+            return $res->fetchAll();
+        } catch (PDOException $e){
+            echo("[ERRORE] Query SQL SearchPremiums() non riuscita. Errore: ".$e->getMessage());
+            exit();
+        }
     }
 ?>
 <!--====== NAVBAR ONE PART START ======-->
@@ -133,8 +259,7 @@
 
                                             for($x=0; $x < $nOfNotifications; $x++){
                                                 $row = $notifications[$x];
-                                                $typeRes = getNotificationType($row['Codice'], $pdo)->fetch();
-                                                $type = $typeRes[0];
+                                                $type = $row['Type'];
                                                 if($type == 'Invito'){
                                                     $poll = getInvitePoll($row['Codice'], $pdo)->fetch();
                                                     $pollCreator = getPollCreator($poll['Codice'], $pdo)->fetch();
@@ -227,39 +352,117 @@
     <!-- container -->
 </section>
 <!--====== NAVBAR ONE PART ENDS ======-->
-<div class="container-xl" id="adminDashboard-container">
+<div class="container-xl" id="subscriptionsDashboard-container">
     <div class="container-fluid row justify-content-center">
-        <img src="../img/logoPollDBBlack.png" class="img-sm col-3" alt="...">
+        <img src="../img/logoPollDBBlack.png" class="img-sm col-6" alt="...">
     </div>
-    <form class="row g-6 needs-validation" id="login-form" method="post">
-        <div class="col-4">
-            <div class="card">
-                <h5 class="card-header" style="font-size: 50px"><i class='bi bi-heart-fill'></i><br>Gestione Domini</h5>
-                <div class="card-body">
-                    <p class="card-text">Gestisci i domini di interesse, eliminali e creane di nuovi!</p>
-                    <a href="DomainDashboard.php" class="btn primary-btn">Vai alla gestione domini</a>
+    <h2>Gestione abbonamenti Premium</h2>
+    <form class="row align-items-center justify-content-center gap-1" method="post">
+        <div class="col-sm-9 p-0 form-floating">
+            <?php
+                if(!empty($_SESSION['search'])){
+                    echo("<input type='text' class='form-control' id='searchField' name='searchField' value='".$_SESSION['search']."' placeholder='Nome del dominio di interesse' maxlength='30'>");
+                } else {
+                    echo("<input type='text' class='form-control' id='searchField' name='searchField' placeholder='Nome del dominio di interesse' maxlength='30'>");
+                }
+            ?>
+            <label for="searchField">Email Utente</label>
+        </div>
+        <form method="post">
+            <button class="btn btn-lg primary-btn login-btn col-sm-2" type="submit"><i class="bi bi-search" style="font-size: 150%"></i></button>
+        </form>
+        <div class="col-12 container-fluid mt-4">
+            <form class="row justify-content-center gap-1" style="max-height: 250px; overflow-y: scroll;" method="post">
+                <?php
+
+                    $premiums = searchPremiums($pdo);
+                    echo($premiums[0]['Emailutente']);
+
+                    if(sizeof($premiums)==0){
+                        echo('Nessun utente premium trovato');
+                    }
+                    for($x=0; $x<sizeof($premiums); $x++){
+                        $premiumName = $premiums[$x]['Emailutente'];
+                        $subscriptionStartDate = $premiums[$x]['InizioAbbonamento'];
+                        $subscriptionEndDate = $premiums[$x]['FineAbbonamento'];
+                        echo("
+                            <div class='col-12 mb-3' style='background-color: grey; height: 50px; color: white; border-radius: 25px; display: flex; justify-content: start; align-items: center'>"
+                            .$premiumName.
+                            "<button class='btn primary-btn login-btn d-grid wrap-content col-sm-3 btn-square-md ms-auto me-1' value='".$premiumName."' type='submit' name='toDecrease3'>-1Y</button>
+                            <button class='btn primary-btn login-btn d-grid wrap-content col-sm-3 btn-square-md mx-1' value='".$premiumName."' type='submit' name='toDecrease2'>-1M</button>
+                            <button class='btn primary-btn login-btn d-grid wrap-content col-sm-3 btn-square-md ms-1 me-3' value='".$premiumName."' type='submit' name='toDecrease1'>-1D</button>
+                            <button class='btn primary-btn login-btn d-grid wrap-content col-sm-3 btn-square-md ms-3 me-1' value='".$premiumName."' type='submit' name='toIncrease1'>+1D</button>
+                            <button class='btn primary-btn login-btn d-grid wrap-content col-sm-3 btn-square-md mx-1' value='".$premiumName."' type='submit' name='toIncrease2'>+1M</button>
+                            <button class='btn primary-btn login-btn d-grid wrap-content col-sm-3 btn-square-md mx-1' value='".$premiumName."' type='submit' name='toIncrease3'>+1Y</button>
+                            <button class='btn secondary-btn login-btn d-grid wrap-content col-sm-3 btn-square-md mx-1' value='".$premiumName."' type='submit' name='toDelete'><i class='bi bi-x-lg' style='font-size: 15px'></i></button></div>
+                        ");
+                    }
+
+                ?>
+            </form>
+        </div>
+        <h2>Aggiungi nuovo abbonamento Premium</h2>
+        <form method="post">
+            <div class="col-5">
+                <label class="form-label" for="email">Email Utente</label>
+                <input type="text" <?php
+                if($emailInserted and $checkEmailRes and !$checkPremiumRes){
+                    echo("class='form-control is-valid'");
+                } else if($emailInserted) {
+                    echo("class='form-control is-invalid'");
+                } else {
+                    echo("class='form-control'");
+                }
+                ?> id="email" name="email" placeholder="Email utente" maxlength="30" required>
+                <div class="valid-feedback">
+                    Email utente valida!
+                </div>
+                <div class="invalid-feedback">
+                    Email utente non valida o già premium!
                 </div>
             </div>
-        </div>
-        <div class="col-4">
-            <div class="card">
-                <h5 class="card-header" style="font-size: 50px"><i class="bi bi-code-square"></i><br>Console database</h5>
-                <div class="card-body">
-                    <p class="card-text">Visualizza le call fatte al database!</p>
-                    <a href="registrationEnterprise.php" class="btn primary-btn">Vai alla console database</a>
+            <div class="col-5 mt-3">
+                <label class="form-label">Data di fine abbonamento</label>
+                <div class="input-group date">
+                    <input type="date" <?php
+                    if($endDateInserted and $checkEndDateRes){
+                        echo("class='form-control is-valid'");
+                    } else if($endDateInserted) {
+                        echo("class='form-control is-invalid'");
+                    } else {
+                        echo("class='form-control'");
+                    }
+                    ?>class="form-control" id="dateOfEnd" name="dateOfEnd" required>
+                </div>
+                <div class="valid-feedback">
+                    Data di fine valida!
+                </div>
+                <div class="invalid-feedback">
+                    Data di fine non valida!
                 </div>
             </div>
-        </div>
-        <div class="col-4">
-            <div class="card">
-                <h5 class="card-header" style="font-size: 50px"><i class="bi bi-patch-plus-fill"></i><br>Gestione abbonamenti</h5>
-                <div class="card-body">
-                    <p class="card-text">Gestisci gli abbonamenti degli utenti premium</p>
-                    <a href="SubscriptionsDashboard.php" class="btn primary-btn">Vai alla gestione abbonamenti</a>
+            <div class="col-5 mt-3">
+                <label class="form-label" for="cost">Costo</label>
+                <input type="number" step="0.01" min="0" <?php
+                if($costInserted and $checkCostRes){
+                    echo("class='form-control is-valid'");
+                } else if($costInserted) {
+                    echo("class='form-control is-invalid'");
+                } else {
+                    echo("class='form-control'");
+                }
+                ?> class="form-control" id="cost" name="cost" required>
+                <div class="valid-feedback">
+                    Costo valido!
+                </div>
+                <div class="invalid-feedback">
+                    Costo non valido!
                 </div>
             </div>
-        </div>
+            <button class="btn primary-btn login-btn mt-4" type="submit" id="addSubscriptionBtn" name="addSubscriptionBtn" value="addSubscriptionBtn">Aggiungi Abbonamento</button>
+        </form>
     </form>
+
 </div>
 </body>
 </html>
