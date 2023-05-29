@@ -22,3 +22,12 @@
 .opzione{
     margin-top: 5px;
 }
+
+body{
+    background-image: none !important;
+}
+
+.newq{
+    background-color: black !important;
+    border-color: black !important;
+}

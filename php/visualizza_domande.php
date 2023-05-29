@@ -102,7 +102,7 @@
     </section>
     <!--====== NAVBAR ONE PART ENDS ======-->
     
-    <div class="container box2">
+    <div class="container box2" style="margin-top:3%">
         <h1 class="t3">
             <?php
                 echo $TitoloSondaggio;
@@ -148,7 +148,8 @@
    <?php
         
         if($type != "Utente"){
-            echo '<button class="btn btn-primary" onclick="location.href=\'inserisci_dom.php?CodiceSondaggio=\' + encodeURIComponent(\'' . $CodiceSondaggio . '\')">Crea nuova domanda</button>';        }
+            echo '<button class="btn btn-primary newq" onclick="location.href=\'inserisci_dom.php?CodiceSondaggio=\' + encodeURIComponent(\'' . $CodiceSondaggio . '\')">Crea nuova domanda</button>';        
+        }
     ?>
 
     </div>

@@ -130,7 +130,7 @@
               <input type="text" class="form-control opzione" name="opzione4" id="opzione4" placeholder="Opzione 4">
             </div>
            
-            <button type="submit" class="btn primary-btn">Carica domanda nel sondaggio</button>
+            <button type="submit" class="btn primary-btn newq">Carica domanda nel sondaggio</button>
 
             <!-- Finestra per upload immagine -->
             <div class="modal fade" id="uploadfile" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

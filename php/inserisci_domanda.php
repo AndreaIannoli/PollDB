@@ -39,9 +39,8 @@
       
     }
 
-    header('Location: ' . $_SERVER['HTTP_REFERER']); //per tornare indietro una volta fatto l'inserimento
-
-  
-
+    //per tornare indietro una volta fatto tutto
+    header('Location: visualizza_sondaggi.php');
+    exit;
 
 ?>

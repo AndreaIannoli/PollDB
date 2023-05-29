@@ -225,7 +225,7 @@ $ DELIMITER ;
 
 #Insercisci domanda aperta sondaggio
 DELIMITER $
-CREATE PROCEDURE AddDomandaAperta (IN Testo VARCHAR(200), Punteggio INT, Foto VARCHAR(50), MaxCaratteri INT, CodiceSondaggio INT)
+CREATE PROCEDURE AddDomandaAperta (IN Testo VARCHAR(300), Punteggio INT, Foto VARCHAR(300), MaxCaratteri INT, CodiceSondaggio INT)
 BEGIN
 	INSERT INTO Domanda (Testo, Punteggio, Foto)  VALUES (Testo, Punteggio, Foto);
 	SET @last_id = LAST_INSERT_ID(); 
@@ -236,7 +236,7 @@ $ DELIMITER ;
 
 #Insercisci domanda chiusa sondaggio
 DELIMITER $
-CREATE PROCEDURE AddDomandaChiusa (IN Testo VARCHAR(200), Punteggio INT, Foto VARCHAR(50), Opzione1 VARCHAR(50), Opzione2 VARCHAR(50), Opzione3 VARCHAR(50), Opzione4 VARCHAR(50), CodiceSondaggio INT)
+CREATE PROCEDURE AddDomandaChiusa (IN Testo VARCHAR(300), Punteggio INT, Foto VARCHAR(300), Opzione1 VARCHAR(50), Opzione2 VARCHAR(50), Opzione3 VARCHAR(50), Opzione4 VARCHAR(50), CodiceSondaggio INT)
 BEGIN
 	INSERT INTO Domanda (Testo, Punteggio, Foto)  VALUES (Testo, Punteggio, Foto);
 	SET @last_id = LAST_INSERT_ID(); 
