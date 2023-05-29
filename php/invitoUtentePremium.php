@@ -344,9 +344,6 @@ if(isset($_POST['buttonAggiungi'])) {
 
 
                     if (isset($_POST["buttonAggiungi"])) {
-
-
-
                         $arrayNuovo = array();
                         $i = 0;
 
@@ -356,11 +353,9 @@ if(isset($_POST['buttonAggiungi'])) {
                             $arrayNuovo[$i] = $elemento;
 
                             $i++;
-
                         }
 
                         $_SESSION["utentiSelezionati"] = $arrayNuovo;
-
 
                         try {
 
@@ -375,14 +370,10 @@ if(isset($_POST['buttonAggiungi'])) {
                                 $sql = "CALL creaInvito(?, ?)";
                                 // call the stored procedure
 
-
-
                                 $res = $pdo -> prepare($sql);
 
                                 $res->bindValue(1, $CodiceSondaggio, PDO::PARAM_STR);
                                 $res->bindValue(2, $emailUtente, PDO::PARAM_STR);
-
-
 
                                 $res -> execute();
 

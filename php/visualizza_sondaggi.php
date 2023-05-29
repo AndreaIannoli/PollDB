@@ -28,8 +28,8 @@
     session_start();
     $userType = $_SESSION['userType'];
     $emailUtente = $_SESSION['emailLogged'];
-    $emailUtente = "email.azienda@email.com";
-    $userType = "Azienda";
+    $emailUtente = "utente@gmail.com";
+    $userType = "Premium";
 
   /*
 

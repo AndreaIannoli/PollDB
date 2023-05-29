@@ -374,6 +374,31 @@ END
 $
 DELIMITER;
 
+
+DELIMITER $
+CREATE PROCEDURE daNonInvitare(IN codSondaggio INT)
+BEGIN
+
+    DECLARE rifiutati INT;
+    DECLARE invitati INT; 
+    DECLARE sottrazione INT;
+    
+    /*SET rifiutati := (SELECT count(*) FROM RispostaInvito WHERE CodiceInvito IN (SELECT CodiceNotifica FROM Invito WHERE CodiceSondaggio = codSondaggio) 
+		AND Esito = 'RIFIUTATO'); 
+        
+    SET invitati := (SELECT count(*) FROM Notifica WHERE ((Codice IN (SELECT CodiceNotifica FROM Invito)) 
+		AND (codSondaggio IN (SELECT CodiceSondaggio FROM Invito))) );*/
+        
+	SET invitati := (SELECT count(*) FROM Invito WHERE (CodiceSondaggio = codSondaggio));
+    
+    SET rifiutati := (SELECT count(*)FROM Invito WHERE (CodiceSondaggio = codSondaggio AND Esito = 'RIFIUTATO'));
+        
+    SET sottrazione = invitati - rifiutati;
+    SELECT sottrazione AS 'Result';
+END
+$ DELIMITER;
+
+
 DELIMITER $
 CREATE PROCEDURE SearchUtentePremium(IN email varchar(30))
 BEGIN
@@ -395,14 +420,48 @@ BEGIN
 END
 $ DELIMITER ;
 
+
 DELIMITER $
 CREATE PROCEDURE ReturnUtenti(IN codSondaggio INT)
 BEGIN
-	SELECT Email FROM Utente WHERE Email NOT IN 
+	/*SELECT Email FROM Utente WHERE Email NOT IN 
     (SELECT EmailUtente FROM Notifica WHERE (SELECT CodiceNotifica FROM Invito) = Codice AND 
-    (SELECT CodiceSondaggio FROM Invito) = codSondaggio);
+    (SELECT CodiceSondaggio FROM Invito) = codSondaggio);*/
+    
+    SELECT Email
+FROM Utente
+LEFT JOIN NotificaInvito ON Utente.Email = NotificaInvito.EmailUtente
+LEFT JOIN Invito ON Invito.Codice = NotificaInvito.CodiceInvito
+WHERE Invito.CodiceSondaggio != codSondaggio OR Invito.CodiceSondaggio IS NULL;
+
+    
+	/*SELECT Email FROM Utente WHERE Email NOT IN 
+    (SELECT EmailUtente FROM NotificaInvito WHERE (SELECT Codice FROM Invito) = CodiceInvito AND 
+    (SELECT CodiceSondaggio FROM Invito) = codSondaggio);*/
 END
 $ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE creaInvito(IN codSondaggio INT, email varchar(30))
+BEGIN
+DECLARE codInvito INT;
+	DECLARE codiceDaInserire varchar(36);
+	set codiceDaInserire = uuid();
+    
+	INSERT INTO Invito(CodiceSondaggio) VALUES(codSondaggio);
+    
+    
+    SET codInvito := (SELECT Codice FROM Invito ORDER BY Codice DESC limit 1);
+    
+    INSERT INTO NotificaInvito(CodiceNotifica, CodiceInvito, EmailUtente, Data, Archiviata) VALUES(codiceDaInserire, codInvito, email, current_date(), false);
+    
+	/*INSERT INTO Notifica(Codice, EmailUtente, Data, Archiviata) VALUES(codiceDaInserire, email, current_date(), false);
+	INSERT INTO Invito(CodiceNotifica, CodiceSondaggio) VALUES(codiceDaInserire, codSondaggio);*/
+
+
+END
+$ DELIMITER;
+
 
 DELIMITER $
 CREATE PROCEDURE ReturnAccettati(IN codSondaggio INT)
