@@ -755,14 +755,18 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE GetSondaggiSimpleUser(IN emailUtente VARCHAR(30))
 BEGIN
-	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio WHERE (EmailUtente='$emailUtente');
+	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio WHERE (EmailUtente = emailUtente);
 END
 $ DELIMITER ;
 
 DELIMITER $
-CREATE PROCEDURE GetSondaggiPremium(IN emailUtente VARCHAR(30))
+CREATE PROCEDURE GetSondaggiPremium(IN emailUtent VARCHAR(30))
 BEGIN
+<<<<<<< HEAD
 	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailCreatorePremium = emailUtente;
+=======
+	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailCreatorePremium=emailUtente;
+>>>>>>> 873f8393bbdd1242839f8a94cfbf7b90081373a1
 END
 $ DELIMITER ;
 
