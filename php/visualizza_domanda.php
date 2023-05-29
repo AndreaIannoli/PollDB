@@ -13,17 +13,9 @@
   <body>
 
   <?php
-    $host = "localhost:3306";
-    $dbName = "PollDB";
-    $username = "root";
-    $pass = "PollDB";
-    try {
-        $pdo = new PDO('mysql:host='.$host.';dbname='.$dbName, $username, $pass);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
-        echo("[ERRORE] Connessione al DB non riuscita. Errore: " . $e->getMessage());
-        throw $e;
-    }
+     require 'accountManager.php';
+     require 'connectionManager.php';
+     $pdo = connectToDB();
 
     session_start();
     $emailUtente = $_SESSION['emailLogged'];
@@ -31,14 +23,25 @@
     $IdDomanda = $_GET['IdDomanda']; #bisogna inserire l'id passato nell'url
     $tipologia = "CHIUSA";
 
-
+    /*
     $sql="SELECT * FROM DomandaAperta WHERE Id='$IdDomanda'";
     $res=$pdo->query($sql);
-    if ($res->rowCount() > 0) {
-      $tipologia = "APERTA";
-    } else {
-      $tipologia = "CHIUSA";
+    */
+    try{
+      $sql = 'CALL CheckTipoDomanda(?)';
+      $res = $pdo->prepare($sql);
+      $res->bindValue(1, $IdDomanda, PDO::PARAM_INT);
+      $res->execute();
+      if ($res->rowCount() > 0) {
+        $tipologia = "APERTA";
+      } else {
+        $tipologia = "CHIUSA";
+      }
+      $res->closeCursor();
+    }catch (PDOException $e){
+        echo 'exception'.$e;
     }
+    
 
   ?>
 
@@ -136,11 +139,14 @@
             <div class="tag">
               <p class="t3">
               <?php
-                $sql="SELECT Punteggio FROM Domanda WHERE Id='$IdDomanda'";
-                $res=$pdo->query($sql);
-                $row = $res->fetch();
+                $sql = "SELECT Punteggio FROM Domanda WHERE Id = ?";
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(1, $IdDomanda, PDO::PARAM_INT);
+                $stmt->execute();
+                $row = $stmt->fetch();
                 $punteggio = $row['Punteggio'];
                 echo $punteggio;
+                
                 ?>
               <i class="bi bi-coin"></i></p>
             </div>
@@ -151,11 +157,13 @@
           <h4 class="t2">Domanda:</h4  >
           <p class="t2">
             <?php
-              $sql="SELECT Testo FROM Domanda WHERE Id='$IdDomanda'";
-              $res=$pdo->query($sql);
-              $row = $res->fetch();
+              $sql = "SELECT Testo FROM Domanda WHERE Id = ?";
+              $stmt = $pdo->prepare($sql);
+              $stmt->bindParam(1, $IdDomanda, PDO::PARAM_INT);
+              $stmt->execute();
+              $row = $stmt->fetch();
               $testo = $row['Testo'];
-              echo $testo;
+              echo $testo;              
             ?>
           </p>
         </div>
@@ -163,18 +171,21 @@
         <!--PREMIUM ONLY!!! forse da togliere visto che anche gli utenti normali possono visualizzare le risposte dei sondaggi a cui hanno partecipato-->
         <?php
           //if($type == "Premium"){
-            if($tipologia == 'APERTA'){
-              $sql="SELECT Testo FROM RispostaAperta WHERE IdDomanda='$IdDomanda'";
-            }else{
-              $sql="SELECT Testo FROM RispostaChiusa WHERE IdDomanda='$IdDomanda'";
+            if ($tipologia == 'APERTA') {
+              $sql = "SELECT Testo FROM RispostaAperta WHERE IdDomanda = ?";
+            } else {
+              $sql = "SELECT Testo FROM RispostaChiusa WHERE IdDomanda = ?";
             }
-            $res=$pdo->query($sql);
-            foreach($res as $row) {
-              echo '<div class="box answer">';
-              echo '<h4 class="t2">Risposta:</h4>';
-              echo '<p class="t2">' . str_replace("\n", "<br>", $row["Testo"]) . '</p>'; //lo slash n in php viene interpretato diversamente in html
-              echo '</div>';
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(1, $IdDomanda, PDO::PARAM_INT);
+            $stmt->execute();
+            foreach ($stmt as $row) {
+                echo '<div class="box answer">';
+                echo '<h4 class="t2">Risposta:</h4>';
+                echo '<p class="t2">' . str_replace("\n", "<br>", $row["Testo"]) . '</p>';
+                echo '</div>';
             }
+          
           //} 
         ?>
          <!--PREMIUM ONLY!!!-->
@@ -196,18 +207,20 @@
             <input type="hidden" name="IdDomanda" value="<?php echo $IdDomanda; ?>">
             <input type="hidden" name="tipologia" value="<?php echo $tipologia; ?>">
             <div class="mb-3">
-                <label for="recipient-name" class="col-form-label">Testo della risposta:</label>
+            <label for="recipient-name" class="col-form-label">Testo della risposta:</label>
                 <?php
                   if($tipologia == "APERTA"){
                     echo '<textarea class="form-control" rows="3" name="testoRisposta"></textarea>';
                   }else{
-                    $sql="SELECT Testo FROM Opzione WHERE IdDomanda='$IdDomanda'";
-                    $res=$pdo->query($sql);
-                    foreach($res as $row) {
-                      echo '<div class="form-check">';
-                      echo '<input class="form-check-input" type="checkbox" name="selections[]" value="' . $row["Testo"] . '">';
-                      echo $row["Testo"];
-                      echo '</div>';                      
+                    $sql = "SELECT Testo FROM Opzione WHERE IdDomanda = ?";
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->bindParam(1, $IdDomanda, PDO::PARAM_INT);
+                    $stmt->execute();
+                    foreach ($stmt as $row) {
+                        echo '<div class="form-check">';
+                        echo '<input class="form-check-input" type="checkbox" name="selections[]" value="' . $row["Testo"] . '">';
+                        echo $row["Testo"];
+                        echo '</div>';
                     }
                   }
                 ?>

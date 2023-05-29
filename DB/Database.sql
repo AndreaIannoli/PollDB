@@ -821,3 +821,10 @@ BEGIN
 	SELECT Id, Testo, Punteggio FROM Domanda WHERE Id IN (SELECT IdDomanda FROM Composizione WHERE Composizione.CodiceSondaggio= codSondaggio);
 END
 $ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE GetRank()
+BEGIN
+	SELECT Nome, Cognome, TotaleBonus FROM Utente ORDER BY TotaleBonus DESC;
+END
+$ DELIMITER ;

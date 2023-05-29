@@ -6,8 +6,8 @@
     <title>Inserisci Domanda</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../stylesheets/style.css">
     <link href="../stylesheets/rank.css" rel="stylesheet">
+    <link rel="stylesheet" href="../stylesheets/style.css">
 
   </head>
   <body>
@@ -110,8 +110,17 @@
         <th class="punteggio">Totale Bonus</th>
     </tr>
     <?php     
+                /*
                 $sql="SELECT Nome, Cognome, TotaleBonus FROM Utente ORDER BY TotaleBonus DESC";
                 $res=$pdo->query($sql);
+                */
+                try{
+                    $stmt = $pdo->prepare("CALL GetRank()");
+                    $stmt->execute();
+                    $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+                }catch (PDOException $e){
+                    echo 'exception'.$e;
+                }
                 foreach($res as $index => $row) {
                     $Nome = $row["Nome"];
                     $Cognome = $row["Cognome"];

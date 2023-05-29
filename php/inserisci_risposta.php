@@ -1,16 +1,8 @@
 <?php
 
-    $host = "localhost:3306";
-    $dbName = "PollDB";
-    $username = "root";
-    $pass = "PollDB";
-    try {
-        $pdo = new PDO('mysql:host='.$host.';dbname='.$dbName, $username, $pass);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
-        echo("[ERRORE] Connessione al DB non riuscita. Errore: " . $e->getMessage());
-        throw $e;
-    }
+    require 'accountManager.php';
+    require 'connectionManager.php';
+    $pdo = connectToDB();
 
     session_start();
     $emailUtente = $_SESSION['emailLogged'];
@@ -24,7 +16,7 @@
     if ($tipologia == 'APERTA') {
 
         try{
-          $sql="CALL InserisciRispostaAperta('$testoRisposta', '$IdDomanda', '$emailUtente')";
+          $sql="CALL AddRispostaAperta('$testoRisposta', '$IdDomanda', '$emailUtente')";
           $res=$pdo->exec($sql);
         } catch (PDOException $e) {
           echo("[Abbiamo un problema: " . $e->getMessage());
@@ -38,7 +30,7 @@
             foreach($selections as $selection) {
                 $risposta .= $selection . "\n";
             }
-            $sql="CALL InserisciRispostaChiusa('$risposta', '$IdDomanda', '$emailUtente')";
+            $sql="CALL AddRispostaChiusa('$risposta', '$IdDomanda', '$emailUtente')";
             $res=$pdo->exec($sql); 
         } catch (PDOException $e) {
           echo("Abbiamo un problema: " . $e->getMessage());
