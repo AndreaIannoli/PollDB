@@ -21,7 +21,7 @@ $pdo = connectToDB();
 session_start();
 $emailUtente = $_SESSION['emailLogged'];
 $type = $_SESSION['type'];
-$_SESSION['emailCreatore'] = 'email.azienda@email.com';
+$_SESSION['emailCreatore'] = 'utente@gmail.com';
 
 
 
@@ -78,8 +78,9 @@ if(isset($_POST["statoSondaggioRadio"])){
 
 $dataCreazione = $_POST[date("y-m-d")];
 
-
-//salva i dati nel database
+if(isset($_POST["chiusuraSondaggioData"])){
+    $dataChiusura = $_POST["chiusuraSondaggioData"];
+}
 
 
 if(isset($_POST['buttonAggiungi'])) {
@@ -308,12 +309,12 @@ function getDominiSelezionati(){
                                     if(in_array($domainName, $_SESSION["dominiSelezionati"]) == 'EXIST') {
                                         //echo('pulsante interested'.$x);
                                         echo("                                
-                                                <button class='btn btn-primary login-btn d-grid wrap-content col-sm-3 btn-square-md' value='interested' type='submit' name='" . $domainName . "'><i class='bi bi-heart-fill'></i>" . $domainName . "</button>                            
+                                                <button class='btn btn-primary login-btn d-grid wrap-content col-sm-3 btn-square-md' value='interested' type='submit' name='" . $domainName . "'><i class='bi bi-heart-fill'></i>" . $domainName . " </button>                            
                                              ");
                                     } else {
                                         //echo('pulsante NOT interested'.$x);
                                         echo("                                
-                                                <button class='btn btn-primary login-btn d-grid wrap-content col-sm-3 btn-square-md' value='notInterested' type='submit' name='" . $domainName . "'><i class='bi bi-heart'></i>" . $domainName . "</button>                            
+                                                <button class='btn btn-primary login-btn d-grid wrap-content col-sm-3 btn-square-md' value='notInterested' type='submit' name='" . $domainName . "'><i class='bi bi-heart'></i>" . $domainName . " </button>                            
                                             ");
                                     }
                                     //echo 'fine ciclo'.$x;
@@ -355,7 +356,7 @@ function getDominiSelezionati(){
 
                     <label for="start">Start date:</label>
 
-                    <input type="date" id="chiusuraSondaggioData" name="chiusuraSondaggioData" min="<?php echo date('Y-m-d'); ?>" required>
+                    <input type="date" id="chiusuraSondaggioData" name="chiusuraSondaggioData" min="<?php echo date('Y-m-d'); ?>" value="<?echo($dataChiusura)?>" required>
 
 
                 </div>
@@ -417,9 +418,15 @@ function getDominiSelezionati(){
 
                         try {
 
+                            $emailC = $_SESSION["emailCreatore"];
+
                             // execute the stored procedure
-                            $sql = "CALL InserisciSondaggio('$nomeSondaggio', '$numMaxUtenti', '$dataChiusura', '$statoSondaggio')";
+                            $sql = "CALL addSondaggio('$nomeSondaggio', '$numMaxUtenti', '$dataChiusura', '$statoSondaggio', '$emailC')";
                             // call the stored procedure
+
+                            echo( "data chiusura: ".$dataChiusura);
+
+                            echo("stato: ".$statoSondaggio);
 
                             $res = $pdo -> prepare($sql);
 
@@ -459,7 +466,7 @@ function getDominiSelezionati(){
                         $res->closeCursor();
 
 
-                        for($i = 0; $i < sizeof($arrayNuovo); $i++){
+                        /*for($i = 0; $i < sizeof($arrayNuovo); $i++){
                             try{
                                 $sql = 'CALL AggiungiAppartenenza(?, ?)';
                                 $res = $pdo->prepare($sql);
@@ -473,10 +480,10 @@ function getDominiSelezionati(){
                             }catch(PDOException $e) {
                                 echo 'exception: ' . $e;
                             }
-                        }
+                        }*/
 
 
-                        if(checkType($_SESSION["emailCreatore"], $pdo) == "Premium"){
+                        /*if(checkType($_SESSION["emailCreatore"], $pdo) == "Premium"){
                             try{
                                 $sql = 'CALL aggiungiCreazionePremium(?, ?)';
                                 $res = $pdo->prepare($sql);
@@ -522,7 +529,7 @@ function getDominiSelezionati(){
                             }
 
 
-                        }
+                        }*/
                     }
 
                     ?>

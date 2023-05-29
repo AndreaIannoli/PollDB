@@ -28,43 +28,44 @@
     session_start();
     $userType = $_SESSION['userType'];
     $emailUtente = $_SESSION['emailLogged'];
+    $emailUtente = "email.azienda@email.com";
+    $userType = "Azienda";
 
-    /*
-    $emailUtente = "utente@gmail.com";
+  /*
 
-  try {
-      $sql = 'CALL searchAzienda(?)';
-      $res = $pdo->prepare($sql);
-      $res->bindValue(1, $emailUtente, PDO::PARAM_STR);
-      $res->execute();
-  } catch (PDOException $e){
-      echo 'exception: '.$e;
-  }
-  $row = $res->fetch();
-  $azienda = $row[0];
-  $res->closeCursor();
-  try {
-      $sql = 'CALL searchUtentePremium(?)';
-      $res = $pdo->prepare($sql);
-      $res->bindValue(1, $emailUtente, PDO::PARAM_STR);
-      $res->execute();
-  } catch (PDOException $e){
-      echo 'exception: '.$e;
-  }
-  $row = $res->fetch();
-  $utenteP = $row[0];
-  $res->closeCursor();
-  //echo("azienda: ".$azienda);
-  //echo("utenteP: ".$utenteP);
-      require 'connectionManager.php';
-      $pdo = connectToDB();
-      session_start();
-      $emailUtente = $_SESSION['emailLogged'];
-      $type = $_SESSION['type'];
+try {
+    $sql = 'CALL searchAzienda(?)';
+    $res = $pdo->prepare($sql);
+    $res->bindValue(1, $emailUtente, PDO::PARAM_STR);
+    $res->execute();
+} catch (PDOException $e){
+    echo 'exception: '.$e;
+}
+$row = $res->fetch();
+$azienda = $row[0];
+$res->closeCursor();
+try {
+    $sql = 'CALL searchUtentePremium(?)';
+    $res = $pdo->prepare($sql);
+    $res->bindValue(1, $emailUtente, PDO::PARAM_STR);
+    $res->execute();
+} catch (PDOException $e){
+    echo 'exception: '.$e;
+}
+$row = $res->fetch();
+$utenteP = $row[0];
+$res->closeCursor();
+//echo("azienda: ".$azienda);
+//echo("utenteP: ".$utenteP);
+    require 'connectionManager.php';
+    $pdo = connectToDB();
+    session_start();
+    $emailUtente = $_SESSION['emailLogged'];
+    $type = $_SESSION['type'];
 
-  $emailUtente = "utente@gmail.com";
-  $type = "Premium";
-  */
+$emailUtente = "utente@gmail.com";
+$type = "Premium";
+*/
 
   ?>
 
@@ -267,29 +268,7 @@
                     echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
                     echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
                     echo '<a href="../visualizza_domande/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
-                    if(is_null($azienda)){
-                        echo '<a href="invitoUtentePremium.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '&MaxUtenti=' . urlencode($MaxUtenti)  . '&emailUtente=' . urlencode($emailUtente).'"><button  type="button" class="btn btn-light">invita</button></a>';
-                    }else {
-                        try{
-                            // execute the stored procedure
-                            $sql = "CALL randomUtenti()";
-                            // call the stored procedure
-                            $res = $pdo -> prepare($sql);
-                            $res -> execute();
-                        }catch (PDOException $e) {
-                            die("Error occurred:" . $e->getMessage());
-                        }
-                        $utentiInvitati = [];
-                        for($x=0; $x < $res -> rowCount(); $x++){
-                            $row = $res->fetch();
-                            array_push($utentiInvitati, $row[0]);
-                            //echo("utente preso: ".$utentiInvitati[$x]);
-                            if(sizeof($utentiInvitati) == $MaxUtenti){
-                                $x = $res -> rowCount();
-                            }
-                        }
-                        $res->closeCursor();
-                    }
+
                   echo '</div>';
                 }
                     echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
@@ -334,7 +313,8 @@
                         echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
                         echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
                         echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
-                        echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
+                        echo '<a href="invitoUtentePremium.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '&MaxUtenti=' . urlencode($MaxUtenti) . '&emailUtente=' . urlencode($emailUtente) .'"><button  type="button" class="btn btn-light">Invita</button></a>';
+
                         echo '</div>';
                     }
                 }else{
@@ -366,7 +346,7 @@
                     $stmt->execute([$emailUtente]);
                     $codiceazienda = $stmt->fetchColumn();
                     //poi prende i sondaggi
-                    $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN CreazioneAziendale ON Sondaggio.Codice = CreazioneAziendale.CodiceSondaggio WHERE CodiceAzienda='$codiceazienda'";
+                    $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailCreatoreAzienda = '$emailUtente';";
                     $res=$pdo->query($sql);
                     foreach($res as $row) {
                         $CodiceSondaggio = $row["Codice"];
@@ -379,8 +359,45 @@
                         echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
                         echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
                         echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
-                        echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
-                        echo '</div>';
+
+
+                        $nameInvito = "invitoAzienda".$CodiceSondaggio;
+                        //'.$nameInvito.'
+
+
+                        echo '<button  type="button" class="btn btn-light" name="'.$nameInvito.'" id="'.$nameInvito.'">invita</button>';
+
+                        //var_dump($_POST[$nameInvito]);
+
+                        if(isset($_POST[$nameInvito])){
+
+                            try {
+                                // execute the stored procedure
+                                $sql1 = "CALL RandomInvite(?)";
+                                // call the stored procedure
+                                $res1 = $pdo -> prepare($sql1);
+                                $res1 -> bindValue(1, $CodiceSondaggio, PDO::PARAM_STR);
+                                $res1 -> execute();
+
+                            } catch (PDOException $e) {
+                                die("Error occurred:" . $e->getMessage());
+                            }
+
+                            $uentiRandom = [];
+                            for($i = 0; $i < $res1 -> rowCount(); $i++){
+                                $row1 = $res1->fetch();
+                                array_push($utentiRandom[$i], $row1[0]);
+                            }
+
+                            echo("utenti random: ");
+
+                            print_r($utentiRandom);
+
+                            $res1->closeCursor();
+
+                        }
+
+                        //echo '</div>';
                     }
                 }
               }
