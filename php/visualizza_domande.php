@@ -130,7 +130,7 @@
             echo 'exception'.$e;
           }
           foreach($res as $row) {
-            $iddomanda = $row["IdDomanda"];
+            $iddomanda = $row["Id"];
             /*
             $sql="SELECT Id, Testo, Punteggio FROM Domanda WHERE Id='$iddomanda'";
             $res=$pdo->query($sql);
