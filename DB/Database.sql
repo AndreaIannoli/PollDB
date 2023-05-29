@@ -749,7 +749,7 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE GetSondaggiSimpleUser(IN emailUtente VARCHAR(30))
 BEGIN
-	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio WHERE (EmailUtente = emailUtente);
+	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio  WHERE Associazione.EmailUtente=emailUtente;
 END
 $ DELIMITER ;
 

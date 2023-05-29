@@ -253,10 +253,14 @@ $type = "Premium";
         <!-- questa parte dovrebbe contenere i sondaggi che hai creato se sei premium, quelli a cui hai partecipato se sei utente-->
         <?php
               if ($userType == "Utente") {
-                $stmt = $pdo->prepare("CALL GetSondaggiSimpleUser(?)");
-                $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
-                $stmt->execute();
-                $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+                try{
+                    $stmt = $pdo->prepare("CALL GetSondaggiSimpleUser(?)");
+                    $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
+                    $stmt->execute();
+                    $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+                }catch (PDOException $e){
+                    echo 'exception'.$e;
+                }
                 foreach($res as $row) {
                     $CodiceSondaggio = $row["Codice"];
                     $titoloSondaggio = $row["Titolo"];
@@ -276,13 +280,15 @@ $type = "Premium";
               }else{
                 //la select devo inserire azienda o premium e se è azienda devo andare a prendere il codiceazienda dalla tabella azienda con l'email per prendere il codiceazienda
                 if ($userType == "Premium") {
-                    echo($userType);
-                    echo($emailUtente);
                     //deve prendere i sondaggi a cui ha partecipato 
-                    $stmt = $pdo->prepare("CALL GetSondaggiSimpleUser(?)");
-                    $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
-                    $stmt->execute();
-                    $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+                    try{
+                        $stmt = $pdo->prepare("CALL GetSondaggiSimpleUser(?)");
+                        $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
+                        $stmt->execute();
+                        $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+                    }catch (PDOException $e){
+                        echo 'exception'.$e;
+                    }
                     foreach($res as $row) {
                         $CodiceSondaggio = $row["Codice"];
                         $titoloSondaggio = $row["Titolo"];
@@ -300,10 +306,14 @@ $type = "Premium";
                     //e quelli da lui creati
                     echo '<h1 style="margin-top:7%;" class="t3"">Sondaggi da te creati</h1>';
                     echo '<p class="t3" style="margin-bottom: 5%;">Visualizza la lista dei sondaggi che hai creato, assieme alla lista di domande e le loro relative risposte. Non perderti mai nessuna informazione e resta aggiornato sui risultati dei sondaggi!</p>';
-                    $stmt = $pdo->prepare("CALL GetSondaggiPremium(?)");
-                    $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
-                    $stmt->execute();
-                    $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+                    try{
+                        $stmt = $pdo->prepare("CALL GetSondaggiPremium(?)");
+                        $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
+                        $stmt->execute();
+                        $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+                    }catch (PDOException $e){
+                        echo 'exception'.$e;
+                    }
                     foreach($res as $row) {
                         $CodiceSondaggio = $row["Codice"];
                         $titoloSondaggio = $row["Titolo"];
@@ -321,10 +331,14 @@ $type = "Premium";
                     }
                 }else{
                     //l'azienda prende tutti i sondaggi a cui ha partecipato
-                    $stmt = $pdo->prepare("CALL GetSondaggiSimpleUser(?)");
-                    $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
-                    $stmt->execute();
-                    $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+                    try{
+                        $stmt = $pdo->prepare("CALL GetSondaggiSimpleUser(?)");
+                        $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
+                        $stmt->execute();
+                        $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+                    }catch (PDOException $e){
+                        echo 'exception'.$e;
+                    }
                     foreach($res as $row) {
                         $CodiceSondaggio = $row["Codice"];
                         $titoloSondaggio = $row["Titolo"];
@@ -350,10 +364,14 @@ $type = "Premium";
                     //poi prende i sondaggi
                     $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailCreatoreAzienda = '$emailUtente';";
                     $res=$pdo->query($sql);*/
-                    $stmt = $pdo->prepare("CALL GetSondaggiAzienda(?)");
-                    $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
-                    $stmt->execute();
-                    $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+                    try{
+                        $stmt = $pdo->prepare("CALL GetSondaggiAzienda(?)");
+                        $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
+                        $stmt->execute();
+                        $res = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+                    }catch (PDOException $e){
+                        echo 'exception'.$e;
+                    }
                     foreach($res as $row) {
                         $CodiceSondaggio = $row["Codice"];
                         $titoloSondaggio = $row["Titolo"];
@@ -365,14 +383,9 @@ $type = "Premium";
                         echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
                         echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
                         echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
-
-
                         $nameInvito = "invitoAzienda".$CodiceSondaggio;
                         //'.$nameInvito.'
-
-
                         echo '<button  type="button" class="btn btn-light" name="'.$nameInvito.'" id="'.$nameInvito.'">invita</button>';
-
                         //var_dump($_POST[$nameInvito]);
 
                         if(isset($_POST[$nameInvito])){
