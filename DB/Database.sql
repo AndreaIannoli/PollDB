@@ -762,9 +762,10 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE GetSondaggiPremium(IN emailUtente VARCHAR(30))
 BEGIN
-	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN CreazionePremium ON Sondaggio.Codice = CreazionePremium.CodiceSondaggio WHERE EmailUtentePremium='$emailUtente';
+	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailCreatorePremium = emailUtente;
 END
 $ DELIMITER ;
+
 
 DELIMITER $
 CREATE PROCEDURE AddSubscription(IN EmailUtente_Inserita VARCHAR(30), FineAbbonamento_Inserito Date, Costo_Inserito DOUBLE)
