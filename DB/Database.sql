@@ -317,6 +317,17 @@ END
 $
 DELIMITER ;
 
+
+DELIMITER $
+CREATE PROCEDURE AddPremio (IN nome varchar(30), descrizione text, UrlFotoPremio TEXT, puntiMinimi int, email varchar(30))
+BEGIN
+	INSERT INTO `premio`(`Nome`, `Descrizione`, `Foto`, `PuntiMin`, `EmailAdmin`) 
+		VALUES (nome, descrizione, UrlFotoPremio, puntiMinimi, email);
+END 
+$
+DELIMITER ;	
+
+
 DELIMITER $
 CREATE PROCEDURE SearchDominio (IN Argomento_Inserito VARCHAR(30))
 BEGIN

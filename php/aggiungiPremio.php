@@ -15,13 +15,17 @@ require 'accountManager.php';
 require "upload.php";
 
 $pdo = connectToDB();
+session_start();
+$userType = $_SESSION['userType'];
+$emailUtente = $_SESSION['emailLogged'];
 
-$email = "";
+$emailUtente = "utenteAdmin@gmail.com";
+
+//echo(print_r($_SESSION));
 
 if(isset($_POST["buttonAggiungi"])){
-    echo("sono dentro");
     try {
-        $sql = 'CALL inserisciPremio(?, ?, ?, ?, ?)';
+        $sql = 'CALL AddPremio(?, ?, ?, ?, ?)';
         $res = $pdo->prepare($sql);
 
         echo(" -".uploadProPic()." -");
@@ -29,8 +33,8 @@ if(isset($_POST["buttonAggiungi"])){
         $res->bindValue(1, $_POST["nome"], PDO::PARAM_STR);
         $res->bindValue(2, $_POST["descrizione"], PDO::PARAM_STR);
         $res->bindValue(3, uploadPrizePic(), PDO::PARAM_STR);
-        $res->bindValue(4, $_POST["numeroMaxPartecipanti"], PDO::PARAM_STR);
-        $res->bindValue(5, $email, PDO::PARAM_STR);
+        $res->bindValue(4, $_POST["puntiMin"], PDO::PARAM_STR);
+        $res->bindValue(5, $emailUtente, PDO::PARAM_STR);
 
         $res -> execute();
         $res->closeCursor();
@@ -139,7 +143,7 @@ if(isset($_POST["buttonAggiungi"])){
         <div class="col-12">
 
             <label class="form-label">Punti</label>
-            <input type="number" class="form-range" max="100" min="1" id="customRange2" name="numeroMaxPartecipanti" width="50" style="width: 100px" required>
+            <input type="number" class="form-range" max="100" min="1" id="customRange2" name="puntiMin" width="50" style="width: 100px" required>
 
         </div>
 
