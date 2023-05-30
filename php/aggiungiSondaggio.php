@@ -17,6 +17,8 @@
 
 require "accountManager.php";
 require "connectionManager.php";
+require 'NotificationManager.php';
+require 'LogsManager.php';
 $pdo = connectToDB();
 session_start();
 $emailUtente = $_SESSION['emailLogged'];
@@ -53,10 +55,6 @@ try {
 
 
 <?php
-
-require_once 'connection.php';
-
-
 $nomeSondaggio = $_POST["nomeSondaggio"];
 $numMaxUtenti = $_POST["numeroMaxPartecipanti"];
 $dataChiusura = $_POST["chiusuraSondaggioData"];
@@ -414,9 +412,11 @@ function getDominiSelezionati(){
                             $res -> execute();
 
                             $res->closeCursor();
-
+                            insertLog("AddSondaggio", "Executed");
                         } catch (PDOException $e) {
-                            die("Error occurred:" . $e->getMessage());
+                            echo("Error occurred:" . $e->getMessage());
+                            insertLog("AddSondaggio", "Aborted");
+                            exit();
                         }
 
 
@@ -447,9 +447,9 @@ function getDominiSelezionati(){
                         $res->closeCursor();
 
 
-                        /*for($i = 0; $i < sizeof($arrayNuovo); $i++){
+                        for($i = 0; $i < sizeof($arrayNuovo); $i++){
                             try{
-                                $sql = 'CALL AggiungiAppartenenza(?, ?)';
+                                $sql = 'CALL AddAppartenenza(?, ?)';
                                 $res = $pdo->prepare($sql);
 
                                 $res->bindValue(1, $riga[0], PDO::PARAM_STR);
@@ -458,59 +458,12 @@ function getDominiSelezionati(){
                                 $res->execute();
 
                                 $res->closeCursor();
+                                insertLog("AddAppartenenza", "Executed");
                             }catch(PDOException $e) {
                                 echo 'exception: ' . $e;
+                                insertLog("AddAppartenenza", "Aborted");
                             }
-                        }*/
-
-
-                        /*if(checkType($_SESSION["emailCreatore"], $pdo) == "Premium"){
-                            try{
-                                $sql = 'CALL aggiungiCreazionePremium(?, ?)';
-                                $res = $pdo->prepare($sql);
-
-                                $res->bindValue(1, $_SESSION["emailCreatore"], PDO::PARAM_STR);
-                                $res->bindValue(2,  $riga[0], PDO::PARAM_STR);
-
-                                $res->execute();
-
-                                $res->closeCursor();
-                            }catch(PDOException $e) {
-                                echo 'exception: ' . $e;
-                            }
-
-                        }else if(checkType($_SESSION["emailCreatore"], $pdo) == "Azienda"){
-                            try{
-                                $sql = 'CALL returnCodiceAzienda(?)';
-                                $res = $pdo->prepare($sql);
-
-                                echo("stampo valori: ".$riga[0]." ".$_SESSION["emailCreatore"]." ");
-
-                                $res->bindValue(1, $_SESSION["emailCreatore"], PDO::PARAM_STR);
-
-                                $res->execute();
-                            }catch(PDOException $e) {
-                                echo 'exception: ' . $e;
-                            }
-                            $row = $res->fetch();
-                            $codiceAzienda = $row[0];
-                            $res->closeCursor();
-                            try{
-                                $sql = 'CALL aggiungiCreazioneAziendale(?, ?)';
-                                $res = $pdo->prepare($sql);
-
-                                $res->bindValue(1, $riga[0], PDO::PARAM_STR);
-                                $res->bindValue(2,  $codiceAzienda, PDO::PARAM_STR);
-
-                                $res->execute();
-
-                                $res->closeCursor();
-                            }catch(PDOException $e) {
-                                echo 'exception: ' . $e;
-                            }
-
-
-                        }*/
+                        }
                     }
 
                     ?>

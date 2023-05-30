@@ -22,6 +22,7 @@
     require 'connectionManager.php';
     require 'accountManager.php';
     require 'NotificationManager.php';
+    require 'LogsManager.php';
 
     $pdo = connectToDB();
     session_start();
@@ -63,8 +64,10 @@
             $res = $pdo->prepare($sql);
             $res->bindValue( 1, $domainName, PDO::PARAM_STR);
             $res->execute();
+            insertLog("RemoveDomain", "Executed");
         } catch (PDOException $e) {
             echo("[ERRORE] Query SQL RemoveDomain() non riuscita. Errore: ".$e->getMessage());
+            insertLog("RemoveDomain", "Aborted");
             exit();
         }
     }
@@ -76,8 +79,10 @@
             $res->bindValue( 1, $domainName, PDO::PARAM_STR);
             $res->bindValue( 2, $domainDescription, PDO::PARAM_STR);
             $res->execute();
+            insertLog("AddDomain", "Executed");
         } catch (PDOException $e) {
             echo("[ERRORE] Query SQL AddDomain() non riuscita. Errore: ".$e->getMessage());
+            insertLog("AddDomain", "Aborted");
             exit();
         }
     }

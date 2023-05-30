@@ -12,6 +12,8 @@
 <?php
 require 'connectionManager.php';
 require 'accountManager.php';
+require 'NotificationManager.php';
+require 'LogsManager.php';
 require "upload.php";
 
 $pdo = connectToDB();
@@ -38,8 +40,10 @@ if(isset($_POST["buttonAggiungi"])){
 
         $res -> execute();
         $res->closeCursor();
+        insertLog("AddPremio", "Executed");
     } catch (PDOException $e){
         echo 'exception: '.$e;
+        insertLog("AddPremio", "Aborted");
     }
 }
 
@@ -127,61 +131,22 @@ if(isset($_POST["buttonAggiungi"])){
 
     <form class="row g-3 needs-validation" id="login-form" method="post">
         <div class="col-12">
-
         </div>
         <div class="col-12">
             <label class="form-label">Nome</label>
             <input type="text" id="nome" name="nome" placeholder="Nome premio" required>
-
         </div>
         <div class="col-12">
-
             <label class="form-label">descrizione</label>
             <textarea class="form-control" id="descrizione" name="descrizione" rows="3"></textarea>
-
         </div>
         <div class="col-12">
-
             <label class="form-label">Punti</label>
             <input type="number" class="form-range" max="100" min="1" id="customRange2" name="puntiMin" width="50" style="width: 100px" required>
-
         </div>
-
         <div class="col-12">
-
             <label for="prizePicUpload" class="form-label">Immagine del premio</label>
             <input class="form-control" type="file" id="prizePicUpload" name="prizePicUpload" accept=".jpg,.gif,.png">
-
-
-            <?php
-            /*if(isset($_POST["submit"])) {
-                $target_dir = "uploads/";
-                $target_file = $target_dir . basename($_FILES["image"]["name"]);
-                $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
-
-                // Verifica se il file selezionato è un'immagine
-                $check = getimagesize($_FILES["image"]["tmp_name"]);
-                if($check === false) {
-                    echo "Il file selezionato non è un'immagine.";
-                    exit();
-                }
-
-                // Verifica se l'immagine rispetta le dimensioni e il tipo consentiti
-                if ($_FILES["image"]["size"] > 5000000 || $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif" ) {
-                    echo "Sono consentiti solo file di tipo JPG, JPEG, PNG e GIF di dimensioni massime di 5MB.";
-                    exit();
-                }
-
-                // Sposta l'immagine dalla sua posizione temporanea alla sua posizione definitiva sul server
-                if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-                    echo "L'immagine ". basename( $_FILES["image"]["name"]). " è stata caricata con successo.";
-                } else {
-                    echo "Si è verificato un errore durante il caricamento dell'immagine.";
-                }
-            }*/
-            ?>
-
-
         </div>
         <div id="premio-btn-container">
             <button class="btn btn-primary" type="submit" name="buttonAggiungi">Aggiungi</button>

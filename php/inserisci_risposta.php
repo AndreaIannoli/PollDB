@@ -1,7 +1,8 @@
 <?php
-
     require 'accountManager.php';
     require 'connectionManager.php';
+    require 'NotificationManager.php';
+    require 'LogsManager.php';
     $pdo = connectToDB();
 
     session_start();
@@ -18,8 +19,10 @@
         try{
           $sql="CALL AddRispostaAperta('$testoRisposta', '$IdDomanda', '$emailUtente')";
           $res=$pdo->exec($sql);
+          insertLog("AddRispostaAperta", "Executed");
         } catch (PDOException $e) {
           echo("[Abbiamo un problema: " . $e->getMessage());
+          insertLog("AddRispostaAperta", "Aborted");
           throw $e;
         }
   
@@ -31,9 +34,11 @@
                 $risposta .= $selection . "\n";
             }
             $sql="CALL AddRispostaChiusa('$risposta', '$IdDomanda', '$emailUtente')";
-            $res=$pdo->exec($sql); 
+            $res=$pdo->exec($sql);
+            insertLog("AddRispostaChiusa", "Executed");
         } catch (PDOException $e) {
           echo("Abbiamo un problema: " . $e->getMessage());
+          insertLog("AddRispostaChiusa", "Aborted");
           throw $e;
         }
         

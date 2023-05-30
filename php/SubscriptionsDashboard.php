@@ -22,6 +22,7 @@
     require 'connectionManager.php';
     require 'accountManager.php';
     require 'NotificationManager.php';
+    require 'LogsManager.php';
 
     $pdo = connectToDB();
     session_start();
@@ -121,8 +122,10 @@
             $res->bindValue( 2, $endSubscription, PDO::PARAM_STR);
             $res->bindValue( 3, $cost, PDO::PARAM_STR);
             $res->execute();
+            insertLog("AddSubscription", "Executed");
         } catch (PDOException $e) {
             echo("[ERRORE] Query SQL AddSubscription() non riuscita. Errore: ".$e->getMessage());
+            insertLog("AddSubscription", "Aborted");
             exit();
         }
     }
@@ -133,8 +136,10 @@
             $res = $pdo->prepare($sql);
             $res->bindValue( 1, $email, PDO::PARAM_STR);
             $res->execute();
+            insertLog("RemoveSubscription", "Executed");
         } catch (PDOException $e) {
             echo("[ERRORE] Query SQL AddSubscription() non riuscita. Errore: ".$e->getMessage());
+            insertLog("RemoveSubscription", "Aborted");
             exit();
         }
     }

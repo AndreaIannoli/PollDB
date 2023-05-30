@@ -749,7 +749,11 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE GetSondaggiSimpleUser(IN emailUtente VARCHAR(30))
 BEGIN
+<<<<<<< Updated upstream
 	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio  WHERE Associazione.EmailUtente=emailUtente;
+=======
+	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio,Associazione WHERE(EmailUtente = emailUtente and Codice=CodiceSondaggio);
+>>>>>>> Stashed changes
 END
 $ DELIMITER ;
 

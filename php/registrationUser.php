@@ -16,6 +16,7 @@
         require "connectionManager.php";
         require "accountManager.php";
         require "upload.php";
+        require "LogsManager.php";
         $pdo = connectToDB();
         session_start();
         session_unset();
@@ -73,8 +74,10 @@
                 $res->bindValue(7, 0, PDO::PARAM_INT);
                 $res->bindValue(8, uploadProPic(), PDO::PARAM_STR);
                 $res->execute();
+                insertLog("RegisterUtenteSemplice", "Executed");
             } catch (PDOException $e) {
                 echo("[ERRORE] Query SQL RegistrazioneUtenteSemplice() non riuscita. Errore: ".$e->getMessage());
+                insertLog("RegisterUtenteSemplice", "Aborted");
                 exit();
             }
 

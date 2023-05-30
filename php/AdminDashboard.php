@@ -22,6 +22,7 @@
     require 'connectionManager.php';
     require 'accountManager.php';
     require 'NotificationManager.php';
+    require 'LogsManager.php';
 
     session_start();
     if(isset($_POST['searchField'])){
@@ -243,10 +244,10 @@
         </div>
         <div class="col-4">
             <div class="card">
-                <h5 class="card-header" style="font-size: 50px"><i class="bi bi-code-square"></i><br>Console database</h5>
+                <h5 class="card-header" style="font-size: 50px"><i class="bi bi-code-square"></i><br>Gestione premi</h5>
                 <div class="card-body">
-                    <p class="card-text">Visualizza le call fatte al database!</p>
-                    <a href="registrationEnterprise.php" class="btn primary-btn">Vai alla console database</a>
+                    <p class="card-text">Aggiungi nuovi premi per i tuoi utenti!</p>
+                    <a href="aggiungiPremio.php" class="btn primary-btn">Aggiungi premio</a>
                 </div>
             </div>
         </div>

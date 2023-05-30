@@ -15,6 +15,7 @@
     <?php
         require "connectionManager.php";
         require "accountManager.php";
+        require 'LogsManager.php';
         require "upload.php";
         $pdo = connectToDB();
         session_start();
@@ -60,8 +61,10 @@
                 $res->bindValue(5, $_POST['email'], PDO::PARAM_STR);
                 $res->bindValue(6, uploadProPic(), PDO::PARAM_STR);
                 $res->execute();
+                insertLog("RegisterAzienda", "Executed");
             } catch (PDOException $e) {
                 echo("[ERRORE] Query SQL RegistrazioneAzienda() non riuscita. Errore: ".$e->getMessage());
+                insertLog("RegisterAzienda", "Aborted");
                 exit();
             }
 

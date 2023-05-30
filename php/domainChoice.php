@@ -19,6 +19,7 @@
     require 'connectionManager.php';
     require 'accountManager.php';
     require 'NotificationManager.php';
+    require 'LogsManager.php';
 
     session_start();
     if(isset($_POST['searchField'])){
@@ -287,8 +288,10 @@
                                 $res->execute();
                                 $res->closeCursor();
                                 unset($_POST[$domainName]);
+                                insertLog("AddInteressamento", "Executed");
                             } catch (PDOException $e) {
                                 echo('Failed to execute Add query: '.$e);
+                                insertLog("AddInteressamento", "Aborted");
                             }
                             $interests = getInteressamento($_SESSION['emailLogged'], $pdo);
                             $interestsArguments = [];
@@ -307,8 +310,10 @@
                                 $res->execute();
                                 $res->closeCursor();
                                 unset($_POST[$domainName]);
+                                insertLog("RemoveInteressamento", "Executed");
                             } catch (PDOException $e) {
                                 echo('Failed to execute Remove query: '.$e);
+                                insertLog("RemoveInteressamento", "Aborted");
                             }
                             $interests = getInteressamento($_SESSION['emailLogged'], $pdo);
                             $interestsArguments = [];
@@ -332,6 +337,9 @@
                     }
                 ?>
             </form>
+            <div class="d-flex justify-content-end mt-5">
+                <button class="btn btn-primary login-btn" onclick="window.location.href='visualizza_sondaggi.php';">Avanti</button>
+            </div>
         </div>
     </form>
 

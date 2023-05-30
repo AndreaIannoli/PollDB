@@ -13,11 +13,11 @@
 <body>
 
 <?php
-
-$host = "localhost";
-$dbName = "PollDB";
-$username = "root";
-$pass = "root";
+require 'accountManager.php';
+require 'connectionManager.php';
+require 'NotificationManager.php';
+require 'LogsManager.php';
+$pdo = connectToDB();
 
 session_start();
 $emailUtente = $_SESSION['emailLogged'];
@@ -35,14 +35,6 @@ if(!isset($_SESSION['utentiSelezionati'])){
 
     $_SESSION["utentiSelezionati"] = array();
 
-}
-
-try {
-    $pdo = new PDO('mysql:host='.$host.';dbname='.$dbName, $username, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo("[ERRORE] Connessione al DB non riuscita. Errore: " . $e->getMessage());
-    exit();
 }
 ?>
 
@@ -336,7 +328,7 @@ if(isset($_POST['buttonAggiungi'])) {
 
 
                                 // execute the stored procedure
-                                $sql = "CALL addInvito(?, ?)";
+                                $sql = "CALL AddInvito(?, ?)";
                                 // call the stored procedure
 
                                 $res = $pdo -> prepare($sql);
@@ -347,17 +339,13 @@ if(isset($_POST['buttonAggiungi'])) {
                                 $res -> execute();
 
                                 $res->closeCursor();
-
+                                insertLog("AddInvito", "Executed");
                             }
-
-
-
                         } catch (PDOException $e) {
+                            insertLog("AddInvito", "Aborted");
                             die("Error occurred:" . $e->getMessage());
                         }
-
                         unset($_SESSION["utentiSelezionati"]);
-
                     }
 
                     ?>

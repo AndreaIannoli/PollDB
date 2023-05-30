@@ -23,6 +23,7 @@
     require 'NotificationManager.php';
     require 'accountManager.php';
     require 'connectionManager.php';
+    require 'LogsManager.php';
     $pdo = connectToDB();
 
     session_start();
@@ -397,8 +398,9 @@ $type = "Premium";
                                 $res1 = $pdo -> prepare($sql1);
                                 $res1 -> bindValue(1, $CodiceSondaggio, PDO::PARAM_STR);
                                 $res1 -> execute();
-
+                                insertLog("RandomInvite", "Executed");
                             } catch (PDOException $e) {
+                                insertLog("RandomInvite", "Aborted");
                                 die("Error occurred:" . $e->getMessage());
                             }
 
