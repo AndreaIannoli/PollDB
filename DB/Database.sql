@@ -832,3 +832,36 @@ BEGIN
 	SELECT Nome, Cognome, TotaleBonus FROM Utente ORDER BY TotaleBonus DESC;
 END
 $ DELIMITER ;
+
+/* Statistiche */
+
+DELIMITER $
+CREATE PROCEDURE NumberRisposte(IN IdDomanda INT)
+BEGIN
+    SELECT Domanda.Id, Domanda.Testo, COUNT(RispostaAperta.Id) AS C1, COUNT(RispostaChiusa.Id) AS C2
+    FROM Domanda
+    LEFT JOIN RispostaAperta  ON Domanda.Id = RispostaAperta.IdDomanda
+    LEFT JOIN RispostaChiusa  ON Domanda.Id = RispostaChiusa.IdDomanda
+    WHERE Domanda.Id = IdDomanda
+    GROUP BY Domanda.Id;
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE GetStatisticaAperte(IN domanda INT)
+BEGIN
+	SELECT MIN(LENGTH(Testo)) AS Minimo, MAX(LENGTH(Testo)) as Massimo, AVG(LENGTH(Testo)) AS Medio
+	FROM RispostaAperta
+	WHERE RispostaAperta.IdDomanda = domanda;
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE GetStatisticaChiuse(IN domanda INT)
+BEGIN
+	SELECT Testo, COUNT(*) AS Conteggio
+	FROM RispostaChiusa
+	WHERE IdDomanda = domanda
+    GROUP BY Testo;
+END
+$ DELIMITER ;
