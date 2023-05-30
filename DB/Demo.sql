@@ -12,6 +12,7 @@ CALL PromoteToAdmin('utenteAdmin@gmail.com');
 
 CALL AddSondaggio("Prova", 3, "2023-05-31", "APERTO", "azienda1@email.com");
 
+
 CALL AddDomain('Calcio', 'Si calcia');
 CALL AddDomain('Pallavolo', 'Si palleggia');
 
@@ -24,3 +25,4 @@ CALL AddInteressamento('Calcio', 'utente4@gmail.com');
 Call AddAppartenenza(1, 'Calcio');
 
 
+CALL AddSondaggio("Prova", 3, "2023-05-31", "APERTO", "utente1@gmail.com");CALL AddSondaggio("Prova", 3, "2023-05-31", "APERTO", "utente1@gmail.com");

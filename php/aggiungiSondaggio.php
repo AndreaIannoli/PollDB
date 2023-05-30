@@ -21,8 +21,8 @@ $pdo = connectToDB();
 session_start();
 $emailUtente = $_SESSION['emailLogged'];
 $type = $_SESSION['type'];
-$_SESSION['emailCreatore'] = 'utente@gmail.com';
 
+echo(print_r($_SESSION));
 
 
 if(!isset($_SESSION["arrayDomini"])){
@@ -334,31 +334,25 @@ function getDominiSelezionati(){
 
 
                 <div class="row">
-
                     <div class="col-12"></div>
                 </div>
 
                 <div id="col-12">
-
                     <label for="customRange2" class="form-label">numero massimo di partecipanti</label>
                     <input type="number" class="form-range" max="100" min="1" id="customRange2" name="numeroMaxPartecipanti" value="<?php
 
                     if(isset($_POST["numeroMaxPartecipanti"])){
                         echo($_POST["numeroMaxPartecipanti"]);
                     }
-
                     ?>" width="50" required>
 
                 </div>
 
 
                 <div id="col-12">
-
                     <label for="start">Start date:</label>
 
                     <input type="date" id="chiusuraSondaggioData" name="chiusuraSondaggioData" min="<?php echo date('Y-m-d'); ?>" value="<?echo($dataChiusura)?>" required>
-
-
                 </div>
 
 
@@ -366,9 +360,7 @@ function getDominiSelezionati(){
                     Stato del sondaggio:
 
                     <div class="form-check">
-
                         <?php
-
                         echo($_POST['statoSondaggioRadio']);
 
                         if(!isset($_POST['statoSondaggioRadio']) or $_POST['statoSondaggioRadio'] == 'APERTO'){
@@ -376,7 +368,6 @@ function getDominiSelezionati(){
                         } else {
                             echo('<input class="form-check-input" type="radio" name="statoSondaggioRadio" id="flexRadioDefault" value="APERTO">');
                         }
-
                         ?>
 
                         <label class="form-check-label" for="flexRadioDefault1">
@@ -384,8 +375,6 @@ function getDominiSelezionati(){
                         </label>
                     </div>
                     <div class="form-check">
-
-
                         <?php
 
                         if(isset($_POST['statoSondaggioRadio']) and $_POST['statoSondaggioRadio'] == 'CHIUSO'){
@@ -399,7 +388,6 @@ function getDominiSelezionati(){
                             Chiuso
                         </label>
                     </div>
-
                 </div>
 
 
@@ -407,21 +395,14 @@ function getDominiSelezionati(){
 
                     <button class="btn btn-primary" type="submit" name="buttonAggiungi">Aggiungi</button>
 
-
-
                     <?php
 
                     $flag = false;
-
-
                     if (isset($_POST["buttonAggiungi"])) {
 
                         try {
-
-                            $emailC = $_SESSION["emailCreatore"];
-
                             // execute the stored procedure
-                            $sql = "CALL addSondaggio('$nomeSondaggio', '$numMaxUtenti', '$dataChiusura', '$statoSondaggio', '$emailC')";
+                            $sql = "CALL addSondaggio('$nomeSondaggio', '$numMaxUtenti', '$dataChiusura', '$statoSondaggio', '$emailUtente')";
                             // call the stored procedure
 
                             echo( "data chiusura: ".$dataChiusura);

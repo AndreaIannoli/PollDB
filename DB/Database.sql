@@ -36,7 +36,7 @@ CREATE TABLE UtentePremium(
     FineAbbonamento Date,
     Costo DOUBLE,
     NumSondaggi INT DEFAULT 0,
-    FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
+    FOREIGN KEY (Emailutente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
 
 CREATE TABLE Sondaggio(
@@ -49,7 +49,7 @@ CREATE TABLE Sondaggio(
     EmailCreatorePremium VARCHAR(30),
     EmailCreatoreAzienda VARCHAR(30),
     
-    FOREIGN KEY(EmailCreatorePremium) REFERENCES UtentePremium(EmailUtente),
+    FOREIGN KEY(EmailCreatorePremium) REFERENCES UtentePremium(Emailutente),
     FOREIGN KEY(EmailCreatoreAzienda) REFERENCES Azienda(IndirizzoEmail),
     CONSTRAINT chk1 CHECK(
     (EmailCreatorePremium IS NOT NULL AND EmailCreatoreAzienda IS NULL) OR 
@@ -547,7 +547,7 @@ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE AddSondaggio (IN Titolo_Inserito varchar(30),  MaxUtenti_Inserito INT, DataChiusura_Inserita DATE, Stato_Inserito varchar(30), EmailCreatore_Inserita VARCHAR(30))
 BEGIN
-	IF((SELECT count(*) FROM Azienda WHERE(IndirizzoEmail=EmailCreatore_Inserita))>0) THEN
+	IF((SELECT count(*) FROM Azienda WHERE (IndirizzoEmail = EmailCreatore_Inserita)) > 0) THEN
 		INSERT INTO Sondaggio (Titolo, MaxUtenti, DataCreazione, DataChiusura, Stato, EmailCreatoreAzienda) 
 			VALUES (Titolo_Inserito, MaxUtenti_Inserito, current_date(), DataChiusura_Inserita, Stato_Inserito, EmailCreatore_Inserita);
 	ELSE

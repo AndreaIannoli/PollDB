@@ -18,12 +18,13 @@ $host = "localhost";
 $dbName = "PollDB";
 $username = "root";
 $pass = "root";
+
 session_start();
+$emailUtente = $_SESSION['emailLogged'];
+$type = $_SESSION['type'];
+
 
 //$_SESSION['emailCreatore'] = 'nome.esempio@email.com';
-
-
-
 if(!isset($_SESSION["arrayDomini"])){
 
     $_SESSION["arrayDomini"] = array();
@@ -163,37 +164,26 @@ if(isset($_POST['buttonAggiungi'])) {
 <!--====== ------------------------------------------------------------- ======-->
 
 <div class="container text-center">
-
     <div class="row align-items-center" id="rowAlignCenter">
 
-
         <div class="col">
-
         </div>
-
         <div class="col">
-
         </div>
 
         <div class="col-12" id="addPoll-container" style="max-width: 1000px">
 
-
-
             <form method="post" class="row g-3 needs-validation" id="addPoll-form" >
-
-
-
 
                 <div class="col">
                     <div class="row align-items-center justify-content-center gap-1">
-
-
 
                         <label >Invita utenti per il sondaggio: <?php echo($TitoloSondaggio); ?></label>
 
                         <!--<div class="col-sm-9 p-0 form-floating">
 
                                         <?php
+
                         //echo($CodiceSondaggio);
 
                         /*
@@ -204,10 +194,8 @@ if(isset($_POST['buttonAggiungi'])) {
                                 }
                         */
                         ?>
-                                        <label for="searchField">Nome del dominio di interesse</label>
+                                    <label for="searchField">Nome del dominio di interesse</label>
                                     </div>-->
-
-
 
                         <div  class="col container-fluid mt-4">
 
@@ -215,14 +203,9 @@ if(isset($_POST['buttonAggiungi'])) {
 
                                 <?php
                                 $flag = false;
-
-
-
-
                                 try {
                                     $sql = 'CALL returnUtenti(?)';
                                     $res = $pdo->prepare($sql);
-
 
                                     $res->bindValue(1, $CodiceSondaggio, PDO::PARAM_STR);
 
@@ -252,7 +235,6 @@ if(isset($_POST['buttonAggiungi'])) {
                                 if(sizeof($utenti) == 0){
                                     echo('Nessun utente trovato');
                                 }
-
 
                                 for($x=0; $x < sizeof($utenti); $x++){
 
@@ -287,8 +269,6 @@ if(isset($_POST['buttonAggiungi'])) {
                                     }else{
                                         $flag = false;
                                     }
-
-
                                     //echo isset($_POST[$utente])? ' EXIST' : ' NOT EXIST';
 
                                     $_POST[$x] = null;
@@ -321,28 +301,17 @@ if(isset($_POST['buttonAggiungi'])) {
                     </div>
                 </div>
 
-
-
                 <div class="row">
-
                     <div class="col-12">
-
                     </div>
                 </div>
-
-
 
                 <div id="login-btn-container">
 
                     <button class="btn btn-primary" type="submit" name="buttonAggiungi">Aggiungi</button>
 
-
-
                     <?php
-
                     $flag = false;
-
-
                     if (isset($_POST["buttonAggiungi"])) {
                         $arrayNuovo = array();
                         $i = 0;
@@ -367,7 +336,7 @@ if(isset($_POST['buttonAggiungi'])) {
 
 
                                 // execute the stored procedure
-                                $sql = "CALL creaInvito(?, ?)";
+                                $sql = "CALL addInvito(?, ?)";
                                 // call the stored procedure
 
                                 $res = $pdo -> prepare($sql);
@@ -387,85 +356,28 @@ if(isset($_POST['buttonAggiungi'])) {
                             die("Error occurred:" . $e->getMessage());
                         }
 
-                        /*
-                        try {
-                            $sql = 'CALL SearchCodiceSondaggio(?)';
-                            $res = $pdo->prepare($sql);
-
-                            $res->bindValue(1, $nomeSondaggio, PDO::PARAM_STR);
-
-                            $res->execute();
-
-                        } catch (PDOException $e) {
-                            echo 'exception: ' . $e;
-                        }
-
-                        $riga = $res->fetch();
-
-                        $arrayNuovo = array();
-                        $i = 0;
-
-                        while (!empty($_SESSION["utentiSelezionati"])) {
-
-                            $elemento = array_shift($_SESSION["utentiSelezionati"]);
-                            $arrayNuovo[$i] = $elemento;
-
-                            $i++;
-
-                        }
-
-                        $res->closeCursor();
-
-
-                        for($i = 0; $i < sizeof($arrayNuovo); $i++){
-
-                            try{
-
-                                $sql = 'CALL AggiungiAppartenenza(?, ?)';
-                                $res = $pdo->prepare($sql);
-
-                                $res->bindValue(1, $riga[0], PDO::PARAM_STR);
-                                $res->bindValue(2, $arrayNuovo[$i], PDO::PARAM_STR);
-
-
-
-                                $res->execute();
-
-                                $res->closeCursor();
-
-
-                            }catch(PDOException $e) {
-                                echo 'exception: ' . $e;
-                            }
-                        }
-
-                        */
-
                         unset($_SESSION["utentiSelezionati"]);
 
                     }
 
                     ?>
+
                 </div>
 
-
-
             </form>
-        </div>
+            <div class="d-flex justify-content-start mt-5">    <button class="btn btn-primary login-btn" onclick="window.location.href='visualizza_sondaggi.php';">indietro</button></div>
 
+
+        </div>
         <div class="col">
-
         </div>
-
         <div class="col">
-
         </div>
+
     </div>
 
 
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-
 
     <!--====== ------------------------------------------------------------- ======-->
 
