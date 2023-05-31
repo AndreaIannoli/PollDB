@@ -6,6 +6,9 @@
     $pdo = connectToDB();
 
     session_start();
+    navBarCheck($pdo);
+    requiredLogin();
+    requiredUser();
     $emailUtente = $_SESSION['emailLogged'];
     $IdDomanda = $_POST['IdDomanda'];
     $tipologia = $_POST['tipologia'];

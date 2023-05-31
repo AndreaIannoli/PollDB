@@ -237,14 +237,14 @@
             <div class="card">
                 <h5 class="card-header" style="font-size: 50px"><i class='bi bi-heart-fill'></i><br>Gestione Domini</h5>
                 <div class="card-body">
-                    <p class="card-text">Gestisci i domini di interesse, eliminali e creane di nuovi!</p>
+                    <p class="card-text">Gestisci i domini d'interesse, eliminali e creane di nuovi!</p>
                     <a href="DomainDashboard.php" class="btn primary-btn">Vai alla gestione domini</a>
                 </div>
             </div>
         </div>
         <div class="col-4">
             <div class="card">
-                <h5 class="card-header" style="font-size: 50px"><i class="bi bi-code-square"></i><br>Gestione premi</h5>
+                <h5 class="card-header" style="font-size: 50px"><i class="bi bi-trophy-fill"></i><br>Gestione premi</h5>
                 <div class="card-body">
                     <p class="card-text">Aggiungi nuovi premi per i tuoi utenti!</p>
                     <a href="aggiungiPremio.php" class="btn primary-btn">Aggiungi premio</a>

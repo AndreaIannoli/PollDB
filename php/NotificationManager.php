@@ -38,6 +38,19 @@
         }
     }
 
+    function getNotificationPrize($notificationCode, PDO $pdo){
+        try {
+            $sql = 'CALL ReturnNotificationPrize(?)';
+            $res = $pdo->prepare($sql);
+            $res->bindValue(1, $notificationCode, PDO::PARAM_STR);
+            $res->execute();
+            return $res;
+        } catch (PDOException $e){
+            echo("[ERRORE] Query SQL ReturnNotificationPrize() non riuscita. Errore: ".$e->getMessage());
+            exit();
+        }
+    }
+
     function getInvitePoll($InviteCode, PDO $pdo){
         $res = null;
         try {
@@ -74,6 +87,35 @@
         } catch (PDOException $e) {
             echo("[ERRORE] Query SQL DenyInvito() non riuscita. Errore: ".$e->getMessage());
             exit();
+        }
+    }
+
+    function archiveNotification($notificationCode, PDO $pdo){
+        try {
+            if(getNotificationType($notificationCode, $pdo) != "Invito") {
+                $sql = "CALL ArchiveNotifica(?)";
+                $res = $pdo->prepare($sql);
+                $res->bindValue(1, $notificationCode, PDO::PARAM_STR);
+                $res->execute();
+            } else {
+                denyInvite($notificationCode, $pdo);
+            }
+        } catch (PDOException $e) {
+            echo("[ERRORE] Query SQL ArchiveNotifica() non riuscita. Errore: ".$e->getMessage());
+            exit();
+        }
+    }
+
+    function navBarCheck(PDO $pdo){
+        if(isset($_POST['AcceptInvite'])){
+            acceptInvite($_POST['AcceptInvite'], $pdo);
+            unset($_POST['AcceptInvite']);
+        } else if(isset($_POST['DenyInvite'])) {
+            denyInvite($_POST['DenyInvite'], $pdo);
+            unset($_POST['DenyInvite']);
+        } else if(isset($_POST['toArchive'])){
+            archiveNotification($_POST['toArchive'], $pdo);
+            unset($_POST['toArchive']);
         }
     }
 ?>

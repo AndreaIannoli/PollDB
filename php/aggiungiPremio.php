@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Aggiungi premio</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-    <link href="../php/aggiungiPremio.css" rel="stylesheet">
+    <link href="../stylesheets/aggiungiPremio.css" rel="stylesheet">
 </head>
 <body>
 
@@ -18,6 +18,9 @@ require "upload.php";
 
 $pdo = connectToDB();
 session_start();
+requiredLogin();
+requiredAdmin();
+navBarCheck($pdo);
 $userType = $_SESSION['userType'];
 $emailUtente = $_SESSION['emailLogged'];
 
@@ -76,7 +79,7 @@ if(isset($_POST["buttonAggiungi"])){
                         <ul class="navbar-nav m-auto">
                             <li class="nav-item">
                                 <a
-                                        class="page-scroll active"
+                                        class="page-scroll"
                                         data-bs-toggle="collapse"
                                         data-bs-target="#sub-nav1"
                                         aria-controls="sub-nav1"
@@ -102,17 +105,28 @@ if(isset($_POST["buttonAggiungi"])){
                             </li>
                         </ul>
                     </div>
-                    <div class="navbar-btn d-none d-sm-inline-block">
-                        <ul style="margin-bottom: 0px; padding-left: 0px;">
-                            <li>
-                                <a class="btn primary-btn-outline" href="login.php"
-                                >Login</a
-                                >
-                            </li>
-                            <li>
-                                <a class="btn primary-btn" href="registration.php"
-                                >Registrati</a
-                                >
+
+                    <div class="d-sm-flex flex-row">
+                        <!-- Notification menu -->
+                        <ul class="d-flex flex-row justify-content-center align-items-center gap-4 list-unstyled" style="margin-bottom: 0px; padding-left: 0px;">
+                            <li class="d-flex align-items-center justify-content-center gap-2" style="display:flex; align-items: center; justify-content: center">
+                                <div class="dropdown d-flex align-items-center justify-content-center gap-2">
+                                    <?php
+                                    echo("<p id='navbar-name'>Ciao, ".$_SESSION['nameLogged']."!</p>");
+                                    ?>
+                                    <button class="profile-container" style="background-color: transparent" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <?php
+                                        echo('
+                                                 <img src="'.$_SESSION['userProPicURI'].'" alt="Profile Picture" class="profile-picture">
+                                         ');
+                                        ?>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li class="dropdown-item"><a href="AdminDashboard.php" style="color: black; font-weight: bold; text-decoration: none;">Dashboard</a></li>
+                                        <hr>
+                                        <li class="dropdown-item"><a href="home.php" style="color: black; font-weight: bold">Logout</a></li>
+                                    </ul>
+                                </div>
                             </li>
                         </ul>
                     </div>

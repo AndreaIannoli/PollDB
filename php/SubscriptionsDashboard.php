@@ -26,6 +26,9 @@
 
     $pdo = connectToDB();
     session_start();
+    navBarCheck($pdo);
+    requiredLogin();
+    requiredAdmin();
 
     if(!isset($_SESSION['authorized']) or $_SESSION['authorized'] == 0){
         session_unset();
@@ -197,13 +200,13 @@
                         <img src="../img/logoPollDBWhite.png" alt="Logo"  style="width: 150px"/>
                     </a>
                     <button
-                        class="navbar-toggler"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#navbarOne"
-                        aria-controls="navbarOne"
-                        aria-expanded="false"
-                        aria-label="Toggle navigation"
+                            class="navbar-toggler"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#navbarOne"
+                            aria-controls="navbarOne"
+                            aria-expanded="false"
+                            aria-label="Toggle navigation"
                     >
                         <span class="toggler-icon"></span>
                         <span class="toggler-icon"></span>
@@ -213,15 +216,18 @@
                         <ul class="navbar-nav m-auto">
                             <li class="nav-item">
                                 <a
-                                    class="page-scroll"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#sub-nav1"
-                                    aria-controls="sub-nav1"
-                                    aria-expanded="false"
-                                    aria-label="Toggle navigation"
-                                    href="javascript:void(0)"
+                                        class="page-scroll"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#sub-nav1"
+                                        aria-controls="sub-nav1"
+                                        aria-expanded="false"
+                                        aria-label="Toggle navigation"
+                                        href="javascript:void(0)"
                                 >
                                     Home
+                                    <div class="sub-nav-toggler">
+                                        <span><i class="lni lni-chevron-down"></i></span>
+                                    </div>
                                 </a>
                                 <ul class="sub-menu collapse" id="sub-nav1">
                                     <li><a href="/php/home.php#project">Il progetto</a></li>
@@ -240,110 +246,23 @@
                     <div class="d-sm-flex flex-row">
                         <!-- Notification menu -->
                         <ul class="d-flex flex-row justify-content-center align-items-center gap-4 list-unstyled" style="margin-bottom: 0px; padding-left: 0px;">
-                            <li>
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="notificationButton">
-                                        <i class="bi bi-bell-fill"></i>
-                                    </button>
-                                    <?php
-                                        $res = getUserNotifications($_SESSION['emailLogged'], $pdo);
-                                        $nOfNotifications = $res->rowCount();
-                                        if($nOfNotifications != 0){
-                                            echo('
-                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                                    '.$nOfNotifications.'
-                                                    <span class="visually-hidden">unread messages</span>
-                                                </span>
-                                            ');
-                                        }
-                                    ?>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <?php
-                                            $notifications = $res->fetchAll();
-                                            $res->closeCursor();
-
-                                            for($x=0; $x < $nOfNotifications; $x++){
-                                                $row = $notifications[$x];
-                                                $type = $row['Type'];
-                                                if($type == 'Invito'){
-                                                    $poll = getInvitePoll($row['Codice'], $pdo)->fetch();
-                                                    $pollCreator = getPollCreator($poll['Codice'], $pdo)->fetch();
-                                                    if(array_key_exists('EmailUtentePremium', $pollCreator)) {
-                                                        $userSender = getUser($pollCreator['EmailUtentePremium'], $pdo)->fetch();
-                                                        $sender = $userSender['Nome'].' '.$userSender['Cognome'];
-                                                        $senderProPic = getUserProPic($userSender['Email'], $pdo);
-                                                    } else if(array_key_exists('CodiceAzienda', $pollCreator)){
-                                                        $sender = getAzienda($pollCreator['CodiceAzienda'], $pdo)->fetch()['Nome'];
-                                                    }
-                                                  echo(
-                                                    '<li class="dropdown-item-text" style="width: max-content;">
-                                                        <div class="d-flex align-items-center justify-content-center fw-bold">Invito da '.$sender.'</div>
-                                                        <div class="d-inline-flex gap-3 align-items-center justify-content-center" style="width: 350px">
-                                                            <div>
-                                                                <div class="profile-container">
-                                                                    <img src="'.$senderProPic.'" alt="Profile Picture" class="profile-picture">
-                                                                </div>
-                                                            </div>
-                                                            <div class="vr" style="width: 2px">
-                                                            </div>
-                                                            <div class="text-wrap">
-                                                                '.$sender.' ti ha invitato a partecipare al sondaggio '.$poll['Titolo'].'
-                                                                <form class="d-flex align-items-center justify-content-center gap-2 mt-1" method="post">
-                                                                    <button class="btn primary-btn-outline" name="AcceptInvite" value="'.$row['Codice'].'" type="submit">
-                                                                        Accetta
-                                                                    </button>
-                                                                    <button class="btn primary-btn" name="DenyInvite" value="'.$row['Codice'].'" type="submit">
-                                                                        Rifiuta
-                                                                    </button>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </li>'
-                                                  );
-                                                }
-                                            }
-
-                                        ?>
-                                        <li class="dropdown-item-text" style="width: max-content;">
-                                            <div class="d-flex align-items-center justify-content-center fw-bold">Invito da ...</div>
-                                            <div class="d-inline-flex gap-3 align-items-center justify-content-center" style="width: 350px">
-                                                <div>
-                                                    <div class="profile-container">
-                                                        <img src="http://www.cs.unibo.it/~roccetti/marco-old.jpg" alt="Profile Picture" class="profile-picture">
-                                                    </div>
-                                                </div>
-                                                <div class="vr" style="width: 2px">
-                                                </div>
-                                                <div class="text-wrap">
-                                                    Nome ti ha invitato a partecipare al sondaggio NomeSondaggio
-                                                    <form class="d-flex align-items-center justify-content-center gap-2 mt-1">
-                                                        <a class="btn primary-btn-outline" href="javascript:void(0)">
-                                                            Accetta
-                                                        </a>
-                                                        <a class="btn primary-btn" href="javascript:void(0)">
-                                                            Rifiuta
-                                                        </a>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <hr>
-                                        <li class="dropdown-item">Another action</li>
-                                        <li class="dropdown-item">Something else here</li>
-                                    </ul>
-                                </div>
-                            </li>
                             <li class="d-flex align-items-center justify-content-center gap-2" style="display:flex; align-items: center; justify-content: center">
-                                <?php
-                                    echo("<p id='navbar-name'>Ciao, ".$_SESSION['nameLogged']."!</p>");
-                                ?>
-                                <div class="profile-container">
+                                <div class="dropdown d-flex align-items-center justify-content-center gap-2">
                                     <?php
-                                     echo('
-                                             <img src="'.$_SESSION['userProPicURI'].'" alt="Profile Picture" class="profile-picture">
-                                     ');
+                                    echo("<p id='navbar-name'>Ciao, ".$_SESSION['nameLogged']."!</p>");
                                     ?>
-                                    <img src="http://www.cs.unibo.it/~roccetti/marco-old.jpg" alt="Profile Picture" class="profile-picture">
+                                    <button class="profile-container" style="background-color: transparent" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <?php
+                                        echo('
+                                                 <img src="'.$_SESSION['userProPicURI'].'" alt="Profile Picture" class="profile-picture">
+                                         ');
+                                        ?>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li class="dropdown-item"><a href="AdminDashboard.php" style="color: black; font-weight: bold; text-decoration: none;">Dashboard</a></li>
+                                        <hr>
+                                        <li class="dropdown-item"><a href="home.php" style="color: black; font-weight: bold">Logout</a></li>
+                                    </ul>
                                 </div>
                             </li>
                         </ul>
@@ -381,18 +300,19 @@
                 <?php
 
                     $premiums = searchPremiums($pdo);
-                    echo($premiums[0]['Emailutente']);
 
                     if(sizeof($premiums)==0){
                         echo('Nessun utente premium trovato');
                     }
                     for($x=0; $x<sizeof($premiums); $x++){
                         $premiumName = $premiums[$x]['Emailutente'];
+                        $premiumEnd = $premiums[$x]['FineAbbonamento'];
+                        $premiumCost = $premiums[$x]['Costo'];
                         $subscriptionStartDate = $premiums[$x]['InizioAbbonamento'];
                         $subscriptionEndDate = $premiums[$x]['FineAbbonamento'];
                         echo("
                             <div class='col-12 mb-3' style='background-color: grey; height: 50px; color: white; border-radius: 25px; display: flex; justify-content: start; align-items: center'>"
-                            .$premiumName.
+                            .$premiumName.'<br> Fine:'.$premiumEnd.' Costo:'.$premiumCost.
                             "<button class='btn primary-btn login-btn d-grid wrap-content col-sm-3 btn-square-md ms-auto me-1' value='".$premiumName."' type='submit' name='toDecrease3'>-1Y</button>
                             <button class='btn primary-btn login-btn d-grid wrap-content col-sm-3 btn-square-md mx-1' value='".$premiumName."' type='submit' name='toDecrease2'>-1M</button>
                             <button class='btn primary-btn login-btn d-grid wrap-content col-sm-3 btn-square-md ms-1 me-3' value='".$premiumName."' type='submit' name='toDecrease1'>-1D</button>

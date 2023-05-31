@@ -14,9 +14,8 @@
         <?php
             require 'connectionManager.php';
             require 'accountManager.php';
-
-
             $pdo = connectToDB();
+
             $checkEmailRes = false;
             $checkPassRes = false;
 

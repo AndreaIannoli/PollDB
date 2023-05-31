@@ -14,7 +14,7 @@ CREATE TABLE Azienda(
     Nome VARCHAR(30),
     Sede VARCHAR(30),
     IndirizzoEmail VARCHAR(30) NOT NULL,
-    UrlFoto TEXT, /*DA DECIDERE*/
+    UrlFoto TEXT,
     
     PRIMARY KEY(IndirizzoEmail)
 ) ENGINE = "INNODB";
@@ -27,7 +27,7 @@ CREATE TABLE Utente(
     DataDiNascita DATE,
     LuogoNascita VARCHAR(30),
     TotaleBonus INT,
-    UrlFoto TEXT /*DA DECIDERE*/
+    UrlFoto TEXT
 ) ENGINE = "INNODB";
 
 CREATE TABLE UtentePremium(
@@ -49,7 +49,7 @@ CREATE TABLE Sondaggio(
     EmailCreatorePremium VARCHAR(30),
     EmailCreatoreAzienda VARCHAR(30),
     
-    FOREIGN KEY(EmailCreatorePremium) REFERENCES UtentePremium(Emailutente),
+    FOREIGN KEY(EmailCreatorePremium) REFERENCES UtentePremium(Emailutente) ON DELETE CASCADE,
     FOREIGN KEY(EmailCreatoreAzienda) REFERENCES Azienda(IndirizzoEmail),
     CONSTRAINT chk1 CHECK(
     (EmailCreatorePremium IS NOT NULL AND EmailCreatoreAzienda IS NULL) OR 
@@ -435,20 +435,9 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE ReturnUtenti(IN codSondaggio INT)
 BEGIN
-	/*SELECT Email FROM Utente WHERE Email NOT IN 
-    (SELECT EmailUtente FROM Notifica WHERE (SELECT CodiceNotifica FROM Invito) = Codice AND 
-    (SELECT CodiceSondaggio FROM Invito) = codSondaggio);*/
-    
-    SELECT Email
-FROM Utente
-LEFT JOIN NotificaInvito ON Utente.Email = NotificaInvito.EmailUtente
-LEFT JOIN Invito ON Invito.Codice = NotificaInvito.CodiceInvito
-WHERE Invito.CodiceSondaggio != codSondaggio OR Invito.CodiceSondaggio IS NULL;
-
-    
-	/*SELECT Email FROM Utente WHERE Email NOT IN 
-    (SELECT EmailUtente FROM NotificaInvito WHERE (SELECT Codice FROM Invito) = CodiceInvito AND 
-    (SELECT CodiceSondaggio FROM Invito) = codSondaggio);*/
+    SELECT Email FROM Utente WHERE Email NOT IN
+	(SELECT EmailUtente FROM NotificaInvito WHERE CodiceInvito IN (SELECT Codice FROM Invito WHERE Invito.CodiceSondaggio = codSondaggio))
+	AND Email NOT IN (SELECT EmailUtente FROM UtenteAmministratore);
 END
 $ DELIMITER ;
 
@@ -486,7 +475,7 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE ReturnCodiceSondaggioInvito(IN CodiceNotifica_Inserito varchar(36))
 BEGIN
-	SELECT CodiceSondaggio FROM Invito WHERE Codice = (SELECT CodiceInvito WHERE(CodiceNotifica=CodiceNotifica_Inserito));
+	SELECT CodiceSondaggio FROM Invito WHERE Codice = (SELECT CodiceInvito FROM NotificaInvito WHERE(CodiceNotifica=CodiceNotifica_Inserito));
 END
 $ DELIMITER ;
 
@@ -560,9 +549,10 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE AcceptInvito (IN CodiceNotifica_Inserito VARCHAR(36))
 BEGIN
-	UPDATE NotificaInvito SET Archiviato = true WHERE(CodiceNotifica=CodiceNotifica_Inserito);
+	UPDATE NotificaInvito SET Archiviata = true WHERE(CodiceNotifica=CodiceNotifica_Inserito);
     INSERT INTO Associazione VALUES((SELECT CodiceSondaggio FROM Invito WHERE(Codice=(SELECT CodiceInvito FROM NotificaInvito WHERE(CodiceNotifica=CodiceNotifica_Inserito)))), (SELECT EmailUtente FROM NotificaInvito WHERE(CodiceNotifica=CodiceNotifica_Inserito)));
 	UPDATE Invito SET Esito = "ACCETTATO" WHERE(Codice = (SELECT CodiceInvito FROM NotificaInvito WHERE(CodiceNotifica=CodiceNotifica_Inserito)));
+    UPDATE Utente SET TotaleBonus = TotaleBonus + 0.5 WHERE(Email = (SELECT EmailUtente FROM NotificaInvito WHERE(CodiceNotifica=CodiceNotifica_Inserito)));
 END 
 $
 DELIMITER ;
@@ -570,7 +560,7 @@ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE DenyInvito (IN CodiceNotifica_Inserito VARCHAR(36))
 BEGIN
-	UPDATE NotificaInvito SET Archiviato = true WHERE(CodiceNotifica=CodiceNotifica_Inserito);
+	UPDATE NotificaInvito SET Archiviata = true WHERE(CodiceNotifica=CodiceNotifica_Inserito);
     UPDATE Invito SET Esito = "RIFIUTATO" WHERE(Codice = (SELECT CodiceInvito FROM NotificaInvito WHERE(CodiceNotifica=CodiceNotifica_Inserito)));
 END 
 $
@@ -749,11 +739,7 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE GetSondaggiSimpleUser(IN emailUtente VARCHAR(30))
 BEGIN
-<<<<<<< Updated upstream
 	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio  WHERE Associazione.EmailUtente=emailUtente;
-=======
-	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio,Associazione WHERE(EmailUtente = emailUtente and Codice=CodiceSondaggio);
->>>>>>> Stashed changes
 END
 $ DELIMITER ;
 
@@ -809,6 +795,7 @@ BEGIN
     ELSEIF(TipoDecremento = 3) THEN
 		UPDATE UtentePremium SET FineAbbonamento=DATE_SUB(FineAbbonamento, INTERVAL 1 YEAR) WHERE(EmailUtente=EmailUtente_Inserita);
     END IF;
+    DELETE FROM UtentePremium WHERE(FineAbbonamento < current_date());
 END
 $ DELIMITER ;
 
@@ -863,5 +850,59 @@ BEGIN
 	FROM RispostaChiusa
 	WHERE IdDomanda = domanda
     GROUP BY Testo;
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE ArchiveNotifica(IN CodiceNotifica_Inserito varchar(36))
+BEGIN
+	IF((SELECT count(*) FROM NotificaInvito WHERE(CodiceNotifica=CodiceNotifica_Inserito))>0) THEN
+		UPDATE NotificaInvito SET Archiviata=true WHERE(CodiceNotifica=CodiceNotifica_Inserito);
+    ELSE
+		UPDATE NotificaPremio SET Archiviata=true WHERE(CodiceNotifica=CodiceNotifica_Inserito);
+    END IF;
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE ReturnNotificationPrize(IN CodiceNotifica_Inserito varchar(36))
+BEGIN
+	SELECT Nome,Foto,PuntiMin FROM Premio WHERE(Nome=(SELECT NomePremio FROM NotificaPremio WHERE(CodiceNotifica=CodiceNotifica_Inserito)));
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE AddVincita(IN Email_Inserita varchar(30), NomePremio_Inserito VARCHAR(30))
+BEGIN
+	INSERT INTO Vincita VALUES(Email_Inserita, NomePremio_Inserito, current_date());
+    INSERT INTO NotificaPremio VALUES(uuid(), NomePremio_Inserito, Email_Inserita, current_date(), false);
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE TRIGGER CheckPremio AFTER UPDATE ON Utente
+FOR EACH ROW
+BEGIN
+	IF(OLD.TotaleBonus < NEW.TotaleBonus) THEN
+		WHILE((SELECT count(*) FROM Premio WHERE((PuntiMin < NEW.TotaleBonus) AND (Nome NOT IN (SELECT NomePremio FROM Vincita WHERE(NEW.Email=EmailUtente)))))>0) DO
+			CALL AddVincita(NEW.Email, (SELECT Nome FROM Premio WHERE((PuntiMin < NEW.TotaleBonus) AND (Nome NOT IN (SELECT NomePremio FROM Vincita WHERE(NEW.Email=EmailUtente))))));
+        END WHILE;
+    END IF;
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE EVENT CheckAbbonamentoDaily
+ON SCHEDULE EVERY 1 DAY DO
+BEGIN
+	DELETE FROM UtentePremium WHERE(FineAbbonamento < current_date());
+END
+$ DELIMITER ;
+
+DELIMITER $
+CREATE EVENT CheckSondaggioDaily
+ON SCHEDULE EVERY 1 DAY DO
+BEGIN
+	UPDATE Sondaggio SET Stato="CHIUSO" WHERE(DataChiusura < current_date());
 END
 $ DELIMITER ;

@@ -24,5 +24,6 @@ CALL AddInteressamento('Calcio', 'utente4@gmail.com');
 
 Call AddAppartenenza(1, 'Calcio');
 
-
-CALL AddSondaggio("Prova", 3, "2023-05-31", "APERTO", "utente1@gmail.com");CALL AddSondaggio("Prova", 3, "2023-05-31", "APERTO", "utente1@gmail.com");
+CALL AddSubscription("utente1@gmail.com", date_add(current_date(), INTERVAL 10 DAY), 0);
+CALL AddSondaggio("Prova", 3, "2023-05-31", "APERTO", "utente1@gmail.com");
+CALL AddSondaggio("Prova", 3, "2023-05-31", "APERTO", "utente1@gmail.com");

@@ -27,6 +27,7 @@
     $pdo = connectToDB();
 
     session_start();
+    navBarCheck($pdo);
     $userType = $_SESSION['userType'];
     $emailUtente = $_SESSION['emailLogged'];
     //$emailUtente = "utente@gmail.com";
@@ -96,7 +97,7 @@ $type = "Premium";
                           <ul class="navbar-nav m-auto">
                               <li class="nav-item">
                                   <a
-                                          class="page-scroll active"
+                                          class="page-scroll"
                                           data-bs-toggle="collapse"
                                           data-bs-target="#sub-nav1"
                                           aria-controls="sub-nav1"
@@ -132,7 +133,6 @@ $type = "Premium";
                                           <i class="bi bi-bell-fill"></i>
                                       </button>
                                       <?php
-                                      /*
                                       $res = getUserNotifications($_SESSION['emailLogged'], $pdo);
                                       $nOfNotifications = $res->rowCount();
                                       if($nOfNotifications != 0){
@@ -143,14 +143,14 @@ $type = "Premium";
                                                 </span>
                                             ');
                                       }
-                                      */
                                       ?>
                                       <ul class="dropdown-menu dropdown-menu-end">
                                           <?php
-                                          /*
                                           $notifications = $res->fetchAll();
                                           $res->closeCursor();
-
+                                          if($nOfNotifications == 0){
+                                              echo("Non ci sono notifiche");
+                                          }
                                           for($x=0; $x < $nOfNotifications; $x++){
                                               $row = $notifications[$x];
                                               $typeRes = getNotificationType($row['Codice'], $pdo)->fetch();
@@ -158,15 +158,22 @@ $type = "Premium";
                                               if($type == 'Invito'){
                                                   $poll = getInvitePoll($row['Codice'], $pdo)->fetch();
                                                   $pollCreator = getPollCreator($poll['Codice'], $pdo)->fetch();
-                                                  if(array_key_exists('EmailUtentePremium', $pollCreator)) {
-                                                      $userSender = getUser($pollCreator['EmailUtentePremium'], $pdo)->fetch();
+                                                  if(array_key_exists('EmailCreatorePremium', $pollCreator)) {
+                                                      $userSender = getUser($pollCreator['EmailCreatorePremium'], $pdo)->fetch();
                                                       $sender = $userSender['Nome'].' '.$userSender['Cognome'];
-                                                      $senderProPic = getUserProPic($userSender['Email'], $pdo);
+                                                      $senderProPic = $userSender['UrlFoto'];
                                                   } else if(array_key_exists('CodiceAzienda', $pollCreator)){
-                                                      $sender = getAzienda($pollCreator['CodiceAzienda'], $pdo)->fetch()['Nome'];
+                                                      $userSender = getAzienda($pollCreator['CodiceAzienda'], $pdo)->fetch();
+                                                      $sender = $userSender['Nome'];
+                                                      $senderProPic = $userSender['UrlFoto'];
                                                   }
                                                   echo(
                                                       '<li class="dropdown-item-text" style="width: max-content;">
+                                                        <form class="d-flex align-items-center justify-content-end fw-bold mb-0 mt-0" method="post">
+                                                            <button class="btn secondary-btn" name="toArchive" value="'.$row['Codice'].'" type="submit">
+                                                            x
+                                                            </button>
+                                                        </form>
                                                         <div class="d-flex align-items-center justify-content-center fw-bold">Invito da '.$sender.'</div>
                                                         <div class="d-inline-flex gap-3 align-items-center justify-content-center" style="width: 350px">
                                                             <div>
@@ -190,50 +197,61 @@ $type = "Premium";
                                                         </div>
                                                     </li>'
                                                   );
+                                              } else {
+                                                  $prize = getNotificationPrize($row['Codice'], $pdo)->fetch();
+                                                  echo(
+                                                      '<li class="dropdown-item-text" style="width: max-content;">
+                                                        <form class="d-flex align-items-center justify-content-end fw-bold mb-0 mt-0" method="post">
+                                                            <button class="btn secondary-btn" name="toArchive" value="'.$row['Codice'].'" type="submit">
+                                                            x
+                                                            </button>
+                                                        </form>
+                                                        <div class="d-flex align-items-center justify-content-center fw-bold">Hai vinto '.$prize['Nome'].'</div>
+                                                        <div class="d-inline-flex gap-3 align-items-center justify-content-center" style="width: 350px">
+                                                            <div>
+                                                                <div class="profile-container">
+                                                                    <img src="'.$prize['Foto'].'" alt="Profile Picture" class="profile-picture">
+                                                                </div>
+                                                            </div>
+                                                            <div class="vr" style="width: 2px">
+                                                            </div>
+                                                            <div class="text-wrap">
+                                                                '.'Hai vinto il premio '.$prize['Nome'].'! Complimenti per aver raggiunto più di '.$prize['PuntiMin'].' punti!'.'
+                                                                <form class="d-flex align-items-center justify-content-center gap-2 mt-1" method="post">
+                                                                    <button class="btn primary-btn-outline" name="toArchive" value="'.$row['Codice'].'" type="submit">
+                                                                        OK
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </li>'
+                                                  );
                                               }
                                           }
-                                          */
+
                                           ?>
-                                          <li class="dropdown-item-text" style="width: max-content;">
-                                              <div class="d-flex align-items-center justify-content-center fw-bold">Invito da ...</div>
-                                              <div class="d-inline-flex gap-3 align-items-center justify-content-center" style="width: 350px">
-                                                  <div>
-                                                      <div class="profile-container">
-                                                          <img src="http://www.cs.unibo.it/~roccetti/marco-old.jpg" alt="Profile Picture" class="profile-picture">
-                                                      </div>
-                                                  </div>
-                                                  <div class="vr" style="width: 2px">
-                                                  </div>
-                                                  <div class="text-wrap">
-                                                      Nome ti ha invitato a partecipare al sondaggio NomeSondaggio
-                                                      <form class="d-flex align-items-center justify-content-center gap-2 mt-1">
-                                                          <a class="btn primary-btn-outline" href="javascript:void(0)">
-                                                              Accetta
-                                                          </a>
-                                                          <a class="btn primary-btn" href="javascript:void(0)">
-                                                              Rifiuta
-                                                          </a>
-                                                      </form>
-                                                  </div>
-                                              </div>
-                                          </li>
-                                          <hr>
-                                          <li class="dropdown-item">Another action</li>
-                                          <li class="dropdown-item">Something else here</li>
                                       </ul>
                                   </div>
                               </li>
                               <li class="d-flex align-items-center justify-content-center gap-2" style="display:flex; align-items: center; justify-content: center">
-                                  <?php
-                                  echo("<p id='navbar-name'>Ciao, ".$_SESSION['nameLogged']."!</p>");
-                                  ?>
-                                  <div class="profile-container">
+                                  <div class="dropdown d-flex align-items-center justify-content-center gap-2">
                                       <?php
-                                      echo('
-                                             <img src="'.$_SESSION['userProPicURI'].'" alt="Profile Picture" class="profile-picture">
-                                     ');
+                                      echo("<p id='navbar-name'>Ciao, ".$_SESSION['nameLogged']."!</p>");
                                       ?>
-                                      <img src="http://www.cs.unibo.it/~roccetti/marco-old.jpg" alt="Profile Picture" class="profile-picture">
+                                      <button class="profile-container" style="background-color: transparent" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                          <?php
+                                          echo('
+                                                 <img src="'.$_SESSION['userProPicURI'].'" alt="Profile Picture" class="profile-picture">
+                                         ');
+                                          ?>
+                                      </button>
+                                      <ul class="dropdown-menu dropdown-menu-end">
+                                          <li class="dropdown-item"><a href="visualizza_sondaggi.php" style="color: black; font-weight: bold; text-decoration: none;">Dashboard</a></li>
+                                          <li class="dropdown-item"><a href="statistics.php" style="color: black; font-weight: bold; text-decoration: none;">Statistiche</a></li>
+                                          <li class="dropdown-item"><a href="rank.php" style="color: black; font-weight: bold; text-decoration: none;">Classifica</a></li>
+                                          <hr>
+                                          <li class="dropdown-item"><a href="home.php" style="color: black; font-weight: bold">Logout</a></li>
+                                      </ul>
                                   </div>
                               </li>
                           </ul>
@@ -273,7 +291,7 @@ $type = "Premium";
                     echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
                     echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
                     echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
-                    echo '<a href="../visualizza_domande/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+                    echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
 
                   echo '</div>';
                 }
@@ -425,7 +443,7 @@ $type = "Premium";
         ?>
     <?php
             if($userType != "Utente"){
-                echo '<a class="btn btn-primary newq" href="aggiungiSondaggio.php">Crea nuovo sondaggio</a>';
+                echo '<a class="btn primary-btn newq" href="aggiungiSondaggio.php">Crea nuovo sondaggio</a>';
             }
     ?>
 

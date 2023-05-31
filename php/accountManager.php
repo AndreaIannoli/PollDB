@@ -132,4 +132,42 @@
         }
     }
 
+    function requiredLogin(){
+        if(!isset($_SESSION['authorized']) or $_SESSION['authorized'] == 0){
+            header('Location: home.php');
+        }
+    }
+
+    function requiredAdmin(){
+        if($_SESSION['userType'] != "Amministratore"){
+            header('Location: home.php');
+        }
+    }
+
+    function requiredNotAdmin(){
+        if($_SESSION['userType'] == "Amministratore"){
+            header('Location: home.php');
+        }
+    }
+    function requiredUser(){
+        if($_SESSION['userType'] != "Utente" and $_SESSION['userType'] != "Premium"){
+            header('Location: home.php');
+        }
+    }
+
+    function requiredPremium(){
+        if($_SESSION['userType'] != "Premium"){
+            header('Location: home.php');
+        }
+    }
+
+    function requiredCreator(){
+        if($_SESSION['userType'] != "Azienda" and $_SESSION['userType'] != "Premium"){
+            header('Location: home.php');
+        }
+    }
+
+    function logout(){
+        session_unset();
+    }
 ?>

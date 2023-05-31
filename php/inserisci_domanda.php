@@ -4,6 +4,8 @@
     require 'NotificationManager.php';
     require 'LogsManager.php';
     $pdo = connectToDB();
+    session_start();
+
 
     $max_caratteri = $_POST['max_caratteri'];
     $testoDomanda = $_POST['testoDomanda'];

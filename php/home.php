@@ -11,7 +11,8 @@
 </head>
 <body>
 <?php
-
+    require 'accountManager.php';
+    logout();
 ?>
 <!--====== NAVBAR ONE PART START ======-->
 <section class="navbar-area navbar-one">
