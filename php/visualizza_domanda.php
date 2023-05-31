@@ -335,13 +335,13 @@
                   if($tipologia == "APERTA"){
                     echo '<textarea class="form-control" rows="3" name="testoRisposta"></textarea>';
                   }else{
-                    $sql = "SELECT Testo FROM Opzione WHERE IdDomanda = ?";
+                    $sql = "SELECT Numero, Testo FROM Opzione WHERE IdDomanda = ?";
                     $stmt = $pdo->prepare($sql);
                     $stmt->bindParam(1, $IdDomanda, PDO::PARAM_INT);
                     $stmt->execute();
                     foreach ($stmt as $row) {
                         echo '<div class="form-check">';
-                        echo '<input class="form-check-input" type="checkbox" name="selections[]" value="' . $row["Testo"] . '">';
+                        echo '<input class="form-check-input" type="checkbox" name="selections[]" value="' . $row["Numero"] . '">';
                         echo $row["Testo"];
                         echo '</div>';
                     }

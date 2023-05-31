@@ -267,9 +267,22 @@ $ DELIMITER ;
 
 #Insercisci risposta chiusa domanda 
 DELIMITER $
-CREATE PROCEDURE AddRispostaChiusa (IN Testo VARCHAR(200), IdDomanda INT, EmailUtente VARCHAR(50))
+CREATE PROCEDURE AddRispostaChiusa (IN IdDomanda INT, EmailUtente VARCHAR(50), Opzione1 INT, Opzione2 INT, Opzione3 INT, Opzione4 INT)
 BEGIN
-	INSERT INTO RispostaChiusa (Testo, IdDomanda, EmailUtente)  VALUES (Testo, IdDomanda, EmailUtente);
+	INSERT INTO RispostaChiusa (IdDomanda, EmailUtente)  VALUES (IdDomanda, EmailUtente);
+    SET @last_id = LAST_INSERT_ID(); 
+    IF Opzione1 != 0 THEN
+    INSERT INTO Selezione VALUES (@last_id, Opzione1);
+    END IF;
+    IF Opzione2 != 0 THEN
+    INSERT INTO Selezione VALUES (@last_id, Opzione2);
+    END IF;
+    IF Opzione3 != 0 THEN
+    INSERT INTO Selezione VALUES (@last_id, Opzione3);
+    END IF;
+    IF Opzione4 != 0 THEN
+    INSERT INTO Selezione VALUES (@last_id, Opzione4);
+    END IF;
 END
 $ DELIMITER ;
 
