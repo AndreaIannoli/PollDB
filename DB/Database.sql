@@ -236,15 +236,23 @@ $ DELIMITER ;
 
 #Insercisci domanda chiusa sondaggio
 DELIMITER $
-CREATE PROCEDURE AddDomandaChiusa (IN Testo VARCHAR(300), Punteggio INT, Foto VARCHAR(300), Opzione1 VARCHAR(50), Opzione2 VARCHAR(50), Opzione3 VARCHAR(50), Opzione4 VARCHAR(50), CodiceSondaggio INT)
+CREATE PROCEDURE AddDomandaChiusa (IN Testo VARCHAR(200), Punteggio INT, Foto VARCHAR(50), Opzione1 VARCHAR(50), Opzione2 VARCHAR(50), Opzione3 VARCHAR(50), Opzione4 VARCHAR(50), CodiceSondaggio INT)
 BEGIN
 	INSERT INTO Domanda (Testo, Punteggio, Foto)  VALUES (Testo, Punteggio, Foto);
 	SET @last_id = LAST_INSERT_ID(); 
 	INSERT INTO DomandaChiusa (Id) VALUES (@last_id); 
+    IF LENGTH(Opzione1) > 0 THEN
     INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione1, @last_id); 
+    END IF;
+    IF LENGTH(Opzione2) > 0 THEN
 	INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione2, @last_id); 
+    END IF;
+    IF LENGTH(Opzione3) > 0 THEN
     INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione3, @last_id); 
+    END IF;
+    IF LENGTH(Opzione4) > 0 THEN
     INSERT INTO Opzione (Testo, IdDomanda) VALUES (Opzione4, @last_id);
+    END IF;
     INSERT INTO Composizione (CodiceSondaggio, IdDomanda) VALUES (CodiceSondaggio, @last_id); 
 END
 $ DELIMITER ;
