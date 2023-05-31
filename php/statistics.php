@@ -291,15 +291,19 @@
                         }
                     }
                     //statistica sulle risposte chiuse
-                    $stmt = $pdo->prepare("CALL GetStatisticaChiuse(?)");
-                    $stmt->bindParam(1, $Id, PDO::PARAM_INT);
-                    $stmt->execute();
-                    $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    foreach($res as $index => $row) {
-                        $labels2[] = $row["Testo"];
-                        $data2[] = $row["Conteggio"];
-                        //echo '<p>Numero Risposte:' . $risultato . '</p>';
-                    }
+                    try{
+                        $stmt = $pdo->prepare("CALL GetStatisticaChiuse(?)");
+                        $stmt->bindParam(1, $Id, PDO::PARAM_INT);
+                        $stmt->execute();
+                        $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        foreach($res as $index => $row) {
+                            $labels2[] = $row["Testo"];
+                            $data2[] = $row["Conteggio"];
+                            //echo '<p>Numero Risposte:' . $risultato . '</p>';
+                        }
+                    }catch (PDOException $e) {
+                        echo("Abbiamo un problema: " . $e->getMessage());
+                      }
                     
                     //stampare il grafico rispostechiuse
                     if (!empty($labels2)) {
