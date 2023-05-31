@@ -867,9 +867,9 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE GetStatisticaChiuse(IN domanda INT)
 BEGIN
-	SELECT Testo, COUNT(*) AS Conteggio
-	FROM RispostaChiusa
-	WHERE IdDomanda = domanda
+	SELECT Opzione.Testo, COUNT(*) AS Conteggio
+	FROM Opzione, Selezione, RispostaChiusa
+	WHERE Opzione.IdDomanda = domanda AND Selezione.NumeroOpzione = Opzione.Numero AND Selezione.IdRisposta = RispostaChiusa.Id
     GROUP BY Testo;
 END
 $ DELIMITER ;
