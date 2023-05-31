@@ -296,18 +296,36 @@
           //if($type == "Premium"){
             if ($tipologia == 'APERTA') {
               $sql = "SELECT Testo FROM RispostaAperta WHERE IdDomanda = ?";
+              $stmt = $pdo->prepare($sql);
+              $stmt->bindParam(1, $IdDomanda, PDO::PARAM_INT);
+              $stmt->execute();
+              foreach ($stmt as $row) {
+                  echo '<div class="box answer">';
+                  echo '<h4 class="t2">Risposta:</h4>';
+                  echo '<p class="t2">' . $row["Testo"] . '</p>';
+                  echo '</div>';
+              }
             } else {
-              $sql = "SELECT Testo FROM RispostaChiusa WHERE IdDomanda = ?";
-            }
-            $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(1, $IdDomanda, PDO::PARAM_INT);
-            $stmt->execute();
-            foreach ($stmt as $row) {
+              //prende tutte le risposte relative a quella domanda
+              $sql = "SELECT Id FROM RispostaChiusa WHERE RispostaChiusa.IdDomanda = ?";
+              $stmt = $pdo->prepare($sql);
+              $stmt->bindParam(1, $IdDomanda, PDO::PARAM_INT);
+              $stmt->execute();
+              foreach ($stmt as $row2) {
                 echo '<div class="box answer">';
                 echo '<h4 class="t2">Risposta:</h4>';
-                echo '<p class="t2">' . str_replace("\n", "<br>", $row["Testo"]) . '</p>';
-                echo '</div>';
+                //per ogni risposta prendiamo il suo id e cerchiamo le opzioni corrispondenti
+                $sql2 = "SELECT Testo FROM Selezione JOIN Opzione ON Selezione.NumeroOpzione = Opzione.Numero WHERE Selezione.IdRisposta = ?";
+                $stmt2 = $pdo->prepare($sql2);
+                $stmt2->bindParam(1, $row2["Id"], PDO::PARAM_INT);
+                $stmt2->execute();
+                foreach ($stmt2 as $row3) { 
+                  echo '<p class="t2">' . $row3["Testo"] . '</p>';
+                }
+                echo '</div>';              
+              }
             }
+            
           
           //} 
         ?>
