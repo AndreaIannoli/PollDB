@@ -424,8 +424,9 @@ function getDominiSelezionati(){
                                 $res = $pdo -> prepare($sql);
                                 $res -> execute();
                                 $res->closeCursor();
-
+                                insertLog("addSondaggio", "Executed");
                             } catch (PDOException $e) {
+                                insertLog("addSondaggio", "Aborted");
                                 die("Error occurred:" . $e->getMessage());
                             }
 
@@ -466,7 +467,9 @@ function getDominiSelezionati(){
                                     $res->execute();
 
                                     $res->closeCursor();
+                                    insertLog("AddAppartenenza", "Executed");
                                 } catch (PDOException $e) {
+                                    insertLog("AddAppartenenza", "Aborted");
                                     echo 'exception: ' . $e;
                                 }
                             }
