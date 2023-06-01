@@ -64,9 +64,9 @@ CALL AddDomandaAperta("Utilizza 3 parole per definire il prodotto che hai appena
 
  
 
-CALL AddDomandaChiusa("Quanto fa 2+2", 1, "foro", "4","3","5","6", 2);
-CALL AddDomandaChiusa("Quanti millimetri sono un metro?", 5, "foro", "Cento","Mille","Dieci","Dieci mila", 2);
-CALL AddDomandaChiusa("Qual è la radice quadrata di 16?", 10, "foro", "13","2","4","16", 2);
+CALL AddDomandaChiusa("Quanto fa 2+2", 1, "", "4","3","5","6", 2);
+CALL AddDomandaChiusa("Quanti millimetri sono un metro?", 5, "", "Cento","Mille","Dieci","Dieci mila", 2);
+CALL AddDomandaChiusa("Qual è la radice quadrata di 16?", 10, "", "13","2","4","16", 2);
 
  
 

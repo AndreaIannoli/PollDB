@@ -93,7 +93,6 @@ CREATE TABLE Opzione(
 
 CREATE TABLE RispostaChiusa(
     Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    Testo VARCHAR(30),
     IdDomanda INT,
     EmailUtente VARCHAR(30),
     
@@ -507,7 +506,7 @@ BEGIN
 	ELSE
 		INSERT INTO Sondaggio (Titolo, MaxUtenti, DataCreazione, DataChiusura, Stato, EmailCreatorePremium) 
 			VALUES (Titolo_Inserito, MaxUtenti_Inserito, current_date(), DataChiusura_Inserita, Stato_Inserito, EmailCreatore_Inserita);
-            UPDATE UtentePremium SET NumSondaggi = NumSondaggi+1 WHERE(Emailutente=EmailCreatore_Inserit);
+            UPDATE UtentePremium SET NumSondaggi = NumSondaggi+1 WHERE(Emailutente=EmailCreatore_Inserita);
     END IF;
 END
 $ DELIMITER ;

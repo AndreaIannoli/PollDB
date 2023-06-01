@@ -251,7 +251,6 @@
         $stmt->bindParam(1, $IdDomanda, PDO::PARAM_INT);
         $stmt->execute();
         $background_image_url = $stmt->fetch()['Foto'];
-        echo $background_image_url;
     ?>
     <style>#uploadimage{background-image: url('<?php
         if($background_image_url != ""){

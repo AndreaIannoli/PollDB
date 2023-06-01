@@ -409,6 +409,8 @@ function getDominiSelezionati(){
                     <input type="date" id="chiusuraSondaggioData"  name="chiusuraSondaggioData"
                            min="<?php echo date('Y-m-d'); ?>" value="<?php echo($dataChiusura)?>" >
                 </div>
+                <div id="login-btn-container">
+                    <button class="btn primary-btn" type="submit" name="buttonAggiungi">Aggiungi</button>
                     <?php
                     $flag = false;
                     if (isset($_POST["buttonAggiungi"])) {

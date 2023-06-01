@@ -300,8 +300,7 @@ if(isset($_POST['buttonAggiungi'])) {
                     <div class="row align-items-center justify-content-center gap-1">
 
                         <label >Invita utenti per il sondaggio: <?php echo($TitoloSondaggio); ?></label>
-                                    <label for="searchField">Nome del dominio di interesse</label>
-                                    </div>-->
+
                         <div  class="col container-fluid mt-4">
 
                             <div class="row justify-content-center gap-1" style="max-height: 250px; overflow-y: scroll;" method="post">

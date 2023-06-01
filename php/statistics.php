@@ -237,6 +237,7 @@
             $stmt = $pdo->prepare("SELECT Codice, Titolo FROM Sondaggio");
             $stmt->execute();
             $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
 
             //per ogni sondaggio
             foreach ($res as $row) {
@@ -252,6 +253,7 @@
                 $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $labels = array();
                 $data = array();
+                $stmt->closeCursor();
                 
 
                 //per ogni domanda del sondaggio
@@ -265,6 +267,7 @@
                     $stmt->bindParam(1, $Id, PDO::PARAM_INT);
                     $stmt->execute();
                     $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $stmt->closeCursor();
                     foreach($res as $index => $row) {
                         $risultato = $row["C1"] + $row["C2"];   //conteggio risposte (mi serve)
                         $labels[] = $row["Testo"];
@@ -291,6 +294,7 @@
                         $stmt->bindParam(1, $Id, PDO::PARAM_INT);
                         $stmt->execute();
                         $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        $stmt->closeCursor();
                         foreach($res as $index => $row) {
                             $labels2[] = $row["Testo"];
                             $data2[] = $row["Conteggio"];
@@ -303,12 +307,12 @@
                     if (!empty($labels2)) {
                         echo '<h3 style="">' . $Domanda . '</h3>';
                         echo '
-                            <canvas id="istogramma3-' . $codiceSondaggio . '"></canvas>
+                            <canvas id="istogramma3-' . $Id . '"></canvas>
                             <script>
                                 var labels = ' . json_encode($labels2) . ';
                                 var data = ' . json_encode($data2) . ';
 
-                                var ctx = document.getElementById("istogramma3-' . $codiceSondaggio . '").getContext("2d");
+                                var ctx = document.getElementById("istogramma3-' . $Id . '").getContext("2d");
                                 var chart = new Chart(ctx, {
                                     type: "bar",
                                     data: {
