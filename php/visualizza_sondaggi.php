@@ -27,48 +27,31 @@
     $pdo = connectToDB();
 
     session_start();
+    requiredLogin();
+    requiredNotAdmin();
     navBarCheck($pdo);
     $userType = $_SESSION['userType'];
     $emailUtente = $_SESSION['emailLogged'];
-    //$emailUtente = "utente@gmail.com";
-    //$userType = "Premium";
+    if(isset($_POST["randomInviteBtn"])){
+      try {
+          // execute the stored procedure
+          $sql1 = "CALL RandomInvite(?)";
+          // call the stored procedure
+          $res1 = $pdo -> prepare($sql1);
+          $res1 -> bindValue(1, $_POST["randomInviteBtn"], PDO::PARAM_INT);
+          $res1 -> execute();
+      } catch (PDOException $e) {
+          echo("Error occurred:" . $e->getMessage());
+          exit();
+      }
+      $utentiRandom = [];
+      for($i = 0; $i < $res1 -> rowCount(); $i++){
+          $row1 = $res1->fetch();
+          array_push($utentiRandom[$i], $row1[0]);
+      }
+      $res1->closeCursor();
 
-  /*
-
-try {
-    $sql = 'CALL searchAzienda(?)';
-    $res = $pdo->prepare($sql);
-    $res->bindValue(1, $emailUtente, PDO::PARAM_STR);
-    $res->execute();
-} catch (PDOException $e){
-    echo 'exception: '.$e;
-}
-$row = $res->fetch();
-$azienda = $row[0];
-$res->closeCursor();
-try {
-    $sql = 'CALL searchUtentePremium(?)';
-    $res = $pdo->prepare($sql);
-    $res->bindValue(1, $emailUtente, PDO::PARAM_STR);
-    $res->execute();
-} catch (PDOException $e){
-    echo 'exception: '.$e;
-}
-$row = $res->fetch();
-$utenteP = $row[0];
-$res->closeCursor();
-//echo("azienda: ".$azienda);
-//echo("utenteP: ".$utenteP);
-    require 'connectionManager.php';
-    $pdo = connectToDB();
-    session_start();
-    $emailUtente = $_SESSION['emailLogged'];
-    $type = $_SESSION['type'];
-
-$emailUtente = "utente@gmail.com";
-$type = "Premium";
-*/
-
+    }
   ?>
 
     <!--====== NAVBAR ONE PART START ======-->
@@ -282,18 +265,19 @@ $type = "Premium";
                     echo 'exception'.$e;
                 }
                 foreach($res as $row) {
-                    $CodiceSondaggio = $row["Codice"];
-                    $titoloSondaggio = $row["Titolo"];
-                    $MaxUtenti = $row["MaxUtenti"];
-                    echo '<div class="box answer">';
-                    echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
-                    # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
-                    echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
-                    echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
-                    echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
-                    echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
-
-                  echo '</div>';
+                    if($row['Stato'] != "CHIUSO") {
+                        $CodiceSondaggio = $row["Codice"];
+                        $titoloSondaggio = $row["Titolo"];
+                        $MaxUtenti = $row["MaxUtenti"];
+                        echo '<div class="box answer">';
+                        echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
+                        # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
+                        echo '<p class="info"> Creato il: ' . $row["DataCreazione"] . '</p>';
+                        echo '<p class="info"> Scade il: ' . $row["DataChiusura"] . '</p>';
+                        echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] . '</p>';
+                        echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+                        echo '</div>';
+                    }
                 }
 
               }else{
@@ -309,18 +293,19 @@ $type = "Premium";
                         echo 'exception'.$e;
                     }
                     foreach($res as $row) {
-                        $CodiceSondaggio = $row["Codice"];
-                        $titoloSondaggio = $row["Titolo"];
-                        $MaxUtenti = $row["MaxUtenti"];
-                        echo '<div class="box answer">';
-                        echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
-                        # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
-                        echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
-                        echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
-                        echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
-                        echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
-                        echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
-                        echo '</div>';
+                        if($row['Stato'] != "CHIUSO") {
+                            $CodiceSondaggio = $row["Codice"];
+                            $titoloSondaggio = $row["Titolo"];
+                            $MaxUtenti = $row["MaxUtenti"];
+                            echo '<div class="box answer">';
+                            echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
+                            # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
+                            echo '<p class="info"> Creato il: ' . $row["DataCreazione"] . '</p>';
+                            echo '<p class="info"> Scade il: ' . $row["DataChiusura"] . '</p>';
+                            echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] . '</p>';
+                            echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+                            echo '</div>';
+                        }
                     }
                     //e quelli da lui creati
                     echo '<h1 style="margin-top:7%;" class="t3"">Sondaggi da te creati</h1>';
@@ -334,22 +319,22 @@ $type = "Premium";
                         echo 'exception'.$e;
                     }
                     foreach($res as $row) {
-                        $CodiceSondaggio = $row["Codice"];
-                        $titoloSondaggio = $row["Titolo"];
-                        $MaxUtenti = $row["MaxUtenti"];
-                        echo '<div class="box answer">';
-                        echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
-                        # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
-                        echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
-                        echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
-                        echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
-                        echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
-                        echo '<a href="invitoUtentePremium.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '&MaxUtenti=' . urlencode($MaxUtenti) . '&emailUtente=' . urlencode($emailUtente) .'"><button  type="button" class="btn btn-light">Invita</button></a>';
-
-                        echo '</div>';
+                        if($row['Stato'] != "CHIUSO") {
+                            $CodiceSondaggio = $row["Codice"];
+                            $titoloSondaggio = $row["Titolo"];
+                            $MaxUtenti = $row["MaxUtenti"];
+                            echo '<div class="box answer">';
+                            echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
+                            # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
+                            echo '<p class="info"> Creato il: ' . $row["DataCreazione"] . '</p>';
+                            echo '<p class="info"> Scade il: ' . $row["DataChiusura"] . '</p>';
+                            echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] . '</p>';
+                            echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+                            echo '<a href="invitoUtentePremium.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '&MaxUtenti=' . urlencode($MaxUtenti) . '&emailUtente=' . urlencode($emailUtente) . '"><button  type="button" class="btn btn-light">Invita</button></a>';
+                            echo '</div>';
+                        }
                     }
                 }else{
-                    //l'azienda prende tutti i sondaggi a cui ha partecipato
                     try{
                         $stmt = $pdo->prepare("CALL GetSondaggiSimpleUser(?)");
                         $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
@@ -359,30 +344,25 @@ $type = "Premium";
                         echo 'exception'.$e;
                     }
                     foreach($res as $row) {
-                        $CodiceSondaggio = $row["Codice"];
-                        $titoloSondaggio = $row["Titolo"];
-                        $MaxUtenti = $row["MaxUtenti"];
-                        echo '<div class="box answer">';
-                        echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
-                        # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
-                        echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
-                        echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
-                        echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
-                        echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
-                        echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
-                        echo '</div>';
+                        if($row['Stato'] != "CHIUSO") {
+                            $CodiceSondaggio = $row["Codice"];
+                            $titoloSondaggio = $row["Titolo"];
+                            $MaxUtenti = $row["MaxUtenti"];
+                            echo '<div class="box answer">';
+                            echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
+                            # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
+                            echo '<p class="info"> Creato il: ' . $row["DataCreazione"] . '</p>';
+                            echo '<p class="info"> Scade il: ' . $row["DataChiusura"] . '</p>';
+                            echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] . '</p>';
+                            echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+                            echo '<button  type="button" class="btn btn-light" name="invitoAzienda" id="invitoAzienda">invita</button>';
+                            echo '</div>';
+                        }
                     }
                     //e i sondaggi creati
                     echo '<h1 style="margin-top:7%;" class="t3"">Sondaggi da te creati</h1>';
                     echo '<p class="t3" style="margin-bottom: 8%;">Visualizza la lista dei sondaggi che hai creato, assieme alla lista di domande e le loro relative risposte. Non perderti mai nessuna informazione e resta aggiornato sui risultati dei sondaggi!</p>';
                     //prima deve prendere il codice azienda dall'indirizzo email
-                    /*$sql = "SELECT CodiceFiscale FROM Azienda WHERE IndirizzoEmail=?";
-                    $stmt = $pdo->prepare($sql);
-                    $stmt->execute([$emailUtente]);
-                    $codiceazienda = $stmt->fetchColumn();
-                    //poi prende i sondaggi
-                    $sql="SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailCreatoreAzienda = '$emailUtente';";
-                    $res=$pdo->query($sql);*/
                     try{
                         $stmt = $pdo->prepare("CALL GetSondaggiAzienda(?)");
                         $stmt->bindParam(1, $emailUtente, PDO::PARAM_STR);
@@ -392,51 +372,23 @@ $type = "Premium";
                         echo 'exception'.$e;
                     }
                     foreach($res as $row) {
-                        $CodiceSondaggio = $row["Codice"];
-                        $titoloSondaggio = $row["Titolo"];
-                        $MaxUtenti = $row["MaxUtenti"];
-                        echo '<div class="box answer">';
-                        echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
-                        # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
-                        echo '<p class="info"> Creato il: ' . $row["DataCreazione"] .  '</p>';
-                        echo '<p class="info"> Scade il: ' . $row["DataChiusura"] .  '</p>';
-                        echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] .  '</p>';
-                        echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
-                        $nameInvito = "invitoAzienda".$CodiceSondaggio;
-                        //'.$nameInvito.'
-                        echo '<button  type="button" class="btn btn-light" name="'.$nameInvito.'" id="'.$nameInvito.'">invita</button>';
-                        //var_dump($_POST[$nameInvito]);
-
-                        if(isset($_POST[$nameInvito])){
-
-                            try {
-                                // execute the stored procedure
-                                $sql1 = "CALL RandomInvite(?)";
-                                // call the stored procedure
-                                $res1 = $pdo -> prepare($sql1);
-                                $res1 -> bindValue(1, $CodiceSondaggio, PDO::PARAM_STR);
-                                $res1 -> execute();
-                                insertLog("RandomInvite", "Executed");
-                            } catch (PDOException $e) {
-                                insertLog("RandomInvite", "Aborted");
-                                die("Error occurred:" . $e->getMessage());
-                            }
-
-                            $uentiRandom = [];
-                            for($i = 0; $i < $res1 -> rowCount(); $i++){
-                                $row1 = $res1->fetch();
-                                array_push($utentiRandom[$i], $row1[0]);
-                            }
-
-                            echo("utenti random: ");
-
-                            print_r($utentiRandom);
-
-                            $res1->closeCursor();
-
+                        if($row['Stato'] != "CHIUSO") {
+                            $CodiceSondaggio = $row["Codice"];
+                            $titoloSondaggio = $row["Titolo"];
+                            $MaxUtenti = $row["MaxUtenti"];
+                            echo '<div class="box answer">';
+                            echo '<h4 class="t2">' . $row["Titolo"] . '</h4>';
+                            # se vogliamo mettere una descrizione echo '<p class="t2">'  '</p>';
+                            echo '<p class="info"> Creato il: ' . $row["DataCreazione"] . '</p>';
+                            echo '<p class="info"> Scade il: ' . $row["DataChiusura"] . '</p>';
+                            echo '<p class="info"> Max Utenti: ' . $row["MaxUtenti"] . '</p>';
+                            echo '<a href="../php/visualizza_domande.php?CodiceSondaggio=' . urlencode($CodiceSondaggio) . '&titoloSondaggio=' . urlencode($titoloSondaggio) . '"><button style="display: inline-block; position: absolute; right: 20px;" type="button" class="btn btn-light">Visualizza Domande</button></a>';
+                            $nameInvito = "invitoAzienda" . $CodiceSondaggio;
+                            //'.$nameInvito.'
+                            echo '<form method="post"><button  type="submit" class="btn btn-light" name="randomInviteBtn" id="randomInviteBtn" value="' . $CodiceSondaggio . '">invita random</button></form>';
+                            //var_dump($_POST[$nameInvito]);
+                            echo '</div>';
                         }
-
-                        //echo '</div>';
                     }
                 }
               }

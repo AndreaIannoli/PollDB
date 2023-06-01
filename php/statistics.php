@@ -231,10 +231,7 @@
     <div class="container box2 mt-5">
         <h1 class="t3">Le tue statistiche</h1>
         <p class="t3" style="margin-bottom: 3%;">Visualizza le statistiche relative alle domande e ai sondaggi presenti sulla piattaforma. Ogni rettangolo contiene un sondaggio e le statistiche sulle domande e sulle risposte presenti in esso! </p>
-        <!-- questa parte dovrebbe contenere i sondaggi che hai creato se sei premium, quelli a cui hai partecipato se sei utente-->
     </div>
-        
-
         <!--Statistica: numero di risposte per ogni domanda -->
         <?php
             $stmt = $pdo->prepare("SELECT Codice, Titolo FROM Sondaggio");
@@ -269,11 +266,9 @@
                     $stmt->execute();
                     $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     foreach($res as $index => $row) {
-                        //echo '<p>Domanda: ' . $row["Testo"] . '</p>'; //testo domanda (mi serve)
                         $risultato = $row["C1"] + $row["C2"];   //conteggio risposte (mi serve)
                         $labels[] = $row["Testo"];
                         $data[] = $risultato;
-                        //echo '<p>Numero Risposte:' . $risultato . '</p>';
                     }
                     //statistiche media, minimo e massimo
                     $stmt = $pdo->prepare("CALL GetStatisticaAperte(?)");
@@ -299,7 +294,6 @@
                         foreach($res as $index => $row) {
                             $labels2[] = $row["Testo"];
                             $data2[] = $row["Conteggio"];
-                            //echo '<p>Numero Risposte:' . $risultato . '</p>';
                         }
                     }catch (PDOException $e) {
                         echo("Abbiamo un problema: " . $e->getMessage());

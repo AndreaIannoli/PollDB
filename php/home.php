@@ -187,7 +187,7 @@
             <div class="row justify-content-center">
                 <div class="col-md-3 col-6">
                     <div class="single-client text-center">
-                        <img src="../icons/Seal_of_the_University_of_Bologna.svg" alt="Logo" style="width: 150px; margin: -50px 0px 0px 0px"/>
+                        <img src="../img/Seal_of_the_University_of_Bologna.png" alt="Logo" style="width: 150px; margin: -50px 0px 0px 0px"/>
                     </div>
                     <!-- single client -->
                 </div>
@@ -198,83 +198,6 @@
     </section>
 </div>
 <!--====== CLIENT LOGO PART ENDS ======-->
-<!--====== TEAM STYLE ONE START ======-->
-<lottie-player src="../img/borderWoobler.json" background="transparent"  speed="1" autoplay loop class="section-top-border" style="z-index: 0"></lottie-player>
-<section class="team-area" style="z-index: 1; position: relative;">
-    <div class="container-fluid" style="background: black;">
-        <div class="row justify-content-center">
-            <div class="col-lg-6">
-                <div class="section-title text-center">
-                    <h3 class="title" id="team">Il nostro team...</h3>
-                </div>
-                <!-- row -->
-            </div>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-lg-3 col-md-6">
-                <div class="single-team text-center team-style-one">
-                    <div class="team-image">
-                        <img src="../img/andre.png" alt="Team" />
-                    </div>
-                    <div class="team-content">
-                        <h4 class="name">Andrea Iannoli</h4>
-                        <span class="sub-title">Contributor</span>
-                        <ul class="social">
-                            <li>
-                                <a href="javascript:void(0)">
-                                    <i class="bi bi-linkedin"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- single team -->
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="single-team text-center team-style-one">
-                    <div class="team-image">
-                        <img src="../img/ale.png" alt="Team" />
-                    </div>
-                    <div class="team-content">
-                        <h4 class="name">Alessandro Mazzini</h4>
-                        <span class="sub-title">Contributor</span>
-                        <ul class="social">
-                            <li>
-                                <a href="javascript:void(0)">
-                                    <i class="bi bi-linkedin"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- single team -->
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="single-team text-center team-style-one">
-                    <div class="team-image">
-                        <img src="../img/gabri.png" alt="Team" />
-                    </div>
-                    <div class="team-content">
-                        <h4 class="name">Gabriele Centonze</h4>
-                        <span class="sub-title">Contributor</span>
-                        <ul class="social">
-                            <li>
-                                <a href="javascript:void(0)">
-                                    <i class="bi bi-linkedin"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- single team -->
-            </div>
-        </div>
-        <!-- row -->
-    </div>
-    <!-- container -->
-</section>
-<lottie-player src="../img/borderWoobler.json" background="transparent"  speed="1" autoplay loop class="section-bottom-border" style="z-index: 0"></lottie-player>
-<!--====== TEAM STYLE ONE ENDS ======-->
 <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 <!--====== Bootstrap js ======-->
 <script src="https://cdn.ayroui.com/1.0/js/bootstrap.bundle.min.js"></script>

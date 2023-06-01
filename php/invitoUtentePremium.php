@@ -32,8 +32,6 @@ requiredPremium();
 $emailUtente = $_SESSION['emailLogged'];
 $type = $_SESSION['type'];
 
-
-//$_SESSION['emailCreatore'] = 'nome.esempio@email.com';
 if(!isset($_SESSION["arrayDomini"])){
 
     $_SESSION["arrayDomini"] = array();
@@ -62,8 +60,6 @@ try {
 
     $res->bindValue(1, $CodiceSondaggio, PDO::PARAM_STR);
 
-    //echo("codice sondaggio: ".$CodiceSondaggio);
-
     $res->execute();
 } catch (PDOException $e){
     echo 'exception: '.$e;
@@ -84,11 +80,8 @@ if(isset($_POST["statoSondaggioRadio"])){
 
 $dataCreazione = $_POST[date("y-m-d")];
 
-//salva i dati nel database
 if(isset($_POST['buttonAggiungi'])) {
-
     $dominioSondaggio = $_POST['selectDominio'];
-    //$email = $_SESSION["emailCreatore"];
 }
 ?>
 
@@ -307,24 +300,8 @@ if(isset($_POST['buttonAggiungi'])) {
                     <div class="row align-items-center justify-content-center gap-1">
 
                         <label >Invita utenti per il sondaggio: <?php echo($TitoloSondaggio); ?></label>
-
-                        <!--<div class="col-sm-9 p-0 form-floating">
-
-                                        <?php
-
-                        //echo($CodiceSondaggio);
-
-                        /*
-                                if(isset($_POST['searchField'])){
-                                    echo("<input type='text' class='form-control' id='searchField' name='searchField' value='".$_POST['searchField']."' placeholder='Nome del dominio di interesse'>");
-                                } else {
-                                    echo("<input type='text' class='form-control' id='searchField' name='searchField' placeholder='Nome del dominio di interesse'>");
-                                }
-                        */
-                        ?>
                                     <label for="searchField">Nome del dominio di interesse</label>
                                     </div>-->
-
                         <div  class="col container-fluid mt-4">
 
                             <div class="row justify-content-center gap-1" style="max-height: 250px; overflow-y: scroll;" method="post">
@@ -336,15 +313,10 @@ if(isset($_POST['buttonAggiungi'])) {
                                     $res = $pdo->prepare($sql);
 
                                     $res->bindValue(1, $CodiceSondaggio, PDO::PARAM_STR);
-
-                                    //echo("codice sondaggio: ".$CodiceSondaggio);
-
                                     $res->execute();
                                 } catch (PDOException $e){
                                     echo 'exception: '.$e;
                                 }
-
-                                //unset($_SESSION["utentiSelezionati"]);
 
                                 $utenti = [];
                                 for($x=0; $x < $res -> rowCount(); $x++){
@@ -356,64 +328,36 @@ if(isset($_POST['buttonAggiungi'])) {
 
                                     }
                                 }
-
                                 $res->closeCursor();
-                                //echo sizeof($utenti);
-
                                 if(sizeof($utenti) == 0){
                                     echo('Nessun utente trovato');
                                 }
 
                                 for($x=0; $x < sizeof($utenti); $x++){
-
-                                    //echo 'ciclo'.$x.'';
                                     $utente = $utenti[$x];
 
 
                                     if(isset($_POST[$x]) and $_POST[$x] == 'notInterested'
                                         and sizeof($_SESSION["utentiSelezionati"]) < $MaxUtenti){
-
-                                        //echo("sono dentro");
-
                                         array_push($_SESSION["utentiSelezionati"], $utente);
-
-                                        //print_r($_SESSION["utentiSelezionati"]);
-
                                     }else if(isset($_POST[$x]) and $_POST[$x] == 'interested'){
-                                        //echo '      remove-------------------';
-
-                                        //unset($_SESSION["utentiSelezionati"]);
-
-
                                         $userKey = array_search($utente, $_SESSION["utentiSelezionati"]);
-
-
                                         unset($_SESSION["utentiSelezionati"][$userKey]);
-
                                     }else if(sizeof($_SESSION["utentiSelezionati"]) == $MaxUtenti){
-                                        //echo("hai raggiunto il numero massimo di utenti selezionabili");
                                         $flag = true;
-                                        //print_r($_SESSION["utentiSelezionati"]);
                                     }else{
                                         $flag = false;
                                     }
-                                    //echo isset($_POST[$utente])? ' EXIST' : ' NOT EXIST';
-
                                     $_POST[$x] = null;
-                                    //echo in_array($utente, $_SESSION["utentiSelezionati"])? ' EXIST' : ' NOT EXIST';
                                     if(in_array($utente, $_SESSION["utentiSelezionati"]) == 'EXIST') {
-                                        //echo('pulsante interested'.$x);
                                         echo("                                
                                                         <button class='btn btn-secondary d-grid wrap-content col-sm-3 btn-square-md' value='interested' type='submit' name='" . $x . "'>" . $utente . "</button>                            
                                                      ");
                                     } else {
-                                        //echo('pulsante NOT interested'.$x);
                                         echo("                                
                                                         <button class='btn primary-btn login-btn d-grid wrap-content col-sm-3 btn-square-md' value='notInterested' type='submit' name='" . $x . "'>" . $utente . "</button>                            
                                                     ");
                                     }
-                                    //echo 'fine ciclo'.$x;
-                                    //print_r($utenti);
                                 }
 
                                 echo('<div>');

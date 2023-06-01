@@ -4,8 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Aggiungi premio</title>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link href="../stylesheets/basicstyle.css" rel="stylesheet">
     <link href="../stylesheets/aggiungiPremio.css" rel="stylesheet">
+    <link href="../stylesheets/nav.css" rel="stylesheet">
+    <link href="../stylesheets/button.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -24,16 +34,10 @@ navBarCheck($pdo);
 $userType = $_SESSION['userType'];
 $emailUtente = $_SESSION['emailLogged'];
 
-$emailUtente = "utenteAdmin@gmail.com";
-
-//echo(print_r($_SESSION));
-
 if(isset($_POST["buttonAggiungi"])){
     try {
         $sql = 'CALL AddPremio(?, ?, ?, ?, ?)';
         $res = $pdo->prepare($sql);
-
-        echo(" -".uploadProPic()." -");
 
         $res->bindValue(1, $_POST["nome"], PDO::PARAM_STR);
         $res->bindValue(2, $_POST["descrizione"], PDO::PARAM_STR);
@@ -139,11 +143,11 @@ if(isset($_POST["buttonAggiungi"])){
     <!-- container -->
 </section>
 <!--====== NAVBAR ONE PART ENDS ======-->
-<div class="container-md" id="premio-container">
+<div class="container-sm p-5 mt-3" id="premio-container">
 
-    Aggiungi un nuovo premio
+    <h3>Aggiungi un nuovo premio</h3>
 
-    <form class="row g-3 needs-validation" id="login-form" method="post">
+    <form class="row g-3 needs-validation" id="login-form" method="post" enctype="multipart/form-data">
         <div class="col-12">
         </div>
         <div class="col-12">
@@ -163,12 +167,9 @@ if(isset($_POST["buttonAggiungi"])){
             <input class="form-control" type="file" id="prizePicUpload" name="prizePicUpload" accept=".jpg,.gif,.png">
         </div>
         <div id="premio-btn-container">
-            <button class="btn btn-primary" type="submit" name="buttonAggiungi">Aggiungi</button>
+            <button class="btn primary-btn" type="submit" name="buttonAggiungi">Aggiungi</button>
         </div>
     </form>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
 </body>
 </html>

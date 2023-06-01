@@ -242,16 +242,8 @@
 
 
         <?php
-        /*
-          $sql="SELECT IdDomanda FROM Composizione WHERE CodiceSondaggio='$CodiceSondaggio'";
-          $res=$pdo->query($sql);
-          */
-
           try{
-            /*
-            $sql="SELECT IdDomanda FROM Composizione WHERE CodiceSondaggio='$CodiceSondaggio'";
-            $res=$pdo->query($sql);
-            */
+
             $stmt = $pdo->prepare("CALL GetDomande(?)");
             $stmt->bindParam(1, $CodiceSondaggio, PDO::PARAM_INT);
             $stmt->execute();
@@ -261,11 +253,6 @@
           }
           foreach($res as $row) {
             $iddomanda = $row["Id"];
-            /*
-            $sql="SELECT Id, Testo, Punteggio FROM Domanda WHERE Id='$iddomanda'";
-            $res=$pdo->query($sql);
-            $row2 = $res->fetch();
-            */
             echo '<div class="box answer">';
             echo '<h4 class="t2">Domanda: ' . $row["Id"] . '</h4>';
             echo '<p class="t2">' . $row["Testo"] . '</p>';

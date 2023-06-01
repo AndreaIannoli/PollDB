@@ -4,11 +4,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Inserisci Domanda</title>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link href="../stylesheets/basicstyle.css" rel="stylesheet">
+    <link href="../stylesheets/nav.css" rel="stylesheet">
+    <link href="../stylesheets/button.css" rel="stylesheet">
     <link href="../stylesheets/rank.css" rel="stylesheet">
-    <link rel="stylesheet" href="../stylesheets/style.css">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
   </head>
   <body>
 
@@ -220,12 +227,9 @@
   </section>
     <!--====== NAVBAR ONE PART ENDS ======-->
     
-    <div class="container box2">
+    <div class="container box2 p-5 mt-5" style="background-color: white; border-radius: 20px">
         <h1 class="t3">Classifica Utenti</h1>
         <p class="t3" style="margin-bottom: 8%;">Visualizza la classifica degli utenti e cerca di ottenere sempre più punti per vincere premi più prestigiosi</p>
-
-        <!-- questa parte dovrebbe contenere i sondaggi che hai creato se sei premium, quelli a cui hai partecipato se sei utente-->
-
     <table class="table">
     <tr>
         <th class="tcampo"></th>
@@ -233,11 +237,7 @@
         <th class="tcampo">Cognome</th>
         <th class="punteggio">Totale Bonus</th>
     </tr>
-    <?php     
-                /*
-                $sql="SELECT Nome, Cognome, TotaleBonus FROM Utente ORDER BY TotaleBonus DESC";
-                $res=$pdo->query($sql);
-                */
+    <?php
                 try{
                     $stmt = $pdo->prepare("CALL GetRank()");
                     $stmt->execute();
@@ -250,7 +250,7 @@
                     $Cognome = $row["Cognome"];
                     $TotaleBonus = $row["TotaleBonus"];
                     echo '<tr class="riga">';
-                    echo '<td class="tcampo">' . $index+1 . '</td>';
+                    echo '<td class="tcampo">' . ($index + 1) . '</td>';
                     echo '<td class="tcampo">' . $row["Nome"] . '</td>';
                     echo '<td class="tcampo">' . $row["Cognome"] .  '</td>';
                     echo '<td class="punteggio">' . $row["TotaleBonus"] .  '</td>';
@@ -261,7 +261,5 @@
 
          
     </div>
-      
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
   </body>
 </html>

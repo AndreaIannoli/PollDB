@@ -6,9 +6,15 @@
     <title>Visualizza Domanda</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../stylesheets/visualizza_domanda.css">
-    <link rel="stylesheet" href="../stylesheets/style.css">
-
+    <link href="../stylesheets/basicstyle.css" rel="stylesheet">
+    <link href="../stylesheets/visualizza_domanda.css" rel="stylesheet">
+    <link href="../stylesheets/nav.css" rel="stylesheet">
+    <link href="../stylesheets/button.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
   </head>
   <body>
 
@@ -23,14 +29,10 @@
     requiredLogin();
     requiredNotAdmin();
     $emailUtente = $_SESSION['emailLogged'];
-    $type = $_SESSION['type'];
+    $type = $_SESSION['userType'];
     $IdDomanda = $_GET['IdDomanda']; #bisogna inserire l'id passato nell'url
     $tipologia = "CHIUSA";
 
-    /*
-    $sql="SELECT * FROM DomandaAperta WHERE Id='$IdDomanda'";
-    $res=$pdo->query($sql);
-    */
     try{
       $sql = 'CALL CheckTipoDomanda(?)';
       $res = $pdo->prepare($sql);
@@ -243,8 +245,23 @@
       <!-- container -->
   </section>
   <!--====== NAVBAR ONE PART ENDS ======-->
-    
+    <?php
+        $sql = "SELECT Foto FROM Domanda WHERE Id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(1, $IdDomanda, PDO::PARAM_INT);
+        $stmt->execute();
+        $background_image_url = $stmt->fetch()['Foto'];
+        echo $background_image_url;
+    ?>
+    <style>#uploadimage{background-image: url('<?php
+        if($background_image_url != ""){
+            echo $background_image_url;
+        } else {
+            echo "../img/placeholder.png";
+        }
+     ?>') !important;}</style>
       <div id="uploadimage"> </div>
+
 
     <div class="container pt-5" id="main">
         <h1 class="t2">Informazioni</h1>
@@ -295,24 +312,52 @@
         <?php
           //if($type == "Premium"){
             if ($tipologia == 'APERTA') {
-              $sql = "SELECT Testo FROM RispostaAperta WHERE IdDomanda = ?";
+              $sql = "SELECT Testo, EmailUtente FROM RispostaAperta WHERE IdDomanda = ?";
               $stmt = $pdo->prepare($sql);
               $stmt->bindParam(1, $IdDomanda, PDO::PARAM_INT);
               $stmt->execute();
-              foreach ($stmt as $row) {
+              $res = $stmt->fetchAll();
+              $stmt->closeCursor();
+              foreach ($res as $row) {
+                  if($row["EmailUtente"] == $_SESSION["emailLogged"]){
+                      $alreadyAnswered = true;
+                  }
+                  $userAnswerer = getUser($row2["EmailUtente"], $pdo)->fetch();
                   echo '<div class="box answer">';
+                  echo('
+                    <div>
+                        <div class="profile-container" style="display: inline-block">
+                            <img src="'.$userAnswerer['UrlFoto'].'" alt="Profile Picture" class="profile-picture">
+                        </div>
+                        <div class="t2" style="color:white; display: inline-block; margin-left: 15px !important;">'.$userAnswerer['Email'].' - '.$userAnswerer['Nome'].' '.$userAnswerer['Cognome'].'</div>
+                    </div>
+                  ');
                   echo '<h4 class="t2">Risposta:</h4>';
                   echo '<p class="t2">' . $row["Testo"] . '</p>';
                   echo '</div>';
               }
             } else {
               //prende tutte le risposte relative a quella domanda
-              $sql = "SELECT Id FROM RispostaChiusa WHERE RispostaChiusa.IdDomanda = ?";
+              $sql = "SELECT Id, EmailUtente FROM RispostaChiusa WHERE RispostaChiusa.IdDomanda = ?";
               $stmt = $pdo->prepare($sql);
               $stmt->bindParam(1, $IdDomanda, PDO::PARAM_INT);
               $stmt->execute();
-              foreach ($stmt as $row2) {
+              $res = $stmt->fetchAll();
+              $stmt->closeCursor();
+              foreach ($res as $row2) {
+                if($row2["EmailUtente"] == $_SESSION["emailLogged"]){
+                    $alreadyAnswered = true;
+                }
+                $userAnswerer = getUser($row2["EmailUtente"], $pdo)->fetch();
                 echo '<div class="box answer">';
+                echo('
+                    <div class="mb-3" style="display: flex; align-items: center">
+                        <div class="profile-container" style="display: inline-block">
+                            <img src="'.$userAnswerer['UrlFoto'].'" alt="Profile Picture" class="profile-picture">
+                        </div>
+                        <div class="t2" style="color:white; display: inline-block; margin-left: 15px !important;">'.$userAnswerer['Email'].' - '.$userAnswerer['Nome'].' '.$userAnswerer['Cognome'].'</div>
+                    </div>
+                ');
                 echo '<h4 class="t2">Risposta:</h4>';
                 //per ogni risposta prendiamo il suo id e cerchiamo le opzioni corrispondenti
                 $sql2 = "SELECT Testo FROM Selezione JOIN Opzione ON Selezione.NumeroOpzione = Opzione.Numero WHERE Selezione.IdRisposta = ?";
@@ -330,8 +375,12 @@
           //} 
         ?>
          <!--PREMIUM ONLY!!!-->
+        <?php
+            if(!$alreadyAnswered and $_SESSION['userType'] != 'Azienda'){
+                echo('<div class="floating" style="color:white"><button type="button" class="btn bfloat" data-bs-toggle="modal" data-bs-target="#inseriscirisposta"><i class="bi bi-plus ifloat"></i></button></div>');
+            }
+        ?>
 
-        <div class="floating" style="color:white"><button type="button" class="btn bfloat" data-bs-toggle="modal" data-bs-target="#inseriscirisposta"><i class="bi bi-plus ifloat"></i></button></div>
 
     </div>
 
@@ -351,7 +400,12 @@
             <label for="recipient-name" class="col-form-label">Testo della risposta:</label>
                 <?php
                   if($tipologia == "APERTA"){
-                    echo '<textarea class="form-control" rows="3" name="testoRisposta"></textarea>';
+                    $sql = "SELECT MaxCaratteri FROM DomandaAperta WHERE Id = ?";
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->bindParam(1, $IdDomanda, PDO::PARAM_INT);
+                    $stmt->execute();
+                    $res = $stmt->fetch();
+                    echo '<textarea class="form-control" rows="3" name="testoRisposta" maxlength="'.$res['MaxCaratteri'].'"></textarea>';
                   }else{
                     $sql = "SELECT Numero, Testo FROM Opzione WHERE IdDomanda = ?";
                     $stmt = $pdo->prepare($sql);

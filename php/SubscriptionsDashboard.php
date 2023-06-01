@@ -65,16 +65,6 @@
         $_SESSION['search'] = $_POST['searchField'];
     }
 
-    if(isset($_POST['searchField'])){
-        $_SESSION['search'] = $_POST['searchField'];
-    }
-
-    if(isset($_POST['AcceptInvite'])){
-        acceptInvite($_POST['AcceptInvite'], $pdo);
-    } else if(isset($_POST['DenyInvite'])) {
-        denyInvite($_POST['DenyInvite'], $pdo);
-    }
-
     if(isset($_POST['toDelete'])){
         deleteSubscription($_POST['toDelete'], $pdo);
     }

@@ -27,6 +27,48 @@
         requiredCreator();
         navBarCheck($pdo);
         $CodiceSondaggio = $_GET['CodiceSondaggio'];
+
+        if(isset($_POST['searchField'])){
+            $_SESSION['search'] = $_POST['searchField'];
+        }
+
+        if(isset($_POST['toAdd'])){
+            addComposition($_POST['toAdd'], $_GET['CodiceSondaggio'], $pdo);
+        }
+
+        function addComposition($idDomanda, $codiceSondaggio, PDO $pdo) {
+            try {
+                $sql = "CALL AddComposizione(?, ?)";
+                $res = $pdo->prepare($sql);
+                $res->bindValue( 1, $idDomanda, PDO::PARAM_INT);
+                $res->bindValue( 2, $codiceSondaggio, PDO::PARAM_INT);
+                $res->execute();
+                insertLog("AddComposizione", "Executed");
+            } catch (PDOException $e) {
+                echo("[ERRORE] Query SQL AddComposizione() non riuscita. Errore: ".$e->getMessage());
+                insertLog("AddComposizione", "Aborted");
+                exit();
+            }
+        }
+
+        function searchDomanda(PDO $pdo){
+            try {
+                $sql = 'CALL SearchDomanda(?, ?)';
+                $res = $pdo->prepare($sql);
+                if(!empty($_SESSION['search'])) {
+                    $res->bindValue(1, $_SESSION['search'], PDO::PARAM_STR);
+                    $res->bindValue(2, $_GET['CodiceSondaggio'], PDO::PARAM_INT);
+                } else {
+                    $res->bindValue(1, '', PDO::PARAM_STR);
+                    $res->bindValue(2, $_GET['CodiceSondaggio'], PDO::PARAM_INT);
+                }
+                $res->execute();
+                return $res->fetchAll();
+            } catch (PDOException $e){
+                echo("[ERRORE] Query SQL SearchDomanda() non riuscita. Errore: ".$e->getMessage());
+                exit();
+            }
+        }
         ?>
 
       <!--====== NAVBAR ONE PART START ======-->
@@ -226,8 +268,49 @@
     
     <button type="button" class="btn btn-primary" id="uploadimage" data-bs-toggle="modal" data-bs-target="#uploadfile"> </button>
 
-    <div class="container-md mt-5 p-5" style="background-color: white; border-radius: 20px;" id="main">
-        <h1>Inserisci informazioni</h1>
+    <div class="container-md mt-5 p-5 mb-5" style="background-color: white; border-radius: 20px;" id="main">
+        <h1>Seleziona una domanda</h1>
+        <form class="row align-items-center justify-content-center gap-1" method="post">
+            <div class="col-sm-9 p-0 form-floating">
+                <?php
+                if(!empty($_SESSION['search'])){
+                    echo("<input type='text' class='form-control' id='searchField' name='searchField' value='".$_SESSION['search']."' placeholder='Nome del dominio di interesse' maxlength='30'>");
+                } else {
+                    echo("<input type='text' class='form-control' id='searchField' name='searchField' placeholder='Nome del dominio di interesse' maxlength='30'>");
+                }
+                ?>
+                <label for="searchField">Testo della domanda</label>
+            </div>
+            <form method="post">
+                <button class="btn btn-lg primary-btn login-btn col-sm-2" type="submit"><i class="bi bi-search" style="font-size: 150%"></i></button>
+            </form>
+            <div class="col-12 container-fluid mt-4">
+                <form class="row justify-content-center gap-1" style="max-height: 250px; overflow-y: scroll;" method="post">
+                    <?php
+
+                    $answers = searchDomanda($pdo);
+
+                    if(sizeof($answers)==0){
+                        echo('Nessuna domanda trovata');
+                    }
+                    for($x=0; $x<sizeof($answers); $x++){
+                        $answerText = $answers[$x]['Testo'];
+                        $answerID = $answers[$x]['Id'];
+                        $answerPoint = $answers[$x]['Punteggio'];
+                        echo("
+                            <div class='col-12 mb-3 p-4' style='background-color: #9027e8; color: white; border-radius: 25px; display: flex; justify-content: start; align-items: center'>"
+                            .$answerText.'<br> Punteggio:'.$answerPoint.
+                            "
+                            <button class='btn primary-btn wrap-content col-sm-3 ms-auto' value='".$answerID."' type='submit' name='toAdd'>Aggiungi</button></div>
+                        ");
+                    }
+
+                    ?>
+                </form>
+            </div>
+        </form>
+        <!--Fine aggiunta dinamica -->
+        <h1 class="mt-5">Crea una domanda</h1>
 
         <form action="inserisci_domanda.php" method="post">
             <input type="hidden" name="CodiceSondaggio" value="<?php echo $CodiceSondaggio; ?>">

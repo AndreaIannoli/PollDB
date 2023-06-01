@@ -344,7 +344,6 @@ function getDominiSelezionati(){
                                 }
 
                                 $res->closeCursor();
-                                //echo sizeof($domainNames);
 
                                 if(sizeof($domainNames) == 0){
                                     echo('Nessun dominio di interesse trovato');
@@ -373,20 +372,15 @@ function getDominiSelezionati(){
                                     }
 
                                     $_POST[$domainName] = null;
-                                    //echo in_array($domainName, $_SESSION["dominiSelezionati"])? ' EXIST' : ' NOT EXIST';
                                     if(in_array($domainName, $_SESSION["dominiSelezionati"]) == 'EXIST') {
-                                        //echo('pulsante interested'.$x);
                                         echo("                                
                                                 <button class='btn primary-btn login-btn d-grid wrap-content col-sm-3 btn-square-md' value='interested' type='submit' name='" . $domainName . "'><i class='bi bi-heart-fill'></i>" . $domainName . " </button>                            
                                              ");
                                     } else {
-                                        //echo('pulsante NOT interested'.$x);
                                         echo("                                
                                                 <button class='btn primary-btn login-btn d-grid wrap-content col-sm-3 btn-square-md' value='notInterested' type='submit' name='" . $domainName . "'><i class='bi bi-heart'></i>" . $domainName . " </button>                            
                                             ");
                                     }
-                                    //echo 'fine ciclo'.$x;
-                                    //print_r($domainNames);
                                 }
                                 ?>
                             </div>
@@ -413,44 +407,8 @@ function getDominiSelezionati(){
                     <label for="start">Chiusura sondaggio:</label>
 
                     <input type="date" id="chiusuraSondaggioData"  name="chiusuraSondaggioData"
-                           min="<?php echo date('Y-m-d'); ?>" value="<?echo($dataChiusura)?>" >
+                           min="<?php echo date('Y-m-d'); ?>" value="<?php echo($dataChiusura)?>" >
                 </div>
-
-                <!-- <div id="col-12">
-                    Stato del sondaggio:
-
-                    <div class="form-check">
-                        <?php
-                /*if(!isset($_POST['statoSondaggioRadio']) or $_POST['statoSondaggioRadio'] == 'APERTO'){
-                    echo('<input class="form-check-input" type="radio" name="statoSondaggioRadio" id="flexRadioDefault" value="" checked>');
-                } else {
-                    echo('<input class="form-check-input" type="radio" name="statoSondaggioRadio" id="flexRadioDefault" value="APERTO">');
-                }
-
-                ?>
-                <label class="form-check-label" for="flexRadioDefault">
-                    Aperto
-                </label>
-            </div>
-
-            <div class="form-check">
-                <?php
-
-                if(isset($_POST['statoSondaggioRadio']) and $_POST['statoSondaggioRadio'] == 'CHIUSO'){
-                    echo('<input class="form-check-input" type="radio" name="statoSondaggioRadio" id="flexRadioDefault2" value="" checked>');
-                } else {
-                    echo('<input class="form-check-input" type="radio" name="statoSondaggioRadio" id="flexRadioDefault2" value="CHIUSO">');
-                }*/
-
-                ?>
-                        <label class="form-check-label" for="flexRadioDefault2">
-                            Chiuso
-                        </label>
-                    </div>
-
-                </div> -->
-                <div id="login-btn-container">
-                    <button class="btn primary-btn" type="submit" name="buttonAggiungi">Aggiungi</button>
                     <?php
                     $flag = false;
                     if (isset($_POST["buttonAggiungi"])) {

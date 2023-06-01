@@ -26,7 +26,7 @@ CREATE TABLE Utente(
     Cognome VARCHAR(30),
     DataDiNascita DATE,
     LuogoNascita VARCHAR(30),
-    TotaleBonus INT,
+    TotaleBonus DOUBLE,
     UrlFoto TEXT
 ) ENGINE = "INNODB";
 
@@ -43,7 +43,7 @@ CREATE TABLE Sondaggio(
     Codice INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     MaxUtenti INT NOT NULL,
     Stato ENUM ('APERTO', 'CHIUSO'),
-	Titolo VARCHAR(30) NOT NULL,
+	Titolo VARCHAR(300) NOT NULL,
     DataChiusura Date,
     DataCreazione Date,
     EmailCreatorePremium VARCHAR(30),
@@ -110,28 +110,6 @@ CREATE TABLE RispostaAperta(
     FOREIGN KEY (IdDomanda) REFERENCES DomandaAperta(Id),
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email)
 ) ENGINE = "INNODB";
-
-/*
-CREATE TABLE InserimentoAziendale(
-    IdDomanda INT,
-    IndirizzoEmailAzienda VARCHAR(30),
-    PRIMARY KEY (IdDomanda, IndirizzoEmailAzienda),
-    FOREIGN KEY (IdDomanda) REFERENCES DomandaChiusa(Id),
-    FOREIGN KEY (IdDomanda) REFERENCES DomandaAperta(Id),
-    FOREIGN KEY (IndirizzoEmailAzienda) REFERENCES Azienda(IndirizzoEmail)
-) ENGINE = "INNODB";
-*/
-
-/*
-CREATE TABLE InserimentoPremium(
-    IdDomanda INT,
-    EmailUtentePremium VARCHAR(30),
-    PRIMARY KEY (IdDomanda, EmailUtentePremium),
-    FOREIGN KEY (IdDomanda) REFERENCES DomandaAperta(Id),
-    FOREIGN KEY (IdDomanda) REFERENCES DomandaChiusa(Id),
-	FOREIGN KEY (EmailUtentePremium) REFERENCES UtentePremium(EmailUtente)
-) ENGINE = "INNODB";
-*/
 
 CREATE TABLE UtenteAmministratore(
     EmailUtente VARCHAR(30) PRIMARY KEY,
@@ -216,16 +194,9 @@ CREATE TABLE Interessamento(
     FOREIGN KEY (EmailUtente) REFERENCES Utente(Email) ON DELETE CASCADE
 ) ENGINE = "INNODB";
 
+#STORED PROCEDURES
 DELIMITER $
-CREATE PROCEDURE RandomUtenti ()
-BEGIN
-	SELECT Email FROM Utente ORDER BY RAND();
-END
-$ DELIMITER ;
-
-#Insercisci domanda aperta sondaggio
-DELIMITER $
-CREATE PROCEDURE AddDomandaAperta (IN Testo VARCHAR(300), Punteggio INT, Foto VARCHAR(300), MaxCaratteri INT, CodiceSondaggio INT)
+CREATE PROCEDURE AddDomandaAperta (IN Testo VARCHAR(300), Punteggio INT, Foto Text, MaxCaratteri INT, CodiceSondaggio INT)
 BEGIN
 	INSERT INTO Domanda (Testo, Punteggio, Foto)  VALUES (Testo, Punteggio, Foto);
 	SET @last_id = LAST_INSERT_ID(); 
@@ -234,9 +205,8 @@ BEGIN
 END
 $ DELIMITER ;
 
-#Insercisci domanda chiusa sondaggio
 DELIMITER $
-CREATE PROCEDURE AddDomandaChiusa (IN Testo VARCHAR(200), Punteggio INT, Foto VARCHAR(50), Opzione1 VARCHAR(50), Opzione2 VARCHAR(50), Opzione3 VARCHAR(50), Opzione4 VARCHAR(50), CodiceSondaggio INT)
+CREATE PROCEDURE AddDomandaChiusa (IN Testo VARCHAR(200), Punteggio INT, Foto Text, Opzione1 VARCHAR(50), Opzione2 VARCHAR(50), Opzione3 VARCHAR(50), Opzione4 VARCHAR(50), CodiceSondaggio INT)
 BEGIN
 	INSERT INTO Domanda (Testo, Punteggio, Foto)  VALUES (Testo, Punteggio, Foto);
 	SET @last_id = LAST_INSERT_ID(); 
@@ -257,15 +227,14 @@ BEGIN
 END
 $ DELIMITER ;
 
-#i caratteri massimi di risposta dovrebbero essere a discrezione di chi fa la domanda
 DELIMITER $
 CREATE PROCEDURE AddRispostaAperta (IN Testo VARCHAR(200), IdDomanda INT, EmailUtente VARCHAR(50))
 BEGIN
 	INSERT INTO RispostaAperta (Testo, IdDomanda, EmailUtente)  VALUES (Testo, IdDomanda, EmailUtente);
+    UPDATE Utente SET TotaleBonus = TotaleBonus + (SELECT Punteggio FROM Domanda WHERE(Domanda.Id = IdDomanda)) WHERE(Email=Emailutente);
 END
 $ DELIMITER ;
 
-#Insercisci risposta chiusa domanda 
 DELIMITER $
 CREATE PROCEDURE AddRispostaChiusa (IN IdDomanda INT, EmailUtente VARCHAR(50), Opzione1 INT, Opzione2 INT, Opzione3 INT, Opzione4 INT)
 BEGIN
@@ -283,10 +252,10 @@ BEGIN
     IF Opzione4 != 0 THEN
     INSERT INTO Selezione VALUES (@last_id, Opzione4);
     END IF;
+    UPDATE Utente SET TotaleBonus = TotaleBonus + (SELECT Punteggio FROM Domanda WHERE(Domanda.Id = IdDomanda)) WHERE(Email=Emailutente);
 END
 $ DELIMITER ;
 
-#Inserimento nuovo utente
 DELIMITER $
 CREATE PROCEDURE RegisterUtenteSemplice (IN Email VARCHAR(30), Pass CHAR(64), Nome VARCHAR(30), Cognome VARCHAR(30), DataDiNascita DATE, LuogoDiNascita VARCHAR(30), TotaleBonus INT, UrlFoto_Inserito TEXT)
 BEGIN
@@ -338,7 +307,6 @@ END
 $
 DELIMITER ;
 
-
 DELIMITER $
 CREATE PROCEDURE AddPremio (IN nome varchar(30), descrizione text, UrlFotoPremio TEXT, puntiMinimi int, email varchar(30))
 BEGIN
@@ -347,7 +315,6 @@ BEGIN
 END 
 $
 DELIMITER ;	
-
 
 DELIMITER $
 CREATE PROCEDURE SearchDominio (IN Argomento_Inserito VARCHAR(30))
@@ -410,16 +377,9 @@ DELIMITER;
 DELIMITER $
 CREATE PROCEDURE daNonInvitare(IN codSondaggio INT)
 BEGIN
-
     DECLARE rifiutati INT;
     DECLARE invitati INT; 
     DECLARE sottrazione INT;
-    
-    /*SET rifiutati := (SELECT count(*) FROM RispostaInvito WHERE CodiceInvito IN (SELECT CodiceNotifica FROM Invito WHERE CodiceSondaggio = codSondaggio) 
-		AND Esito = 'RIFIUTATO'); 
-        
-    SET invitati := (SELECT count(*) FROM Notifica WHERE ((Codice IN (SELECT CodiceNotifica FROM Invito)) 
-		AND (codSondaggio IN (SELECT CodiceSondaggio FROM Invito))) );*/
         
 	SET invitati := (SELECT count(*) FROM Invito WHERE (CodiceSondaggio = codSondaggio));
     
@@ -476,22 +436,6 @@ DECLARE codInvito INT;
     INSERT INTO NotificaInvito(CodiceNotifica, CodiceInvito, EmailUtente, Data, Archiviata) VALUES(codiceDaInserire, codInvito, email, current_date(), false);
 END
 $ DELIMITER;
-
-
-DELIMITER $
-CREATE PROCEDURE ReturnAccettati(IN codSondaggio INT)
-BEGIN
-	SELECT count(*) FROM RispostaInvito WHERE CodiceInvito = (SELECT CodiceNotifica FROM Invito WHERE CodiceSondaggio = codSondaggio) 
-		AND Esito = 'ACCETTATO';
-END
-$ DELIMITER ;
-
-DELIMITER $
-CREATE PROCEDURE ReturnCodiceNotifica(IN EmailUtente_Inserita varchar(30))
-BEGIN
-	SELECT CodiceNotifica FROM Notifica WHERE EmailUtente = EmailUtente_Inserita AND Archiviata = false;
-END
-$ DELIMITER ;
 
 DELIMITER $
 CREATE PROCEDURE ReturnCodiceSondaggioInvito(IN CodiceNotifica_Inserito varchar(36))
@@ -555,7 +499,7 @@ $
 DELIMITER ;
 
 DELIMITER $
-CREATE PROCEDURE AddSondaggio (IN Titolo_Inserito varchar(30),  MaxUtenti_Inserito INT, DataChiusura_Inserita DATE, Stato_Inserito varchar(30), EmailCreatore_Inserita VARCHAR(30))
+CREATE PROCEDURE AddSondaggio (IN Titolo_Inserito varchar(300),  MaxUtenti_Inserito INT, DataChiusura_Inserita DATE, Stato_Inserito varchar(30), EmailCreatore_Inserita VARCHAR(30))
 BEGIN
 	IF((SELECT count(*) FROM Azienda WHERE (IndirizzoEmail = EmailCreatore_Inserita)) > 0) THEN
 		INSERT INTO Sondaggio (Titolo, MaxUtenti, DataCreazione, DataChiusura, Stato, EmailCreatoreAzienda) 
@@ -563,6 +507,7 @@ BEGIN
 	ELSE
 		INSERT INTO Sondaggio (Titolo, MaxUtenti, DataCreazione, DataChiusura, Stato, EmailCreatorePremium) 
 			VALUES (Titolo_Inserito, MaxUtenti_Inserito, current_date(), DataChiusura_Inserita, Stato_Inserito, EmailCreatore_Inserita);
+            UPDATE UtentePremium SET NumSondaggi = NumSondaggi+1 WHERE(Emailutente=EmailCreatore_Inserit);
     END IF;
 END
 $ DELIMITER ;
@@ -625,11 +570,12 @@ BEGIN
 	DECLARE MaxUtentiSondaggio INT;
     SET MaxUtentiSondaggio := (SELECT MaxUtenti FROM Sondaggio WHERE Codice = CodiceSondaggio_Inserito);
     DROP TEMPORARY TABLE IF EXISTS UserEligible;
-    IF(SELECT count(*) FROM Utente WHERE((Email NOT IN (SELECT EmailUtente FROM NotificaInvito WHERE(Archiviata = false))) AND (SELECT count(*) FROM Interessamento WHERE((EmailUtente=Email) AND (Argomento IN (SELECT ArgomentoDominio FROM Appartenenza WHERE CodiceSondaggio = CodiceSondaggio_Inserito))))) > 0) THEN 
-		CREATE TEMPORARY TABLE UserEligible SELECT Email FROM Utente WHERE((Email NOT IN (SELECT EmailUtente FROM NotificaInvito WHERE(Archiviata = false))) AND (SELECT count(*) FROM Interessamento WHERE((EmailUtente=Email) AND (Argomento IN (SELECT ArgomentoDominio FROM Appartenenza WHERE CodiceSondaggio = CodiceSondaggio_Inserito)))));
+    IF(SELECT count(*) FROM Utente WHERE((Email NOT IN (SELECT EmailUtente FROM NotificaInvito WHERE(Archiviata = false AND CodiceInvito IN (SELECT Codice FROM Invito WHERE(CodiceSondaggio=CodiceSondaggio_Inserito))))) AND (SELECT count(*) FROM Interessamento WHERE((EmailUtente=Email) AND (Argomento IN (SELECT ArgomentoDominio FROM Appartenenza WHERE CodiceSondaggio = CodiceSondaggio_Inserito))))) > 0) THEN 
+		CREATE TEMPORARY TABLE UserEligible SELECT Email FROM Utente WHERE((Email NOT IN (SELECT EmailUtente FROM NotificaInvito WHERE(Archiviata = false AND CodiceInvito IN (SELECT Codice FROM Invito WHERE(CodiceSondaggio=CodiceSondaggio_Inserito))))) AND (SELECT count(*) FROM Interessamento WHERE((EmailUtente=Email) AND (Argomento IN (SELECT ArgomentoDominio FROM Appartenenza WHERE CodiceSondaggio = CodiceSondaggio_Inserito)))));
 	ELSE
 		CREATE TEMPORARY TABLE UserEligible SELECT Email FROM Utente LIMIT 0;
     END IF;
+    
     IF(MaxUtentiSondaggio < (SELECT count(*) FROM UserEligible)) THEN
 		SET @max := MaxUtentiSondaggio;
 	ELSE
@@ -638,11 +584,12 @@ BEGIN
     SET @i := 0;
     WHILE @i < @max DO
 		SET @CurrentUser = (SELECT Email FROM UserEligible ORDER BY RAND() LIMIT 1);
-        IF((@CurrentUser NOT IN (SELECT EmailUtente FROM NotificaInvito WHERE(Archiviata = false)))) THEN
+        IF((@CurrentUser NOT IN (SELECT EmailUtente FROM NotificaInvito WHERE(Archiviata = false AND CodiceInvito IN (SELECT Codice FROM Invito WHERE(CodiceSondaggio=CodiceSondaggio_Inserito)))))) THEN
             CALL AddInvito(CodiceSondaggio_Inserito, @CurrentUser);
             SET @i = @i + 1;
         END IF;
     END WHILE;
+    
 END
 $ DELIMITER ;
 
@@ -760,21 +707,21 @@ $ DELIMITER ;
 DELIMITER $
 CREATE PROCEDURE GetSondaggiSimpleUser(IN emailUtente VARCHAR(30))
 BEGIN
-	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio  WHERE Associazione.EmailUtente=emailUtente;
+	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione, Stato FROM Sondaggio JOIN Associazione ON Sondaggio.Codice = Associazione.CodiceSondaggio  WHERE Associazione.EmailUtente=emailUtente;
 END
 $ DELIMITER ;
 
 DELIMITER $
 CREATE PROCEDURE GetSondaggiPremium(IN emailUtente VARCHAR(30))
 BEGIN
-	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailCreatorePremium = emailUtente;
+	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione, Stato FROM Sondaggio WHERE EmailCreatorePremium = emailUtente;
 END
 $ DELIMITER ;
 
 DELIMITER $
 CREATE PROCEDURE GetSondaggiAzienda(IN emailUtente VARCHAR(30))
 BEGIN
-	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione FROM Sondaggio WHERE EmailCreatoreAzienda=emailUtente;
+	SELECT Codice, MaxUtenti, Titolo, DataChiusura, DataCreazione, Stato FROM Sondaggio WHERE EmailCreatoreAzienda=emailUtente;
 END
 $ DELIMITER ;
 
@@ -842,7 +789,6 @@ END
 $ DELIMITER ;
 
 /* Statistiche */
-
 DELIMITER $
 CREATE PROCEDURE NumberRisposte(IN IdDomanda INT)
 BEGIN
@@ -900,6 +846,24 @@ BEGIN
 END
 $ DELIMITER ;
 
+
+DELIMITER $
+CREATE PROCEDURE SearchDomanda (IN Testo_Inserito VARCHAR(30), CodiceSondaggio_Inserito INT)
+BEGIN
+	SELECT Id, Testo, Punteggio FROM Domanda WHERE((Testo LIKE CONCAT('%', Testo_Inserito,'%')) AND (Id NOT IN (SELECT IdDomanda FROM Composizione WHERE(CodiceSondaggio=CodiceSondaggio_Inserito))));
+END 
+$
+DELIMITER ;
+
+DELIMITER $
+CREATE PROCEDURE AddComposizione (IN IdDomanda_Inserito INT, CodiceSondaggio_Inserito INT)
+BEGIN
+	INSERT INTO Composizione VALUES(CodiceSondaggio_Inserito, IdDomanda_Inserito);
+END 
+$
+DELIMITER ;
+
+#TRIGGER ED EVENTI
 DELIMITER $
 CREATE TRIGGER CheckPremio AFTER UPDATE ON Utente
 FOR EACH ROW
